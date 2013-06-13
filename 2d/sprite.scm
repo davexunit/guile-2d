@@ -55,13 +55,16 @@
   (rotation sprite-rotation set-sprite-rotation!))
 
 (define (set-sprite-scale! sprite scale)
+  "Sets sprite scale-x and scale-y to the same value."
   (set-sprite-scale-x! sprite scale)
   (set-sprite-scale-y! sprite scale))
 
 (define (load-sprite filename)
+  "Loads a sprite from file with default position, scaling, and rotation values."
   (make-sprite (load-texture filename) 0 0 1 1 0))
 
 (define (draw-sprite sprite)
+  "Renders a sprite."
   (let* ((texture (sprite-texture sprite))
          (w (texture-width texture))
          (h (texture-height texture)))
