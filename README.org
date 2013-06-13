@@ -1,0 +1,22 @@
+* guile-2d
+
+  Guile-2d is a 2D game programming library for GNU Guile. It is a
+  layer above SDL and OpenGL that provides abstractions for common 2D
+  game programming requirements such as:
+
+  - Sprites
+  - Animation
+  - Tilesets
+  - Tile maps
+  - Scene graph
+  - Input handling
+  - Scripting
+
+** Dependencies
+
+   - guile-figl
+   - guile-sdl
+
+** License
+
+   GNU LGPL v3
