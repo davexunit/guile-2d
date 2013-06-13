@@ -48,21 +48,21 @@
 Currently only works with RGBA format surfaces."
   (let* ((texture-id (gl-generate-texture)))
     (with-gl-bind-texture (texture-target texture-2d) texture-id
-      (gl-tex-parameter (texture-target texture-2d)
-                        (texture-parameter-name texture-min-filter)
-                        (texture-min-filter linear))
-      (gl-tex-parameter (texture-target texture-2d)
-                        (texture-parameter-name texture-mag-filter)
-                        (texture-mag-filter linear))
-      (gl-tex-image-2d (texture-target texture-2d)
-                       0
-                       (pixel-format rgba)
-                       (SDL:surface:w surface)
-                       (SDL:surface:h surface)
-                       0
-                       (pixel-format rgba)
-                       (color-pointer-type unsigned-byte)
-                       (SDL:surface-pixels surface)))
+      (gl-texture-parameter (texture-target texture-2d)
+                            (texture-parameter-name texture-min-filter)
+                            (texture-min-filter linear))
+      (gl-texture-parameter (texture-target texture-2d)
+                            (texture-parameter-name texture-mag-filter)
+                            (texture-mag-filter linear))
+      (gl-texture-image-2d (texture-target texture-2d)
+                           0
+                           (pixel-format rgba)
+                           (SDL:surface:w surface)
+                           (SDL:surface:h surface)
+                           0
+                           (pixel-format rgba)
+                           (color-pointer-type unsigned-byte)
+                           (SDL:surface-pixels surface)))
     (make-texture texture-id
                   (SDL:surface:w surface)
                   (SDL:surface:h surface))))
