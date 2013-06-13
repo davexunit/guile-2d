@@ -1,0 +1,34 @@
+# -*- org -*-
+
+* Things To Do
+
+** TODO Sprites
+   Encapsulates an image and all of its transformations: position,
+   rotation, scale, color, etc.
+
+** TODO Sprite batches
+   Efficiently render a large number of sprites. Only change OpenGL
+   context when necessary. For example, don't change texture when
+   rendering several sprites in a row that use the same one.
+
+** TODO Tilesets
+   Break an image up into many small pieces. Useful for creating maps.
+
+   (make-tileset image tile-width tile-height padding margin)
+
+** TODO Tileset animations
+   Given a tileset, an animated sequence of frames can be created.
+
+   (make-animation tileset frame-duration frames)
+
+** TODO Tile maps
+   Create a loader for Tiled .tmx map files.
+
+** TODO Scene graph
+   A tree structure that is traversed when rendering a game scene.
+   The graph is composed of groups and nodes. Transformations are
+   accumulated as the tree is walked.
+
+** TODO Scripting
+   Provide a way for users to easily script 2D games using coroutines
+   (green threads)
