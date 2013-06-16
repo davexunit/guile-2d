@@ -24,7 +24,8 @@
 (define-module (2d window)
   #:use-module (figl gl)
   #:use-module ((sdl sdl) #:prefix SDL:)
-  #:export (open-window))
+  #:export (open-window
+            close-window))
 
 (define* (open-window width height #:optional (depth 24))
   "Creates the game window with the specified dimensions and
@@ -44,3 +45,8 @@ initializes OpenGL state."
   (gl-enable (enable-cap blend))
   (set-gl-blend-function (blending-factor-src src-alpha)
                          (blending-factor-dest one-minus-src-alpha)))
+
+(define (close-window)
+  "Closes the game window and cleans up. This procedure is typically
+called just before calling (quit)."
+  (SDL:quit))
