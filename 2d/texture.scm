@@ -71,12 +71,13 @@ Currently only works with RGBA format surfaces."
   "Loads a texture from a file."
   (surface->texture (SDL:load-image filename)))
 
-(define* (texture-quad texture x y w h)
+(define* (texture-quad texture x y w h #:optional (color '(1 1 1)))
   "Renders a textured quad."
   (let ((x2 (+ x w))
         (y2 (+ y h)))
     (with-gl-bind-texture (texture-target texture-2d) (texture-id texture)
       (gl-begin (begin-mode quads)
+        (apply gl-color color)
         (gl-texture-coordinates 0 0)
         (gl-vertex x y)
         (gl-texture-coordinates 1 0)
