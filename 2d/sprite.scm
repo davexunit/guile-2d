@@ -55,7 +55,7 @@
   (rotation sprite-rotation set-sprite-rotation!)
   (color sprite-color set-sprite-color!))
 
-(define* (make-sprite texture #:optional (x 0) (y 0) (scale-x 0) (scale-y 0)
+(define* (make-sprite texture #:optional (x 0) (y 0) (scale-x 1) (scale-y 1)
                       (rotation 0) (color '(1 1 1)))
   (%make-sprite texture x y scale-x scale-y rotation color))
 
