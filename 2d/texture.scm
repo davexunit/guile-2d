@@ -43,10 +43,19 @@
   (width texture-width)
   (height texture-height))
 
+(define (surface-pixel-format surface)
+  "Returns the OpenGL pixel format for a surface. RGB and RGBA formats
+are supported."
+  (case (SDL:surface:depth surface)
+    ((24) (pixel-format rgb))
+    ((32) (pixel-format rgba))
+    (else (throw 'unsupported-pixel-format))))
+
 (define (surface->texture surface)
   "Translates an SDL surface into an OpenGL texture.
 Currently only works with RGBA format surfaces."
-  (let* ((texture-id (gl-generate-texture)))
+  (let ((texture-id (gl-generate-texture))
+        (pixel-format (surface-pixel-format surface)))
     (with-gl-bind-texture (texture-target texture-2d) texture-id
       (gl-texture-parameter (texture-target texture-2d)
                             (texture-parameter-name texture-min-filter)
@@ -56,11 +65,11 @@ Currently only works with RGBA format surfaces."
                             (texture-mag-filter linear))
       (gl-texture-image-2d (texture-target texture-2d)
                            0
-                           (pixel-format rgba)
+                           pixel-format
                            (SDL:surface:w surface)
                            (SDL:surface:h surface)
                            0
-                           (pixel-format rgba)
+                           pixel-format
                            (color-pointer-type unsigned-byte)
                            (SDL:surface-pixels surface)))
     (make-texture texture-id
