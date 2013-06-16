@@ -89,7 +89,7 @@
   (SDL:gl-swap-buffers))
 
 (define accumulate-fps
-  (let ((last-time (SDL:get-ticks))
+  (let ((last-time 0)
         (fps 0))
     (lambda ()
       "Calculates frames per second."
@@ -101,17 +101,17 @@
           (set! fps 0))))))
 
 (define update-and-render
-  (let ((last-update (SDL:get-ticks))
+  (let ((last-update 0)
         (update-interval (/ 1000 target-fps)))
     (lambda ()
       "Calls update and draw callback when enough time has passed since
 the last tick."
       (let ((time (SDL:get-ticks)))
         (when (>= time (+ last-update update-interval))
-            (set! last-update time)
-            (update-callback)
-            (accumulate-fps)
-            (render))))))
+          (set! last-update time)
+          (update-callback)
+          (accumulate-fps)
+          (render))))))
 
 ;;;
 ;;; Game Loop
