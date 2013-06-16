@@ -45,14 +45,15 @@
 ;; The <sprite> object represents a texture with a given position, scale, and
 ;; rotation.
 (define-record-type <sprite>
-  (make-sprite texture x y scale-x scale-y rotation)
+  (make-sprite texture x y scale-x scale-y rotation color)
   sprite?
   (texture sprite-texture)
   (x sprite-x set-sprite-x!)
   (y sprite-y set-sprite-y!)
   (scale-x sprite-scale-x set-sprite-scale-x!)
   (scale-y sprite-scale-y set-sprite-scale-y!)
-  (rotation sprite-rotation set-sprite-rotation!))
+  (rotation sprite-rotation set-sprite-rotation!)
+  (color sprite-color set-sprite-color!))
 
 (define (set-sprite-scale! sprite scale)
   "Sets sprite scale-x and scale-y to the same value."
@@ -61,15 +62,19 @@
 
 (define (load-sprite filename)
   "Loads a sprite from file with default position, scaling, and rotation values."
-  (make-sprite (load-texture filename) 0 0 1 1 0))
+  (make-sprite (load-texture filename) 0 0 1 1 0 '(1 1 1)))
 
 (define (draw-sprite sprite)
   "Renders a sprite."
   (let* ((texture (sprite-texture sprite))
-         (w (texture-width texture))
-         (h (texture-height texture)))
+         (width (texture-width texture))
+         (height (texture-height texture)))
     (with-gl-push-matrix
       (gl-translate (sprite-x sprite) (sprite-y sprite) 0)
       (gl-rotate (sprite-rotation sprite) 0 0 1)
       (gl-scale (sprite-scale-x sprite) (sprite-scale-y sprite) 0)
-      (texture-quad texture (- (/ w 2)) (- (/ h 2)) w h))))
+      ;; Render a textured quad center on the sprite position.
+      (texture-quad texture
+                    (- (/ width 2)) (- (/ height 2))
+                    width height
+                    (sprite-color sprite)))))
