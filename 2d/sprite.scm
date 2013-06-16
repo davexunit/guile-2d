@@ -45,7 +45,7 @@
 ;; The <sprite> object represents a texture with a given position, scale, and
 ;; rotation.
 (define-record-type <sprite>
-  (make-sprite texture x y scale-x scale-y rotation color)
+  (%make-sprite texture x y scale-x scale-y rotation color)
   sprite?
   (texture sprite-texture)
   (x sprite-x set-sprite-x!)
@@ -55,6 +55,10 @@
   (rotation sprite-rotation set-sprite-rotation!)
   (color sprite-color set-sprite-color!))
 
+(define* (make-sprite texture #:optional (x 0) (y 0) (scale-x 0) (scale-y 0)
+                      (rotation 0) (color '(1 1 1)))
+  (%make-sprite texture x y scale-x scale-y rotation color))
+
 (define (set-sprite-scale! sprite scale)
   "Sets sprite scale-x and scale-y to the same value."
   (set-sprite-scale-x! sprite scale)
@@ -62,7 +66,7 @@
 
 (define (load-sprite filename)
   "Loads a sprite from file with default position, scaling, and rotation values."
-  (make-sprite (load-texture filename) 0 0 1 1 0 '(1 1 1)))
+  (make-sprite (load-texture filename)))
 
 (define (draw-sprite sprite)
   "Renders a sprite."
