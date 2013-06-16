@@ -42,8 +42,8 @@
             load-sprite
             draw-sprite))
 
-;; The <sprite> object represents a texture with a given position, scale, and
-;; rotation.
+;; The <sprite> object represents a texture with a given position, scale,
+;; rotation, and color.
 (define-record-type <sprite>
   (%make-sprite texture x y scale-x scale-y rotation color)
   sprite?
