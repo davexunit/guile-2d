@@ -32,3 +32,20 @@
 ** TODO Scripting
    Provide a way for users to easily script 2D games using coroutines
    (green threads)
+
+** TODO Vectors and matrices
+   Vectors and matrices are needed constantly for games. Provide an
+   easy-to-use module that provides procedures for common
+   vector/matrix math operations
+
+** TODO Fonts
+   Use Freetype to provide font rendering procedures.
+
+** TODO A* pathfinding
+   A* is a commonly used pathfinding algorithm for games. Pathfinding
+   is such a common task that it would be nice to provide users with
+   a generic implementation.
+
+** TODO Bounding box collision detection
+   Most games need simple bounding box collision detection. Provide an
+   efficient implementation that uses quad trees.
