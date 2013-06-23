@@ -55,18 +55,20 @@
   (rotation sprite-rotation set-sprite-rotation!)
   (color sprite-color set-sprite-color!))
 
-(define* (make-sprite texture #:optional (x 0) (y 0) (scale-x 1) (scale-y 1)
-                      (rotation 0) (color '(1 1 1)))
-  (%make-sprite texture x y scale-x scale-y rotation color))
-
 (define (set-sprite-scale! sprite scale)
   "Sets sprite scale-x and scale-y to the same value."
   (set-sprite-scale-x! sprite scale)
   (set-sprite-scale-y! sprite scale))
 
-(define (load-sprite filename)
-  "Loads a sprite from file with default position, scaling, and rotation values."
-  (make-sprite (load-texture filename)))
+(define* (make-sprite texture #:optional (x 0) (y 0) (scale-x 1) (scale-y 1)
+                      (rotation 0) (color '(1 1 1)))
+  "Makes a new sprite object."
+  (%make-sprite texture x y scale-x scale-y rotation color))
+
+(define* (load-sprite filename #:optional (x 0) (y 0) (scale-x 1) (scale-y 1)
+                      (rotation 0) (color '(1 1 1)))
+  "Loads a sprite from file."
+  (make-sprite (load-texture filename) x y scale-x scale-y rotation color))
 
 (define (draw-sprite sprite)
   "Renders a sprite."
