@@ -42,24 +42,34 @@
 ;; The <sprite> object represents a texture with a given position, scale,
 ;; rotation, and color.
 (define-record-type <sprite>
-  (%make-sprite texture position scale rotation color)
+  (%make-sprite texture position scale rotation color anchor)
   sprite?
   (texture sprite-texture)
   (position sprite-position set-sprite-position!)
   (scale sprite-scale set-sprite-scale!)
   (rotation sprite-rotation set-sprite-rotation!)
-  (color sprite-color set-sprite-color!))
+  (color sprite-color set-sprite-color!)
+  (anchor sprite-anchor set-sprite-anchor))
 
-(define* (make-sprite texture #:optional #:key (position #(0 0))
-                      (scale #(1 1)) (rotation 0) (color '(1 1 1)))
+(define (sprite-anchor-vector sprite)
+  (let ((anchor (sprite-anchor sprite)))
+    (cond
+     ((eq? anchor 'center)
+      (let ((texture (sprite-texture sprite)))
+        (vector (/ (texture-width texture) 2)
+                (/ (texture-height texture) 2))))
+     (else anchor))))
+
+(define* (make-sprite texture #:optional #:key (position #(0 0)) (scale #(1 1))
+                      (rotation 0) (color '(1 1 1)) (anchor 'center))
   "Makes a new sprite object."
-  (%make-sprite texture position scale rotation color))
+  (%make-sprite texture position scale rotation color anchor))
 
-(define* (load-sprite filename #:optional #:key (position #(0 0))
-                      (scale #(1 1)) (rotation 0) (color '(1 1 1)))
+(define* (load-sprite filename #:optional #:key (position #(0 0)) (scale #(1 1))
+                      (rotation 0) (color '(1 1 1)) (anchor 'center))
   "Loads a sprite from file."
   (make-sprite (load-texture filename) #:position position #:scale scale
-               #:rotation rotation #:color color))
+               #:rotation rotation #:color color #:anchor anchor))
 
 (define (draw-sprite sprite)
   "Renders a sprite."
@@ -67,13 +77,14 @@
          (width (texture-width texture))
          (height (texture-height texture))
          (pos (sprite-position sprite))
-         (scale (sprite-scale sprite)))
+         (scale (sprite-scale sprite))
+         (anchor (sprite-anchor-vector sprite)))
     (with-gl-push-matrix
       (gl-translate (vx pos) (vy pos) 0)
       (gl-rotate (sprite-rotation sprite) 0 0 1)
       (gl-scale (vx scale) (vy scale) 0)
       ;; Render a textured quad center on the sprite position.
       (texture-quad texture
-                    (- (/ width 2)) (- (/ height 2))
+                    (- (vx anchor)) (- (vy anchor))
                     width height
                     (sprite-color sprite)))))
