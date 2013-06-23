@@ -63,7 +63,7 @@
 
 (define (normalize vector)
   "Normalizes a vector."
-  (let ((m (magnitude vector)))
+  (let ((m (mag vector)))
     (vector-map (lambda (e) (/ e m)) vector)))
 
 (define (vector-reduce proc default vector)
