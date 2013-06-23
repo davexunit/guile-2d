@@ -23,12 +23,27 @@
 
 (define-module (2d vector)
   #:use-module (rnrs base)
-  #:export (v+
+  #:export (vx
+            vy
+            vz
+            v+
             v*
             scale
             mag
             normalize
             vector-reduce))
+
+(define (vx vector)
+  "Returns the first element of a vector."
+  (vector-ref vector 0))
+
+(define (vy vector)
+  "Returns the second element of a vector."
+  (vector-ref vector 1))
+
+(define (vz vector)
+  "Returns the third element of a vector."
+  (vector-ref vector 2))
 
 (define (v+ . vectors)
   "Adds vectors."
