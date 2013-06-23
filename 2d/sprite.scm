@@ -25,13 +25,12 @@
   #:use-module (srfi srfi-9)
   #:use-module (figl gl)
   #:use-module (2d texture)
+  #:use-module (2d vector)
   #:export (make-sprite
             sprite?
             sprite-texture
-            sprite-x
-            set-sprite-x!
-            sprite-y
-            set-sprite-y!
+            sprite-position
+            set-sprite-position!
             sprite-scale-x
             set-sprite-scale-x!
             sprite-scale-y
@@ -45,11 +44,10 @@
 ;; The <sprite> object represents a texture with a given position, scale,
 ;; rotation, and color.
 (define-record-type <sprite>
-  (%make-sprite texture x y scale-x scale-y rotation color)
+  (%make-sprite texture position scale-x scale-y rotation color)
   sprite?
   (texture sprite-texture)
-  (x sprite-x set-sprite-x!)
-  (y sprite-y set-sprite-y!)
+  (position sprite-position set-sprite-position!)
   (scale-x sprite-scale-x set-sprite-scale-x!)
   (scale-y sprite-scale-y set-sprite-scale-y!)
   (rotation sprite-rotation set-sprite-rotation!)
@@ -60,15 +58,15 @@
   (set-sprite-scale-x! sprite scale)
   (set-sprite-scale-y! sprite scale))
 
-(define* (make-sprite texture #:optional #:key (x 0) (y 0)
+(define* (make-sprite texture #:optional #:key (position #(0 0))
                       (scale-x 1) (scale-y 1) (rotation 0) (color '(1 1 1)))
   "Makes a new sprite object."
-  (%make-sprite texture x y scale-x scale-y rotation color))
+  (%make-sprite texture position scale-x scale-y rotation color))
 
-(define* (load-sprite filename #:optional #:key (x 0) (y 0)
+(define* (load-sprite filename #:optional #:key (position #(0 0))
                       (scale-x 1) (scale-y 1) (rotation 0) (color '(1 1 1)))
   "Loads a sprite from file."
-  (make-sprite (load-texture filename) #:x x #:y y
+  (make-sprite (load-texture filename) #:position position
                #:scale-x scale-x #:scale-y scale-y
                #:rotation rotation #:color color))
 
@@ -76,9 +74,10 @@
   "Renders a sprite."
   (let* ((texture (sprite-texture sprite))
          (width (texture-width texture))
-         (height (texture-height texture)))
+         (height (texture-height texture))
+         (pos (sprite-position sprite)))
     (with-gl-push-matrix
-      (gl-translate (sprite-x sprite) (sprite-y sprite) 0)
+      (gl-translate (vx pos) (vy pos) 0)
       (gl-rotate (sprite-rotation sprite) 0 0 1)
       (gl-scale (sprite-scale-x sprite) (sprite-scale-y sprite) 0)
       ;; Render a textured quad center on the sprite position.
