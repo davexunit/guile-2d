@@ -2,6 +2,14 @@
 
 * Things To Do
 
+** TODO Game loop
+   Provide a game loop structure that responds to input events,
+   updates the game state, renders the scene. Use a fixed update
+   timestep and cap the maximum FPS.
+
+** TODO Input
+   Provide hooks to respond to keyboard, mouse, and joystick events.
+
 ** TODO Sprites
    Encapsulates an image and all of its transformations: position,
    rotation, scale, color, etc.
