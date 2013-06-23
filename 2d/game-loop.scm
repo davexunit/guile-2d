@@ -31,6 +31,7 @@
             run-game-loop))
 
 (define target-fps 60)
+(define frame-interval (/ 1000 target-fps))
 
 ;;;
 ;;; Callbacks
@@ -100,16 +101,28 @@
           (set! last-time time)
           (set! fps 0))))))
 
+(define (update accumulator)
+  "Call the update callback. The update callback will be called as
+many times as frame-interval can divide accumulator. The return value
+is the unused accumulator time."
+  (if (>= accumulator frame-interval)
+      (begin
+        (update-callback)
+        (update (- accumulator frame-interval)))
+      accumulator))
+
 (define update-and-render
-  (let ((last-update 0)
-        (update-interval (/ 1000 target-fps)))
+  (let ((remainder 0)
+        (last-time 0))
     (lambda ()
-      "Calls update and draw callback when enough time has passed since
-the last tick."
-      (let ((time (SDL:get-ticks)))
-        (when (>= time (+ last-update update-interval))
-          (set! last-update time)
-          (update-callback)
+      "Calls update and draw callback when enough time has passed
+since the last tick."
+      (let* ((time (SDL:get-ticks))
+             (elapsed (- time last-time))
+             (accumulator (+ remainder elapsed)))
+        (when (>= accumulator frame-interval)
+          (set! last-time time)
+          (set! remainder (update accumulator))
           (accumulate-fps)
           (render))))))
 
