@@ -43,6 +43,23 @@
   (width texture-width)
   (height texture-height))
 
+;; Use a guardian and an after GC hook that ensures that OpenGL
+;; textures are deleted when texture objects are GC'd.
+(define texture-guardian (make-guardian))
+
+(define (reap-textures)
+  (let loop ((texture (texture-guardian)))
+    (when texture
+      ;; When attempting to reap structures upon guile exit, the
+      ;; dynamic pointer to gl-delete-textures becomes invalid. So, we
+      ;; ignore the error and move on.
+      (catch 'misc-error
+        (lambda () (gl-delete-textures (list (texture-id texture))))
+        (lambda (key . args) #f))
+      (loop (texture-guardian)))))
+
+(add-hook! after-gc-hook reap-textures)
+
 (define (surface-pixel-format surface)
   "Returns the OpenGL pixel format for a surface. RGB and RGBA formats
 are supported."
@@ -72,9 +89,11 @@ Currently only works with RGBA format surfaces."
                            pixel-format
                            (color-pointer-type unsigned-byte)
                            (SDL:surface-pixels surface)))
-    (make-texture texture-id
-                  (SDL:surface:w surface)
-                  (SDL:surface:h surface))))
+    (let ((texture (make-texture texture-id
+                                 (SDL:surface:w surface)
+                                 (SDL:surface:h surface))))
+      (texture-guardian texture)
+      texture)))
 
 (define (load-texture filename)
   "Loads a texture from a file."
