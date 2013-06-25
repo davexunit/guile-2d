@@ -22,8 +22,13 @@
 ;;; Code:
 
 (define-module (2d input)
+  #:use-module (srfi srfi-1)
   #:use-module (figl runtime) ;; For the define-enumeration macro
-  #:export (keycode))
+  #:export (keycode
+            any-keycode?
+            keymod
+            all-keymods?
+            mouse-button))
 
 ;;;
 ;;; Keyboard
@@ -263,3 +268,34 @@
   (power 320)
   (euro 321)
   (undo 322))
+
+(define (any-keycode? keycode . keycodes)
+  "Returns true if keycode equals any of the keycodes provided and
+returns false otherwise."
+  (any (lambda (key) (= keycode key)) keycodes))
+
+;; Modifier keys
+(define-enumeration
+  keymod
+  (none 0)
+  (shift 3)
+  (ctrl 192)
+  (alt 768)
+  (meta 3072)
+  (num 4096 )
+  (caps 8192))
+
+(define (all-keymods? mod . expected)
+  "Returns true if all expected modifier bits are set and returns
+false otherwise."
+  (not (zero? (apply logand mod expected))))
+
+;;;
+;;; Mouse
+;;;
+
+(define-enumeration
+  mouse-button
+  (left 1)
+  (middle 2)
+  (right 4))
