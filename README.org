@@ -20,7 +20,7 @@
 ** Example
    Here is the simplest Guile-2d application (so far).
 
-   ```scheme
+   #+BEGIN_SRC scheme
     (use-modules ((sdl sdl) #:prefix SDL:)
                  (figl gl)
                  (2d sprite)
@@ -59,7 +59,7 @@
     ;; Start the game loop.
     ;; The render callback will be called through this procedure.
     (run-game-loop)
-    ```
+   #+END_SRC
 
 ** REPL Driven Development
    The read-eval-print-loop present in Guile allows you to develop
