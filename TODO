@@ -9,8 +9,10 @@
 
 ** TODO Input
    Provide hooks to respond to keyboard, mouse, and joystick events.
+   Wrap SDL keycode, mouse button, etc. constants in our own
+   enumeration.
 
-** TODO Sprites
+** DONE Sprites
    Encapsulates an image and all of its transformations: position,
    rotation, scale, color, etc.
 
@@ -57,3 +59,6 @@
 ** TODO Bounding box collision detection
    Most games need simple bounding box collision detection. Provide an
    efficient implementation that uses quad trees.
+
+** TODO Particle systems
+   Provide a highly configurible particle simulation system.
