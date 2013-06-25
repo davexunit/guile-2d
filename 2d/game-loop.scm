@@ -73,9 +73,12 @@
   "Calls the relevant callback for the event."
   (case (SDL:event:type e)
     ((SDL_KEYDOWN)
-     (key-down-callback (SDL:event:key:keysym:sym e)))
+     (key-down-callback (event-keycode e)))
     ((SDL_KEYUP)
-     (key-up-callback (SDL:event:key:keysym:sym e)))))
+     (key-up-callback (event-keycode e)))))
+
+(define (event-keycode e)
+  (SDL:enum->number SDL:event-keys (SDL:event:key:keysym:sym e)))
 
 ;;;
 ;;; Update and Render
