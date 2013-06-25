@@ -71,8 +71,8 @@
 
 ** Dependencies
 
-   - guile-figl
-   - guile-sdl
+   - [[https://gitorious.org/guile-figl/guile-figl][guile-figl]]
+   - [[https://www.gnu.org/software/guile-sdl/index.html][guile-sdl]]
    - SDL 1.2
 
 ** License
