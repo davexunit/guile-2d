@@ -2,7 +2,7 @@
 
 * Things To Do
 
-** TODO Game loop
+** DONE Game loop
    Provide a game loop structure that responds to input events,
    updates the game state, renders the scene. Use a fixed update
    timestep and cap the maximum FPS.
