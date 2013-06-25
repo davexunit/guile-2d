@@ -4,17 +4,17 @@
              (2d game-loop)
              (2d window)
              (2d input)
+             (2d helpers)
              (ice-9 format))
 
 (define window-width 800)
 (define window-height 600)
 (define sprite #f)
 
-(define (key-down key)
-  (cond ((or (= key (keycode escape))
-             (= key (keycode q)))
-     (close-window)
-     (quit))))
+(define (key-down key mod unicode)
+  (cond ((any-equal? key (keycode escape) (keycode q))
+         (close-window)
+         (quit))))
 
 ;; Draw our sprite
 (define (render)
@@ -22,7 +22,7 @@
 
 ;; Register callbacks.
 (set-render-callback (lambda () (render)))
-(set-key-down-callback (lambda (key) (key-down key)))
+(set-key-down-callback (lambda (key mod unicode) (key-down key mod unicode)))
 
 ;; Open the window.
 (open-window window-width window-height)
