@@ -39,8 +39,8 @@
 
 (define render-callback (lambda () #t))
 (define update-callback (lambda () #t))
-(define key-up-callback (lambda (key) #t))
-(define key-down-callback (lambda (key) #t))
+(define key-up-callback (lambda (key mod unicode) #t))
+(define key-down-callback (lambda (key mod unicode) #t))
 
 (define (set-render-callback callback)
   "Sets the render callback procedure."
@@ -73,12 +73,21 @@
   "Calls the relevant callback for the event."
   (case (SDL:event:type e)
     ((SDL_KEYDOWN)
-     (key-down-callback (event-keycode e)))
+     (key-down-callback (event-keycode e)
+                        (event-keymods e)
+                        (SDL:event:key:keysym:unicode e)))
     ((SDL_KEYUP)
-     (key-up-callback (event-keycode e)))))
+     (key-up-callback (event-keycode e)
+                      (event-keymods e)
+                      (SDL:event:key:keysym:unicode e)))))
 
 (define (event-keycode e)
+  "Returns an integer keycode from an SDL event."
   (SDL:enum->number SDL:event-keys (SDL:event:key:keysym:sym e)))
+
+(define (event-keymods e)
+  "Returns an integer bitmask of keymods from an SDL event"
+  (SDL:flags->number (SDL:flagstash:event-mod) (SDL:event:key:keysym:mod e)))
 
 ;;;
 ;;; Update and Render
