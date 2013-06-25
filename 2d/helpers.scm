@@ -29,7 +29,7 @@
 (define (any-equal? elem . args)
   "Returns true if elem equals any of the arguments and returns false
 otherwise."
-  (any (lambda (e) (= elem e)) args))
+  (any (lambda (e) (equal? elem e)) args))
 
 (define (logand? . args)
   "Returns true if the result of a bitwise AND of the integer
