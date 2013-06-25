@@ -30,8 +30,10 @@
 (define* (open-window width height #:optional (depth 24))
   "Creates the game window with the specified dimensions and
 initializes OpenGL state."
-  ;; Open SDL window in OpenGL mode.
   (SDL:init '(SDL_INIT_VIDEO))
+  ;; Enable unicode key events
+  (SDL:enable-unicode #t)
+  ;; Open SDL window in OpenGL mode.
   (SDL:set-video-mode width height 24 '(SDL_OPENGL))
   ;; Initialize OpenGL orthographic view
   (gl-viewport 0 0 width height)
