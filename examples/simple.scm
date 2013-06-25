@@ -2,18 +2,17 @@
              (figl gl)
              (2d sprite)
              (2d game-loop)
-             (2d window))
+             (2d window)
+             (2d input)
+             (ice-9 format))
 
 (define window-width 800)
 (define window-height 600)
 (define sprite #f)
 
 (define (key-down key)
-  (display key) (newline)
-  (case key
-    ;; Quit program when ESCAPE or Q is pressed.
-    ;; For now we have to use the SDL keycodes, but not for long!
-    ((SDLK_ESCAPE SDLK_q)
+  (cond ((or (= key (keycode escape))
+             (= key (keycode q)))
      (close-window)
      (quit))))
 

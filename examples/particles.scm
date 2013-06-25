@@ -9,7 +9,8 @@
              (2d sprite)
              (2d game-loop)
              (2d window)
-             (2d vector))
+             (2d vector)
+             (2d input))
 
 (set! *random-state* (random-state-from-platform))
 
@@ -63,7 +64,7 @@
 
 (define stars (load-sprite "stars.png" #:anchor #(0 0)))
 (define particle-image (load-texture "bullet.png"))
-(define num-particles 300)
+(define num-particles 1800)
 (define particles
   (list-tabulate num-particles
                  (lambda (n)
@@ -78,10 +79,10 @@
 (set-key-down-callback (lambda (key) (key-down key)))
 
 (define (key-down key)
-  (case key
-    ((SDLK_ESCAPE SDLK_q)
-     (close-window)
-     (quit))))
+  (cond ((or (= key (keycode escape))
+             (= key (keycode q)))
+         (close-window)
+         (quit))))
 
 (define (render)
   (draw-sprite stars)
