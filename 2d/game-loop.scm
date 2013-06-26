@@ -176,6 +176,6 @@ since the last tick."
 
 (define (run-game-loop)
   "Runs event handling, update, and render loop."
-  (while #t
-    (handle-events)
-    (update-and-render)))
+  (handle-events)
+  (update-and-render)
+  (run-game-loop))
