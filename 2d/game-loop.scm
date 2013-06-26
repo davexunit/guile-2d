@@ -28,6 +28,9 @@
             set-update-callback
             set-key-up-callback
             set-key-down-callback
+            set-mouse-motion-callback
+            set-mouse-button-down-callback
+            set-mouse-button-up-callback
             run-game-loop))
 
 (define target-fps 60)
@@ -41,6 +44,9 @@
 (define update-callback (lambda () #t))
 (define key-up-callback (lambda (key mod unicode) #t))
 (define key-down-callback (lambda (key mod unicode) #t))
+(define mouse-motion-callback (lambda (buttons x y xrel yrel) #t))
+(define mouse-button-down-callback (lambda (button x y) #t))
+(define mouse-button-up-callback (lambda (button x y) #t))
 
 (define (set-render-callback callback)
   "Sets the render callback procedure."
@@ -57,6 +63,18 @@
 (define (set-key-down-callback callback)
   "Sets the key down callback procedure."
   (set! key-down-callback callback))
+
+(define (set-mouse-motion-callback callback)
+  "Sets the mouse motion callback procedure."
+  (set! mouse-motion-callback callback))
+
+(define (set-mouse-button-down-callback callback)
+  "Sets the mouse button down callback procedure."
+  (set! mouse-button-down-callback callback))
+
+(define (set-mouse-button-up-callback callback)
+  "Sets the mouse button up callback procedure."
+  (set! mouse-button-up-callback callback))
 
 ;;;
 ;;; Event Handling
@@ -79,7 +97,21 @@
     ((SDL_KEYUP)
      (key-up-callback (event-keycode e)
                       (event-keymods e)
-                      (SDL:event:key:keysym:unicode e)))))
+                      (SDL:event:key:keysym:unicode e)))
+    ((SDL_MOUSEMOTION)
+     (mouse-motion-callback (SDL:event:motion:state e)
+                            (SDL:event:motion:x e)
+                            (SDL:event:motion:y e)
+                            (SDL:event:motion:xrel e)
+                            (SDL:event:motion:yrel e)))
+    ((SDL_MOUSEBUTTONDOWN)
+     (mouse-button-down-callback (SDL:event:button:button e)
+                                 (SDL:event:button:x e)
+                                 (SDL:event:button:y e)))
+    ((SDL_MOUSEBUTTONUP)
+     (mouse-button-up-callback (SDL:event:button:button e)
+                               (SDL:event:button:x e)
+                               (SDL:event:button:y e)))))
 
 (define (event-keycode e)
   "Returns an integer keycode from an SDL event."
