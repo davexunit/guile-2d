@@ -134,15 +134,15 @@
   (SDL:gl-swap-buffers))
 
 (define accumulate-fps
-  (let ((last-time 0)
+  (let ((last-time (delay (SDL:get-ticks)))
         (fps 0))
     (lambda ()
       "Calculates frames per second."
       (let ((time (SDL:get-ticks)))
         (set! fps (1+ fps))
-        (when (>= time (+ last-time 1000))
+        (when (>= time (+ (force last-time) 1000))
           (pk 'FPS fps)
-          (set! last-time time)
+          (set! last-time (delay time))
           (set! fps 0))))))
 
 (define (update accumulator)
@@ -157,15 +157,15 @@ is the unused accumulator time."
 
 (define update-and-render
   (let ((remainder 0)
-        (last-time 0))
+        (last-time (delay (SDL:get-ticks))))
     (lambda ()
       "Calls update and draw callback when enough time has passed
 since the last tick."
       (let* ((time (SDL:get-ticks))
-             (elapsed (- time last-time))
+             (elapsed (- time (force last-time)))
              (accumulator (+ remainder elapsed)))
         (when (>= accumulator frame-interval)
-          (set! last-time time)
+          (set! last-time (delay time))
           (set! remainder (update accumulator))
           (accumulate-fps)
           (render))))))
