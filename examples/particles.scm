@@ -10,7 +10,8 @@
              (2d game-loop)
              (2d window)
              (2d vector)
-             (2d input))
+             (2d input)
+             (2d helpers))
 
 (set! *random-state* (random-state-from-platform))
 
@@ -76,11 +77,10 @@
 
 (set-render-callback (lambda () (render)))
 (set-update-callback (lambda () (update)))
-(set-key-down-callback (lambda (key) (key-down key)))
+(set-key-down-callback (lambda (key mod unicode) (key-down key mod unicode)))
 
-(define (key-down key)
-  (cond ((or (= key (keycode escape))
-             (= key (keycode q)))
+(define (key-down key mod unicode)
+  (cond ((any-equal? key (keycode escape) (keycode q))
          (close-window)
          (quit))))
 
