@@ -43,7 +43,17 @@
             sprite-vertices
             set-sprite-vertices!
             load-sprite
-            draw-sprite))
+            draw-sprite
+            make-sprite-batch
+            sprite-batch?
+            sprite-batch-max-size
+            sprite-batch-size
+            set-sprite-batch-size!
+            sprite-batch-texture
+            set-sprite-batch-texture!
+            sprite-batch-vertices
+            sprite-batch-draw
+            with-sprite-batch))
 
 ;; Used to build OpenGL vertex array for a sprite.
 (define-packed-struct sprite-vertex
@@ -153,3 +163,108 @@
       (gl-disable-client-state (enable-cap texture-coord-array))
       (gl-disable-client-state (enable-cap color-array))
       (gl-disable-client-state (enable-cap vertex-array)))))
+
+;;;
+;;; Sprite Batch
+;;;
+
+;; Sprite batches allow for efficient texture rendering. Sprites drawn
+;; with the same texture are drawn with the same draw call, rather
+;; than binding the texture for each individual draw call.
+
+(define-record-type <sprite-batch>
+  (%make-sprite-batch max-size size texture vertices)
+  sprite-batch?
+  (max-size sprite-batch-max-size)
+  (size sprite-batch-size set-sprite-batch-size!)
+  (texture sprite-batch-texture set-sprite-batch-texture!)
+  (vertices sprite-batch-vertices))
+
+(define* (make-sprite-batch #:optional (max-size 1000))
+  "Creates a new sprite batch. The default max-size is 1000."
+  (%make-sprite-batch max-size 0 #f (make-packed-array sprite-vertex (* 4 max-size))))
+
+;; TODO add transformation logic for scaling and rotating.
+;; TODO add support for colors
+;; TODO add support for different blending modes.
+(define (sprite-batch-draw batch texture x y center-x center-y
+                           width height scale-x scale-y rotation)
+  ;; Render the batch when it's full or the texture changes.
+  (cond ((= (sprite-batch-size batch) (sprite-batch-max-size batch))
+         (sprite-batch-render batch))
+        ((not (equal? texture (sprite-batch-texture batch)))
+         (sprite-batch-switch-texture batch texture)))
+  ;; Add 4 new vertices.
+  (let ((base (* 4 (sprite-batch-size batch)))
+        (vertices (sprite-batch-vertices batch))
+        (x (- x center-x))
+        (y (- y center-y))
+        (x2 (+ x width))
+        (y2 (+ y height)))
+    (pack vertices base sprite-vertex
+          x y
+          1 1 1 1
+          0 0)
+    (pack vertices (+ base 1) sprite-vertex
+          x2 y
+          1 1 1 1
+          1 0)
+    (pack vertices (+ base 2) sprite-vertex
+          x2 y2
+          1 1 1 1
+          1 1)
+    (pack vertices (+ base 3) sprite-vertex
+          x y2
+          1 1 1 1
+          0 1))
+  ;; Increment batch size
+  (set-sprite-batch-size! batch (1+ (sprite-batch-size batch))))
+
+(define (sprite-batch-switch-texture batch texture)
+  "Change the currently bound texture. This requires flushing the
+batched texture vertices first."
+  (sprite-batch-render batch)
+  (set-sprite-batch-texture! batch texture))
+
+(define (sprite-batch-render batch)
+  "Renders and flushes the currently batched texture vertices."
+  (unless (= (sprite-batch-size batch) 0)
+    ;; Draw vertex array.
+    (gl-enable-client-state (enable-cap vertex-array))
+    (gl-enable-client-state (enable-cap color-array))
+    (gl-enable-client-state (enable-cap texture-coord-array))
+    (let* ((texture (sprite-batch-texture batch))
+           (size (sprite-batch-size batch))
+           (struct-size (packed-struct-size sprite-vertex))
+           (vertices (sprite-batch-vertices batch))
+           (vertex-count (* 4 size)))
+      (with-gl-bind-texture (texture-target texture-2d) (texture-id texture)
+        (set-gl-vertex-array (vertex-pointer-type float)
+                             vertices
+                             2
+                             #:stride struct-size
+                             #:offset (packed-struct-offset sprite-vertex x))
+        (set-gl-color-array (color-pointer-type float)
+                            vertices
+                            4
+                            #:stride struct-size
+                            #:offset (packed-struct-offset sprite-vertex r))
+        (set-gl-texture-coordinates-array (tex-coord-pointer-type float)
+                                          vertices
+                                          #:stride struct-size
+                                          #:offset (packed-struct-offset sprite-vertex s))
+        (gl-draw-arrays (begin-mode quads) 0 size)))
+    (gl-disable-client-state (enable-cap texture-coord-array))
+    (gl-disable-client-state (enable-cap color-array))
+    (gl-disable-client-state (enable-cap vertex-array))
+    ;; Reset batch size to 0.
+    (set-sprite-batch-size! batch 0)))
+
+;; emacs: (put 'with-sprite-batch 'scheme-indent-function 1)
+(define-syntax-rule (with-sprite-batch batch body ...)
+  (begin
+    (set-sprite-batch-size! batch 0)
+    (set-sprite-batch-texture! batch #f)
+    body
+    ...
+    (sprite-batch-render batch)))
