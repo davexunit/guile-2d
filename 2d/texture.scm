@@ -32,7 +32,16 @@
             texture-height
             surface->texture
             load-texture
-            texture-quad))
+            texture-quad
+            make-texture-region
+            texture-region?
+            texture-region-texture
+            texture-region-width
+            texture-region-height
+            texture-region-u
+            texture-region-v
+            texture-region-u2
+            texture-region-v2))
 
 ;; The <texture> object is a simple wrapper around an OpenGL texture
 ;; id.
@@ -114,3 +123,30 @@ Currently only works with RGBA format surfaces."
         (gl-vertex x2 y2)
         (gl-texture-coordinates 0 1)
         (gl-vertex x y2)))))
+
+;;;
+;;; Texture Regions
+;;;
+
+;; Texture regions represent a segment of a texture.
+
+(define-record-type <texture-region>
+  (%make-texture-region texture width height u v u2 v2)
+  texture-region?
+  (texture texture-region-texture)
+  (width texture-region-width)
+  (height texture-region-height)
+  (u texture-region-u)
+  (v texture-region-v)
+  (u2 texture-region-u2)
+  (v2 texture-region-v2))
+
+(define (make-texture-region texture x y width height)
+  "Creates a new texture region given a texture and a pixel region."
+  (let* ((w (texture-width texture))
+         (h (texture-height texture))
+         (u (/ x w))
+         (v (/ y h))
+         (u2 (/ (+ x width) w))
+         (v2 (/ (+ y height) h)))
+    (%make-texture-region texture width height u v u2 v2)))
