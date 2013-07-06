@@ -5,7 +5,6 @@
              (srfi srfi-2)
              (srfi srfi-9)
              (ice-9 format)
-             (2d texture)
              (2d sprite)
              (2d game-loop)
              (2d window)
@@ -40,8 +39,8 @@
 
 (open-window window-width window-height)
 
-(define stars (load-sprite "stars.png" #:anchor #(0 0)))
-(define particle-image (load-texture "bullet.png"))
+(define stars (load-sprite "images/stars.png" #:anchor #(0 0)))
+(define particle-image (load-texture "images/bullet.png"))
 (define particle-width (texture-width particle-image))
 (define particle-height (texture-height particle-image))
 (define particle-count 2000)
