@@ -30,7 +30,7 @@
 ;; Load a sprite and center it on the screen.
 ;; Must be done AFTER opening the window.
 (set! sprite (load-sprite "images/sprite.png" #:position (vector (/ window-width 2)
-                                                          (/ window-height 2))))
+                                                                 (/ window-height 2))))
 
 ;; Start the game loop.
 ;; The render callback will be called through this procedure.
