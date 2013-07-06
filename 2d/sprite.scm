@@ -187,8 +187,9 @@
 ;; TODO add transformation logic for scaling and rotating.
 ;; TODO add support for colors
 ;; TODO add support for different blending modes.
-(define (sprite-batch-draw batch texture x y center-x center-y
-                           width height scale-x scale-y rotation)
+(define* (sprite-batch-draw batch texture x y center-x center-y
+                            width height scale-x scale-y rotation
+                            #:optional (u 0) (v 0) (u2 1) (v2 1))
   ;; Render the batch when it's full or the texture changes.
   (cond ((= (sprite-batch-size batch) (sprite-batch-max-size batch))
          (sprite-batch-render batch))
@@ -204,19 +205,19 @@
     (pack vertices base sprite-vertex
           x y
           1 1 1 1
-          0 0)
+          u v)
     (pack vertices (+ base 1) sprite-vertex
           x2 y
           1 1 1 1
-          1 0)
+          u2 v)
     (pack vertices (+ base 2) sprite-vertex
           x2 y2
           1 1 1 1
-          1 1)
+          u2 v2)
     (pack vertices (+ base 3) sprite-vertex
           x y2
           1 1 1 1
-          0 1))
+          u v2))
   ;; Increment batch size
   (set-sprite-batch-size! batch (1+ (sprite-batch-size batch))))
 
