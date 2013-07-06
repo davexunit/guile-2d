@@ -253,7 +253,7 @@ batched texture vertices first."
                                           vertices
                                           #:stride struct-size
                                           #:offset (packed-struct-offset sprite-vertex s))
-        (gl-draw-arrays (begin-mode quads) 0 size)))
+        (gl-draw-arrays (begin-mode quads) 0 vertex-count)))
     (gl-disable-client-state (enable-cap texture-coord-array))
     (gl-disable-client-state (enable-cap color-array))
     (gl-disable-client-state (enable-cap vertex-array))
