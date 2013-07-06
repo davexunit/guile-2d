@@ -332,17 +332,25 @@ size."
   (texture sprite-batch-texture set-sprite-batch-texture!)
   (vertices sprite-batch-vertices))
 
+;; Dynamic state for the current sprite batch.
+(define *sprite-batch* #f)
+
 (define* (make-sprite-batch #:optional (max-size 1000))
   "Creates a new sprite batch. The default max-size is 1000."
   (%make-sprite-batch max-size 0 #f (make-packed-array sprite-vertex (* 4 max-size))))
 
+(define (sprite-batch-draw . args)
+  "Adds a textured quad to the sprite batch."
+  (apply %sprite-batch-draw *sprite-batch* args))
+
 ;; TODO add transformation logic for scaling and rotating.
 ;; TODO add support for colors
 ;; TODO add support for different blending modes.
-(define* (sprite-batch-draw batch texture x y width height
+(define* (%sprite-batch-draw batch texture x y width height
                             #:optional #:key (center-x 0) (center-y 0)
                             (scale-x 1) (scale-y 1) (rotation 0)
                             (u 0) (v 0) (u2 1) (v2 1))
+  "Adds a textured quad to the sprite batch."
   ;; Render the batch when it's full or the texture changes.
   (cond ((= (sprite-batch-size batch) (sprite-batch-max-size batch))
          (sprite-batch-render batch))
@@ -417,8 +425,10 @@ batched texture vertices first."
 ;; emacs: (put 'with-sprite-batch 'scheme-indent-function 1)
 (define-syntax-rule (with-sprite-batch batch body ...)
   (begin
+    (set! *sprite-batch* batch)
     (set-sprite-batch-size! batch 0)
     (set-sprite-batch-texture! batch #f)
     body
     ...
-    (sprite-batch-render batch)))
+    (sprite-batch-render batch)
+    (set! *sprite-batch* #f)))
