@@ -69,13 +69,13 @@
 (define map #f)
 
 (define (tiles->texture-regions width height tileset tiles)
-  (list->array
-   2
-   (list-ec
-    (: y height)
-    (list-ec
-     (: x width)
-     (vector-ref tileset (array-ref tiles y x))))))
+  (define (texture-region-at x y)
+    (vector-ref tileset (array-ref tiles y x)))
+
+  (let ((regions (list-ec (: y height)
+                          (list-ec (: x width)
+                                   (texture-region-at x y)))))
+    (list->array 2 regions)))
 
 (define (key-down key mod unicode)
   (cond ((any-equal? key (keycode escape) (keycode q))
