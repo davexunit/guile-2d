@@ -35,21 +35,15 @@
         (do-ec (: y (map-layer-height layer))
                (: x (map-layer-width layer))
                (let ((tile (array-ref (map-layer-tiles layer) y x)))
-                 (sprite-batch-draw batch
-                                    (texture-region-texture tile)
+                 (sprite-batch-draw (texture-region-texture tile)
                                     (* x (map-layer-tile-width layer))
                                     (* y (map-layer-tile-height layer))
-                                    0
-                                    0
                                     (texture-region-width tile)
                                     (texture-region-height tile)
-                                    1
-                                    1
-                                    0
-                                    (texture-region-u tile)
-                                    (texture-region-v tile)
-                                    (texture-region-u2 tile)
-                                    (texture-region-v2 tile))))))))
+                                    #:u (texture-region-u tile)
+                                    #:v (texture-region-v tile)
+                                    #:u2 (texture-region-u2 tile)
+                                    #:v2 (texture-region-v2 tile))))))))
 
 ;; A small 8x8 array of tile indices.
 (define map-width 8)

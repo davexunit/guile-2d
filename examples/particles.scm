@@ -61,9 +61,7 @@
        (let* ((pos (particle-position p))
               (x (vx pos))
               (y (vy pos)))
-         (sprite-batch-draw batch particle-image x y 0 0
-                            particle-width particle-height
-                            1 1 0)))
+         (sprite-batch-draw particle-image x y particle-width particle-height)))
      particles)))
 
 (set-render-callback (lambda () (render)))
