@@ -21,8 +21,7 @@
    Here is the simplest Guile-2d application (so far).
 
    #+BEGIN_SRC scheme
-    (use-modules ((sdl sdl) #:prefix SDL:)
-                 (figl gl)
+    (use-modules (figl gl)
                  (2d sprite)
                  (2d game-loop)
                  (2d window))
@@ -35,8 +34,7 @@
       (display key) (newline)
       (case key
         ;; Quit program when ESCAPE or Q is pressed.
-        ;; For now we have to use the SDL keycodes, but not for long!
-        ((SDLK_ESCAPE SDLK_q)
+        ((any-equal? key (keycode escape) (keycode q)
          (close-window)
          (quit))))
 
