@@ -43,7 +43,7 @@
 (define particle-image (load-texture "images/bullet.png"))
 (define particle-width (texture-width particle-image))
 (define particle-height (texture-height particle-image))
-(define particle-count 2000)
+(define particle-count 500)
 (define particles
   (list-tabulate particle-count
                  (lambda (n)
@@ -58,10 +58,9 @@
   (with-sprite-batch batch
     (for-each
      (lambda (p)
-       (let* ((pos (particle-position p))
-              (x (vx pos))
-              (y (vy pos)))
-         (sprite-batch-draw particle-image x y particle-width particle-height)))
+       (let* ((sprite (particle-sprite p)))
+         (set-sprite-position! sprite (particle-position p))
+         (draw-sprite sprite)))
      particles)))
 
 (set-render-callback (lambda () (render)))
