@@ -16,9 +16,9 @@
    Encapsulates an image and all of its transformations: position,
    rotation, scale, color, etc.
 
-   - [ ] Add support for texture regions
+   - [X] Add support for texture regions
    - [ ] Add support for animations
-   - [ ] Use a sprite batch when drawing if one is currently bound
+   - [X] Use a sprite batch when drawing if one is currently bound
 
 ** TODO Sprite batches
    Efficiently render a large number of sprites. Only change OpenGL
