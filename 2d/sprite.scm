@@ -343,9 +343,6 @@ size."
   "Adds a textured quad to the sprite batch."
   (apply %sprite-batch-draw *sprite-batch* args))
 
-;; TODO add transformation logic for scaling and rotating.
-;; TODO add support for colors
-;; TODO add support for different blending modes.
 (define* (%sprite-batch-draw batch texture x y width height
                             #:optional #:key (center-x 0) (center-y 0)
                             (scale-x 1) (scale-y 1) (rotation 0)
