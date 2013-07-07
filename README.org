@@ -24,7 +24,8 @@
     (use-modules (figl gl)
                  (2d sprite)
                  (2d game-loop)
-                 (2d window))
+                 (2d window)
+                 (2d input))
 
     (define window-width 800)
     (define window-height 600)
@@ -34,7 +35,7 @@
       (display key) (newline)
       (case key
         ;; Quit program when ESCAPE or Q is pressed.
-        ((any-equal? key (keycode escape) (keycode q)
+        ((any-equal? key (keycode escape) (keycode q))
          (close-window)
          (quit))))
 
