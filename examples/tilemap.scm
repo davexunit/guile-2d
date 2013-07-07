@@ -29,25 +29,17 @@
   (tiles map-layer-tiles))
 
 (define draw-map-layer
-  (let ((batch (make-sprite-batch)))
+  (let ((batch (make-sprite-batch 2000)))
     (lambda (layer)
       (with-sprite-batch batch
         (do-ec (: y (map-layer-height layer))
                (: x (map-layer-width layer))
                (let ((tile (array-ref (map-layer-tiles layer) y x)))
-                 (sprite-batch-draw (texture-region-texture tile)
-                                    (* x (map-layer-tile-width layer))
-                                    (* y (map-layer-tile-height layer))
-                                    (texture-region-width tile)
-                                    (texture-region-height tile)
-                                    #:u (texture-region-u tile)
-                                    #:v (texture-region-v tile)
-                                    #:u2 (texture-region-u2 tile)
-                                    #:v2 (texture-region-v2 tile))))))))
+                 (draw-sprite tile)))))))
 
 ;; A small 8x8 array of tile indices.
-(define map-width 8)
-(define map-height 8)
+(define map-width 32)
+(define map-height 32)
 (define map-tiles
   #2u32((00 01 01 01 01 01 01 02)
         (16 17 17 17 17 17 17 18)
@@ -62,14 +54,25 @@
 (define tile-height 32)
 (define map #f)
 
-(define (tiles->texture-regions width height tileset tiles)
-  (define (texture-region-at x y)
-    (vector-ref tileset (array-ref tiles y x)))
+(define (random-map width height tileset)
+  (let ((tiles (make-array 0 height width))
+        (n (vector-length tileset)))
+    (do-ec (: y height) (: x width)
+           (array-set! tiles (random n) y x))
+    tiles))
 
-  (let ((regions (list-ec (: y height)
+(define (tiles->sprites width height tile-width tile-height tileset tiles)
+  (define (build-sprite x y)
+    (let ((region (vector-ref tileset (array-ref tiles y x))))
+      (make-sprite region
+                   #:position (vector (* x tile-width)
+                                      (* y tile-height))
+                   #:anchor #(0 0))))
+
+  (let ((sprites (list-ec (: y height)
                           (list-ec (: x width)
-                                   (texture-region-at x y)))))
-    (list->array 2 regions)))
+                                   (build-sprite x y)))))
+    (list->array 2 sprites)))
 
 (define (key-down key mod unicode)
   (cond ((any-equal? key (keycode escape) (keycode q))
@@ -77,9 +80,7 @@
          (quit))))
 
 (define (render)
-  (with-gl-push-matrix
-   (gl-translate 100 100 0)
-   (draw-map-layer map)))
+  (draw-map-layer map))
 
 (define window-width 800)
 (define window-height 600)
@@ -92,9 +93,11 @@
 (let* ((texture (load-texture "images/tiles.png"))
        (tileset (split-texture texture 32 32)))
   (set! map (make-map-layer map-width map-height tile-width tile-height
-                            (tiles->texture-regions map-width
-                                                    map-height
-                                                    tileset
-                                                    map-tiles))))
+                            (tiles->sprites map-width
+                                            map-height
+                                            tile-width
+                                            tile-height
+                                            tileset
+                                            (random-map map-width map-height tileset)))))
 
 (run-game-loop)
