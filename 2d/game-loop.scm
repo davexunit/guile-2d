@@ -24,6 +24,7 @@
 (define-module (2d game-loop)
   #:use-module ((sdl sdl) #:prefix SDL:)
   #:use-module (figl gl)
+  #:use-module (2d agenda)
   #:export (set-render-callback
             set-update-callback
             set-key-up-callback
@@ -152,6 +153,7 @@ is the unused accumulator time."
   (if (>= accumulator frame-interval)
       (begin
         (update-callback)
+        (update-agenda)
         (update (- accumulator frame-interval)))
       accumulator))
 
