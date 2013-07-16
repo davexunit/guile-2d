@@ -31,7 +31,8 @@
             scale
             mag
             normalize
-            vector-reduce))
+            vector-reduce
+            vector-from-polar))
 
 (define (vx vector)
   "Returns the first element of a vector."
@@ -79,3 +80,7 @@
            (if (= (vector-length vector) i)
                prev
                (loop (1+ i) (proc prev (vector-ref vector i))))))))
+
+(define (vector-from-polar r theta)
+  (vector (* r (cos theta))
+          (* r (sin theta))))
