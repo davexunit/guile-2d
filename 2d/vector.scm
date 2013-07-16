@@ -82,5 +82,6 @@
                (loop (1+ i) (proc prev (vector-ref vector i))))))))
 
 (define (vector-from-polar r theta)
+  "Converts polar coordinates into a cartesian vector."
   (vector (* r (cos theta))
           (* r (sin theta))))
