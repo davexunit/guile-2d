@@ -23,13 +23,15 @@
 
 (define-module (2d coroutine)
   #:export (coroutine
-            define-coroutine
+            colambda
+            codefine
+            codefine*
             wait)
   #:replace (yield)
   #:use-module (2d agenda))
 
-(define (execute-coroutine thunk)
-  "Creates a procedure that can yield a continuation."
+(define (coroutine thunk)
+  "Calls a procedure that can yield a continuation."
   (define (handler cont callback . args)
     (define (resume . args)
       ;; Call continuation that resumes the procedure.
@@ -42,26 +44,34 @@
   ;; Call procedure.
   (call-with-prompt 'coroutine-prompt thunk handler))
 
-;; emacs: (put 'coroutine 'scheme-indent-function 0)
-(define-syntax-rule (coroutine body ...)
-  (begin
-    (agenda-schedule
-     (lambda ()
-       (execute-coroutine
-        (lambda () body ...))))))
+;; emacs: (put 'colambda 'scheme-indent-function 0)
+(define-syntax-rule (colambda args body ...)
+  "Syntacic sugar for a lambda that is run as a coroutine."
+  (lambda args
+    (coroutine
+     (lambda () body ...))))
 
-;; emacs: (put 'define-coroutine 'scheme-indent-function 1)
-(define-syntax define-coroutine
-  (syntax-rules ()
-    ((_ (name . args) . body)
-     ;; Outer define for the execute-coroutine call.
-     (define (name . args)
-       ;; Make a new procedure with the same signature so that a
-       ;; recursive procedure can be created without starting a new
-       ;; coroutine with each call to itself.
-       (define (name . args) . body)
-       ;; Coroutine time.
-       (execute-coroutine (lambda () (name . args)))))))
+;; emacs: (put 'codefine 'scheme-indent-function 1)
+(define-syntax-rule (codefine (name ...) . body)
+  "Syntactic sugar for defining a procedure that is run as a
+coroutine."
+  (define (name ...)
+    ;; Create an inner procedure with the same signature so that a
+    ;; recursive procedure call does not create a new prompt.
+    (define (name ...) . body)
+    (coroutine
+      (lambda () (name ...)))))
+
+;; emacs: (put 'codefine* 'scheme-indent-function 1)
+(define-syntax-rule (codefine* (name ...) . body)
+    "Syntactic sugar for defining a procedure with optional and
+keyword arguments that is run as a coroutine."
+  (define* (name ...)
+    ;; Create an inner procedure with the same signature so that a
+    ;; recursive procedure call does not create a new prompt.
+    (define* (name ...) . body)
+    (coroutine
+      (lambda () (name ...)))))
 
 (define (yield callback)
   "Yield continuation to a callback procedure."
