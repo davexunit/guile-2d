@@ -40,8 +40,8 @@
                  (draw-sprite tile)))))))
 
 ;; A small 8x8 array of tile indices.
-(define map-width 32)
-(define map-height 32)
+(define map-width 8)
+(define map-height 8)
 (define map-tiles
   #2u32((00 01 01 01 01 01 01 02)
         (16 17 17 17 17 17 17 18)
@@ -100,6 +100,6 @@
                                             tile-width
                                             tile-height
                                             tileset
-                                            (random-map map-width map-height tileset)))))
+                                            map-tiles))))
 
 (run-game-loop)
