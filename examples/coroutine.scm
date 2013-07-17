@@ -9,6 +9,7 @@
              (2d vector)
              (2d input)
              (2d helpers)
+             (2d agenda)
              (2d coroutine))
 
 (define window-width 800)
@@ -37,10 +38,11 @@
 
 ;; Simple script that moves the sprite to a random location every
 ;; second.
-(coroutine
-  (while #t
-    (set-sprite-position! sprite (vector (random window-width)
-                                         (random window-height)))
-    (wait 60)))
+(agenda-schedule
+ (colambda ()
+   (while #t
+     (set-sprite-position! sprite (vector (random window-width)
+                                          (random window-height)))
+     (wait 60))))
 
 (run-game-loop)
