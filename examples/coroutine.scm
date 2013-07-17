@@ -12,6 +12,8 @@
              (2d agenda)
              (2d coroutine))
 
+(init-2d)
+
 (define window-width 800)
 (define window-height 600)
 (define sprite #f)

@@ -7,6 +7,8 @@
              (2d helpers)
              (ice-9 format))
 
+(init-2d)
+
 (define window-width 800)
 (define window-height 600)
 (define sprite #f)

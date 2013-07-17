@@ -13,6 +13,7 @@
              (2d helpers))
 
 (set! *random-state* (random-state-from-platform))
+(init-2d)
 
 ;;;
 ;;; Particles

@@ -10,6 +10,8 @@
              (2d input)
              (2d helpers))
 
+(init-2d)
+
 ;;;
 ;;; Orthogonal tile map example
 ;;;
