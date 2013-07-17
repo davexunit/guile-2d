@@ -24,17 +24,23 @@
 (define-module (2d window)
   #:use-module (figl gl)
   #:use-module ((sdl sdl) #:prefix SDL:)
-  #:export (open-window
+  #:export (init-2d
+            open-window
             close-window))
 
-(define* (open-window width height #:optional (depth 24))
+(define (init-2d)
+  "Initializes guile-2d. This procedure must be called before using
+the rest of the framework."
+  (SDL:init '(SDL_INIT_EVERYTHING))
+  ;; Enable unicode key events
+  (SDL:enable-unicode #t))
+
+(define* (open-window width height #:optional #:key (depth 24) (title "guile-2d"))
   "Creates the game window with the specified dimensions and
 initializes OpenGL state."
-  (SDL:init '(SDL_INIT_VIDEO))
-  ;; Enable unicode key events
-  (SDL:enable-unicode #t)
   ;; Open SDL window in OpenGL mode.
-  (SDL:set-video-mode width height 24 '(SDL_OPENGL))
+  (SDL:set-video-mode width height depth '(SDL_OPENGL))
+  (SDL:set-caption title)
   ;; Initialize OpenGL orthographic view
   (gl-viewport 0 0 width height)
   (set-gl-matrix-mode (matrix-mode projection))
