@@ -49,9 +49,17 @@
             texture-region-u2
             texture-region-v2
             split-texture
+            make-animation
+            animation?
+            animation-frames
+            animation-duration
+            animation-loop?
+            animation-frame
+            animation-length
             make-sprite
             sprite?
             sprite-drawable
+            set-sprite-drawable!
             sprite-position
             set-sprite-position!
             sprite-scale
@@ -113,7 +121,7 @@ are supported."
   (case (SDL:surface:depth surface)
     ((24) (pixel-format rgb))
     ((32) (pixel-format rgba))
-    (else (throw 'unsupported-pixel-format))))
+    (else (throw 'unsupported-pixel-format (SDL:surface:depth surface)))))
 
 (define (surface->texture surface)
   "Translates an SDL surface into an OpenGL texture.
@@ -206,6 +214,64 @@ size."
     (vector-ec (: y rows) (: x columns) (build-tile x y))))
 
 ;;;
+;;; Animations
+;;;
+
+;; The <animation> type represents a vector of textures or texture
+;; regions that are to be played in sequence and possibly looped.
+(define-record-type <animation>
+  (make-animation frames duration loop)
+  animation?
+  (frames animation-frames)
+  (duration animation-duration)
+  (loop animation-loop?))
+
+(define (animation-frame animation index)
+  "Returns the frame for the given index."
+  (vector-ref (animation-frames animation) index))
+
+(define (animation-length animation)
+  "Returns the number of frames in the animation"
+  (vector-length (animation-frames animation)))
+
+;; The <animation-state> type encapsulates the state for playing an
+;; animation.
+(define-record-type <animation-state>
+  (%make-animation-state animation frame-index frame-time playing)
+  animation-state?
+  (animation animation-state-animation)
+  (frame-index animation-state-frame-index set-animation-state-frame-index!)
+  (frame-time animation-state-frame-time set-animation-state-frame-time!)
+  (playing animation-state-playing? set-animation-state-playing!))
+
+(define (make-animation-state animation)
+  (%make-animation-state animation 0 0 #t))
+
+(define (update-animation-state state)
+  "Increments the frame time for the animation state and determines
+which frame to show."
+  (let ((frame-time (1+ (animation-state-frame-time state)))
+        (animation (animation-state-animation state)))
+    (if (and (animation-state-playing? state)
+             (= frame-time (animation-duration animation)))
+        ;; Move to the next frame. If we exceeed the length of the
+        ;; animation then start back at 0.
+        (let ((frame-index (modulo (1+ (animation-state-frame-index state))
+                                   (animation-length animation))))
+          (set-animation-state-frame-time! state 0)
+          (set-animation-state-frame-index! state frame-index)
+          ;; Stop the animation if we've played it once already and
+          ;; the animation does not loop.
+          (when (and (= frame-index 0)
+                     (not (animation-loop? animation)))
+            (set-animation-state-playing! state #f)))
+        (set-animation-state-frame-time! state frame-time))))
+
+(define (animation-state-frame state)
+  (animation-frame (animation-state-animation state)
+                   (animation-state-frame-index state)))
+
+;;;
 ;;; Sprites
 ;;;
 
@@ -222,26 +288,30 @@ size."
   (s float)
   (t float))
 
-;; The <sprite> object represents a drawable object (texture,
+;; The <sprite> type represents a drawable object (texture,
 ;; texture-region, animation, etc.) with a given position, scale,
 ;; rotation, and color.
 (define-record-type <sprite>
-  (%make-sprite drawable position scale rotation color anchor vertices)
+  (%make-sprite drawable position scale rotation color anchor vertices animation-state)
   sprite?
-  (drawable sprite-drawable)
+  (drawable sprite-drawable set-sprite-drawable!)
   (position sprite-position set-sprite-position!)
   (scale sprite-scale set-sprite-scale!)
   (rotation sprite-rotation set-sprite-rotation!)
   (color sprite-color set-sprite-color!)
   (anchor sprite-anchor set-sprite-anchor!)
-  (vertices sprite-vertices set-sprite-vertices!))
+  (vertices sprite-vertices set-sprite-vertices!)
+  (animation-state sprite-animation-state))
 
 (define* (make-sprite drawable #:optional #:key (position #(0 0)) (scale #(1 1))
                       (rotation 0) (color #xffffffff) (anchor 'center))
   "Makes a new sprite object."
   (let ((vertices (make-packed-array sprite-vertex 4))
-        (color (rgba->gl-color color)))
-    (%make-sprite drawable position scale rotation color anchor vertices)))
+        (color (rgba->gl-color color))
+        (animation-state (if (animation? drawable)
+                             (make-animation-state drawable)
+                             #f)))
+    (%make-sprite drawable position scale rotation color anchor vertices animation-state)))
 
 (define* (load-sprite filename #:optional #:key (position #(0 0)) (scale #(1 1))
                       (rotation 0) (color #xffffffff) (anchor 'center))
@@ -249,34 +319,58 @@ size."
   (make-sprite (load-texture filename) #:position position #:scale scale
                #:rotation rotation #:color color #:anchor anchor))
 
+(define (sprite-animation-frame sprite)
+  (animation-state-frame (sprite-animation-state sprite)))
+
+(define (get-texture drawable)
+  (cond ((texture? drawable)
+         drawable)
+        ((texture-region? drawable)
+         (texture-region-texture drawable))))
+
 (define (sprite-texture sprite)
   "Returns the texture for the sprite's drawable object."
-  (let ((drawable (sprite-drawable sprite)))
-    (cond ((texture? drawable)
-           drawable)
-          ((texture-region? drawable)
-           (texture-region-texture drawable)))))
+    (let ((drawable (sprite-drawable sprite)))
+      (cond ((or (texture? drawable)
+                 (texture-region? drawable))
+             (get-texture drawable))
+            ((animation? drawable)
+             (get-texture (sprite-animation-frame sprite))))))
+
+(define (drawable-texture-coords drawable)
+  (cond ((texture? drawable)
+         '(0 0 1 1))
+        ((texture-region? drawable)
+         (list (texture-region-u drawable)
+               (texture-region-v drawable)
+               (texture-region-u2 drawable)
+               (texture-region-v2 drawable)))))
 
 (define (sprite-texture-coords sprite)
   "Returns the texture coordinates for the drawable object."
   (let ((drawable (sprite-drawable sprite)))
-    (cond ((texture? drawable)
-           '(0 0 1 1))
-          ((texture-region? drawable)
-           (list (texture-region-u drawable)
-                 (texture-region-v drawable)
-                 (texture-region-u2 drawable)
-                 (texture-region-v2 drawable))))))
+    (cond ((or (texture? drawable)
+               (texture-region? drawable))
+           (drawable-texture-coords drawable))
+          ((animation? drawable)
+           (drawable-texture-coords (sprite-animation-frame sprite))))))
+
+(define (drawable-size drawable)
+  (cond ((texture? drawable)
+         (vector (texture-width drawable)
+                 (texture-height drawable)))
+        ((texture-region? drawable)
+         (vector (texture-region-width drawable)
+                 (texture-region-height drawable)))))
 
 (define (sprite-drawable-size sprite)
   "Returns the size of the sprite drawable as a vector"
   (let ((drawable (sprite-drawable sprite)))
-    (cond ((texture? drawable)
-           (vector (texture-width drawable)
-                   (texture-height drawable)))
-          ((texture-region? drawable)
-           (vector (texture-region-width drawable)
-                   (texture-region-height drawable))))))
+    (cond ((or (texture? drawable)
+               (texture-region? drawable))
+           (drawable-size drawable))
+          ((animation? drawable)
+           (drawable-size (sprite-animation-frame sprite))))))
 
 (define (sprite-anchor-vector sprite)
   "Returns a vector of the coordinates for the center point of a
@@ -324,6 +418,9 @@ sprite."
 (define (draw-sprite sprite)
   "Renders a sprite. A sprite batch will be used if one is currently
 bound."
+  (when (animation? (sprite-drawable sprite))
+    (update-animation-state (sprite-animation-state sprite)))
+
   (if *sprite-batch*
       (draw-sprite-batched sprite)
       (draw-sprite-vertex-array sprite)))
