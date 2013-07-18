@@ -12,6 +12,11 @@
    Wrap SDL keycode, mouse button, etc. constants in our own
    enumeration.
 
+   - [X] Keyboard
+   - [X] Mouse
+   - [ ] Window
+   - [ ] Joystick
+
 ** TODO Sprites
    Encapsulates an image and all of its transformations: position,
    rotation, scale, color, etc.
@@ -25,9 +30,10 @@
    context when necessary. For example, don't change texture when
    rendering several sprites in a row that use the same one.
 
-   - [ ] Add transformation logic for scaling and rotating.
+   - [ ] Add basic batching for non-scaled, non-rotated sprites
+   - [ ] Add transformation logic for scaling and rotating
    - [ ] Add support for colors
-   - [ ] Add support for different blending modes.
+   - [ ] Add support for different blending modes
 
 ** DONE Tilesets
    Break an image up into many small pieces. Useful for creating maps.
@@ -47,9 +53,9 @@
    The graph is composed of groups and nodes. Transformations are
    accumulated as the tree is walked.
 
-** TODO Scripting
+** DONE Scripting
    Provide a way for users to easily script 2D games using coroutines
-   (green threads)
+   and a scheduler.
 
 ** TODO Vectors and matrices
    Vectors and matrices are needed constantly for games. Provide an
@@ -73,3 +79,9 @@
 
 ** TODO Particle systems
    Provide a highly configurible particle simulation system.
+
+** TODO Asset Management
+   Provide a generic system for loading assets (images, sounds, fonts,
+   etc.) and storing them in a cache. Explore using weak keys so that
+   assets are removed from the cache when they are no longer
+   referenced.
