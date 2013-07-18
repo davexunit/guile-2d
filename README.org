@@ -66,7 +66,7 @@
     Sprites encapsulate the presentation of a image or a region of an image.
 
     The simplest way to get started with sprites is to use the
-    `load-sprite` procedure. All arguments except the filename are
+    =load-sprite= procedure. All arguments except the filename are
     optional keyword arguments.
 
     #+BEGIN_SRC scheme
@@ -75,7 +75,7 @@
     #+END_SRC
 
     Alternatively, you can make a sprite from an existing texture. The
-    same keyword arguments in `load-sprite` are also available here.
+    same keyword arguments in =load-sprite= are also available here.
 
     #+BEGIN_SRC scheme
       (define texture
@@ -100,7 +100,7 @@
     sprites to the GPU in large chunks.
 
     To take advantage of this, create a sprite batch and use
-    `with-sprite-batch`. All calls to `draw-sprite` will use the
+    =with-sprite-batch=. All calls to =draw-sprite= will use the
     sprite batch within this form.
 
     #+BEGIN_SRC scheme
@@ -131,12 +131,12 @@
     Coroutines are procedures that can be exited at any point and
     resumed later.
 
-    It would be nice if after every call to `walk`, the NPC would wait
+    It would be nice if after every call to =walk=, the NPC would wait
     for one second before taking its next step. This is where the
     agenda comes in. The agenda is used to schedule procedures to be
     run after an arbitrary number of game updates (1 by
     default). Since coroutines and the agenda go hand in hand, there
-    exists a `wait` procedure to pause a coroutine and schedule it to
+    exists a =wait= procedure to pause a coroutine and schedule it to
     be resumed later.
 
     Using a coroutine and the agenda, the NPC script can be rewritten
