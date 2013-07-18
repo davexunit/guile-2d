@@ -21,44 +21,138 @@
    Here is the simplest Guile-2d application (so far).
 
    #+BEGIN_SRC scheme
-    (use-modules (figl gl)
-                 (2d sprite)
-                 (2d game-loop)
-                 (2d window)
-                 (2d input))
+     (use-modules (figl gl)
+                  (2d sprite)
+                  (2d game-loop)
+                  (2d window)
+                  (2d input))
 
-    (define window-width 800)
-    (define window-height 600)
-    (define sprite #f)
+     (define window-width 800)
+     (define window-height 600)
+     (define sprite #f)
 
-    (define (key-down key)
-      (display key) (newline)
-      (case key
-        ;; Quit program when ESCAPE or Q is pressed.
-        ((any-equal? key (keycode escape) (keycode q))
-         (close-window)
-         (quit))))
+     (define (key-down key)
+       (display key) (newline)
+       (case key
+         ;; Quit program when ESCAPE or Q is pressed.
+         ((any-equal? key (keycode escape) (keycode q))
+          (close-window)
+          (quit))))
 
-    ;; Draw our sprite
-    (define (render)
-      (draw-sprite sprite))
+     ;; Draw our sprite
+     (define (render)
+       (draw-sprite sprite))
 
-    ;; Register callbacks.
-    (set-render-callback (lambda () (render)))
-    (set-key-down-callback (lambda (key) (key-down key)))
+     ;; Register callbacks.
+     (set-render-callback (lambda () (render)))
+     (set-key-down-callback (lambda (key) (key-down key)))
 
-    ;; Open the window.
-    (open-window window-width window-height)
+     ;; Open the window.
+     (open-window window-width window-height)
 
-    ;; Load a sprite and center it on the screen.
-    ;; Must be done AFTER opening the window.
-    (set! sprite (load-sprite "sprite.png" #:position (vector (/ window-width 2)
-                                                              (/ window-height 2))))
+     ;; Load a sprite and center it on the screen.
+     ;; Must be done AFTER opening the window.
+     (set! sprite (load-sprite "sprite.png" #:position (vector (/ window-width 2)
+                                                               (/ window-height 2))))
 
-    ;; Start the game loop.
-    ;; The render callback will be called through this procedure.
-    (run-game-loop)
+     ;; Start the game loop.
+     ;; The render callback will be called through this procedure.
+     (run-game-loop)
    #+END_SRC
+
+** Features
+
+*** Sprites
+    Sprites encapsulate the presentation of a image or a region of an image.
+
+    The simplest way to get started with sprites is to use the
+    `load-sprite` procedure. All arguments except the filename are
+    optional keyword arguments.
+
+    #+BEGIN_SRC scheme
+      (define sprite (load-sprite "cirno.png" #:position #(0 0) #:scale (1 1)
+                                  #:rotation (0) #:color #xffffff #:anchor 'center))
+    #+END_SRC
+
+    Alternatively, you can make a sprite from an existing texture. The
+    same keyword arguments in `load-sprite` are also available here.
+
+    #+BEGIN_SRC scheme
+      (define texture
+      (define sprite (make-sprite (load-texture "cirno.png"))))
+    #+END_SRC
+
+    Position, scale, rotation, color, and anchor are mutable.
+
+    #+BEGIN_SRC scheme
+      (set-sprite-position! sprite #(100 100))
+    #+END_SRC
+
+    Drawing a sprite is simple.
+
+    #+BEGIN_SRC scheme
+      (draw-sprite sprite)
+    #+END_SRC
+
+*** Sprite Batches
+    When drawing many sprites, it is inefficient to send them to the
+    GPU individually. Sprite batches resolve this issue by sending
+    sprites to the GPU in large chunks.
+
+    To take advantage of this, create a sprite batch and use
+    `with-sprite-batch`. All calls to `draw-sprite` will use the
+    sprite batch within this form.
+
+    #+BEGIN_SRC scheme
+      (define sprites (make-a-ton-of-sprites))
+
+      (define batch (make-sprite-batch))
+
+      (with-sprite-batch batch
+        (for-each
+         (lambda (sprite) (draw-sprite sprite))
+         sprites))
+    #+END_SRC
+
+*** Coroutines and Agendas
+    The ability to write scripts is very important for most games. A
+    script for an RPG NPC could look like this:
+
+    #+BEGIN_SRC scheme
+      ;; Walk up one tile and then down one tile, forever.
+      (while #t
+        (walk 'up)
+        (walk 'down))
+    #+END_SRC
+
+    Unfortunately, running this script as it is means completely
+    locking up the program in an unbounded loop. However, coroutines
+    (and a scheduler known as the "agenda") are here to save the day!
+    Coroutines are procedures that can be exited at any point and
+    resumed later.
+
+    It would be nice if after every call to `walk`, the NPC would wait
+    for one second before taking its next step. This is where the
+    agenda comes in. The agenda is used to schedule procedures to be
+    run after an arbitrary number of game updates (1 by
+    default). Since coroutines and the agenda go hand in hand, there
+    exists a `wait` procedure to pause a coroutine and schedule it to
+    be resumed later.
+
+    Using a coroutine and the agenda, the NPC script can be rewritten
+    such that it does not halt further program execution.
+
+    #+BEGIN_SRC scheme
+      (while #t
+        (walk 'up)
+        (wait 60)
+        (walk 'down)
+        (wait 60))
+    #+END_SRC
+
+    Since guile-2d enforces a fixed timestep and updates 60 times per
+    second, waiting for 60 updates means that the NPC will wait one
+    second in between each step.
 
 ** REPL Driven Development
    The read-eval-print-loop present in Guile allows you to develop
