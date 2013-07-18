@@ -38,11 +38,9 @@
 ** DONE Tilesets
    Break an image up into many small pieces. Useful for creating maps.
 
-** TODO Animations
+** DONE Animations
    Create a data type to represent an animated sequence of textures
    and/or texture regions.
-
-   (make-animation frame-duration frames)
 
 ** TODO Tile maps
    - [ ] Create a generic tilemap module
