@@ -23,8 +23,10 @@
 
 (define-module (2d helpers)
   #:use-module (srfi srfi-1)
+  #:use-module (rnrs arithmetic bitwise)
   #:export (any-equal?
-            logand?))
+            logand?
+            rgba->gl-color))
 
 (define (any-equal? elem . args)
   "Returns true if elem equals any of the arguments and returns false
@@ -35,3 +37,15 @@ otherwise."
   "Returns true if the result of a bitwise AND of the integer
 arguments is non-zero and returns false otherwise."
   (not (zero? (apply logand args))))
+
+(define (rgba->gl-color color)
+  "Converts an integer color code into OpenGL compatible color
+values. Returns a list of four floating point numbers in range [0,1]."
+  (define (component offset)
+    (let ((mask (bitwise-arithmetic-shift-left #xff offset)))
+      (/ (bitwise-arithmetic-shift-right (logand mask color) offset) 255.0)))
+
+  (list (component 24)
+        (component 16)
+        (component 8)
+        (component 0)))
