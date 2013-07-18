@@ -30,6 +30,7 @@
   #:use-module (figl contrib packed-struct)
   #:use-module ((sdl sdl) #:prefix SDL:)
   #:use-module (2d vector)
+  #:use-module (2d helpers)
   #:export (make-texture
             texture?
             texture-id
@@ -236,13 +237,14 @@ size."
   (vertices sprite-vertices set-sprite-vertices!))
 
 (define* (make-sprite drawable #:optional #:key (position #(0 0)) (scale #(1 1))
-                      (rotation 0) (color '(1 1 1)) (anchor 'center))
+                      (rotation 0) (color #xffffffff) (anchor 'center))
   "Makes a new sprite object."
-  (let ((vertices (make-packed-array sprite-vertex 4)))
+  (let ((vertices (make-packed-array sprite-vertex 4))
+        (color (rgba->gl-color color)))
     (%make-sprite drawable position scale rotation color anchor vertices)))
 
 (define* (load-sprite filename #:optional #:key (position #(0 0)) (scale #(1 1))
-                      (rotation 0) (color '(1 1 1)) (anchor 'center))
+                      (rotation 0) (color #xffffffff) (anchor 'center))
   "Loads a sprite from file."
   (make-sprite (load-texture filename) #:position position #:scale scale
                #:rotation rotation #:color color #:anchor anchor))
