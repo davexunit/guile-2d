@@ -26,7 +26,9 @@
   #:use-module ((sdl sdl) #:prefix SDL:)
   #:export (init-2d
             open-window
-            close-window))
+            close-window
+            window-title
+            set-window-title!))
 
 (define (init-2d)
   "Initializes guile-2d. This procedure must be called before using
@@ -58,3 +60,11 @@ initializes OpenGL state."
   "Closes the game window and cleans up. This procedure is typically
 called just before calling (quit)."
   (SDL:quit))
+
+(define (window-title)
+  "Returns the window title string."
+  (SDL:get-caption))
+
+(define (set-window-title! title)
+  "Sets the window title string"
+  (SDL:set-caption title))
