@@ -240,32 +240,38 @@ size."
   (%make-animation-state animation frame-index frame-time playing)
   animation-state?
   (animation animation-state-animation)
-  (frame-index animation-state-frame-index set-animation-state-frame-index!)
-  (frame-time animation-state-frame-time set-animation-state-frame-time!)
-  (playing animation-state-playing? set-animation-state-playing!))
+  (frame-index animation-state-frame-index)
+  (frame-time animation-state-frame-time)
+  (playing animation-state-playing?))
 
 (define (make-animation-state animation)
   (%make-animation-state animation 0 0 #t))
 
 (define (update-animation-state state)
   "Increments the frame time for the animation state and determines
-which frame to show."
+which frame to show. Returns a new animation-state object."
   (let ((frame-time (1+ (animation-state-frame-time state)))
+        (frame-index (animation-state-frame-index state))
+        (playing (animation-state-playing? state))
         (animation (animation-state-animation state)))
-    (if (and (animation-state-playing? state)
-             (= frame-time (animation-duration animation)))
-        ;; Move to the next frame. If we exceeed the length of the
-        ;; animation then start back at 0.
-        (let ((frame-index (modulo (1+ (animation-state-frame-index state))
-                                   (animation-length animation))))
-          (set-animation-state-frame-time! state 0)
-          (set-animation-state-frame-index! state frame-index)
-          ;; Stop the animation if we've played it once already and
-          ;; the animation does not loop.
-          (when (and (= frame-index 0)
-                     (not (animation-loop? animation)))
-            (set-animation-state-playing! state #f)))
-        (set-animation-state-frame-time! state frame-time))))
+
+    ;; Return the same state object if the animation is not playing.
+    (cond ((not playing)
+           state)
+          ;; Return a new state object with a reset frame-index and
+          ;; frame-time if we've reached the end of the animation.
+          ;; Stops playing the animation if the animation does not
+          ;; loop.
+          ((and playing (= frame-time (animation-duration animation)))
+           (let* ((frame-index (modulo (1+ frame-index)
+                                       (animation-length animation)))
+                  (frame-time 0)
+                  (playing (or (not (= frame-index 0))
+                               (animation-loop? animation))))
+             (%make-animation-state animation frame-index frame-time playing)))
+          ;; Return a new state object with an incremented frame index.
+          (else
+           (%make-animation-state animation frame-index frame-time playing)))))
 
 (define (animation-state-frame state)
   (animation-frame (animation-state-animation state)
@@ -301,7 +307,7 @@ which frame to show."
   (color sprite-color set-sprite-color!)
   (anchor sprite-anchor set-sprite-anchor!)
   (vertices sprite-vertices set-sprite-vertices!)
-  (animation-state sprite-animation-state))
+  (animation-state sprite-animation-state set-sprite-animation-state!))
 
 (define* (make-sprite drawable #:optional #:key (position #(0 0)) (scale #(1 1))
                       (rotation 0) (color #xffffffff) (anchor 'center))
@@ -419,7 +425,8 @@ sprite."
   "Renders a sprite. A sprite batch will be used if one is currently
 bound."
   (when (animation? (sprite-drawable sprite))
-    (update-animation-state (sprite-animation-state sprite)))
+    (let ((state (update-animation-state (sprite-animation-state sprite))))
+      (set-sprite-animation-state! sprite state)))
 
   (if *sprite-batch*
       (draw-sprite-batched sprite)
