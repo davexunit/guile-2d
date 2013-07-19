@@ -63,7 +63,8 @@
 ** Features
 
 *** Sprites
-    Sprites encapsulate the presentation of a image or a region of an image.
+    Sprites encapsulate the presentation of an image or a region of an
+    image.
 
     The simplest way to get started with sprites is to use the
     =load-sprite= procedure. All arguments except the filename are
@@ -78,8 +79,7 @@
     same keyword arguments in =load-sprite= are also available here.
 
     #+BEGIN_SRC scheme
-      (define texture
-      (define sprite (make-sprite (load-texture "cirno.png"))))
+      (define sprite (make-sprite (load-texture "cirno.png")))
     #+END_SRC
 
     Position, scale, rotation, color, and anchor are mutable.
@@ -143,12 +143,22 @@
     such that it does not halt further program execution.
 
     #+BEGIN_SRC scheme
-      (while #t
-        (walk 'up)
-        (wait 60)
-        (walk 'down)
-        (wait 60))
+      (agenda-schedule
+       (colambda ()
+         (while #t
+           (walk 'up)
+           (wait 60)
+           (walk 'down)
+           (wait 60))))
+
     #+END_SRC
+
+    =colambda= is a useful macro that is syntactic sugar for a lambda
+    expression executed as a coroutine. =agenda-schedule= accepts a
+    thunk (a procedure that takes 0 arguments) and schedules it to be
+    executed later. In this example we do not provide a second
+    argument to =agenda-schedule=, which means that the thunk will be
+    executed upon the next game update.
 
     Since guile-2d enforces a fixed timestep and updates 60 times per
     second, waiting for 60 updates means that the NPC will wait one
