@@ -1,12 +1,12 @@
-(use-modules (figl gl)
-             (srfi srfi-1)
+(use-modules (srfi srfi-1)
              (srfi srfi-9)
              (srfi srfi-42)
-             (2d sprite)
              (2d game-loop)
-             (2d window)
+             (2d helpers)
+             (2d texture)
+             (2d sprite)
              (2d vector)
-             (2d helpers))
+             (2d window))
 
 (init-2d)
 

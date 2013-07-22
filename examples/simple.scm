@@ -1,6 +1,4 @@
-(use-modules ((sdl sdl) #:prefix SDL:)
-             (figl gl)
-             (2d sprite)
+(use-modules (2d sprite)
              (2d game-loop)
              (2d window)
              (2d helpers))
