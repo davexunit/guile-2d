@@ -11,16 +11,20 @@
 (define window-height 600)
 (define sprite #f)
 
+(define (quit-demo)
+  (close-window)
+  (quit))
+
 (define (key-down key mod unicode)
   (cond ((any-equal? key 'escape 'q)
-         (close-window)
-         (quit))))
+         (quit-demo))))
 
 ;; Draw our sprite
 (define (render)
   (draw-sprite sprite))
 
 ;; Register callbacks.
+(set-quit-callback (lambda () (quit)))
 (set-render-callback (lambda () (render)))
 (set-key-down-callback (lambda (key mod unicode) (key-down key mod unicode)))
 
