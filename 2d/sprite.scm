@@ -30,6 +30,7 @@
   #:use-module (figl contrib packed-struct)
   #:use-module ((sdl sdl) #:prefix SDL:)
   #:use-module (2d vector)
+  #:use-module (2d gl)
   #:use-module (2d helpers)
   #:export (make-texture
             texture?
@@ -109,7 +110,7 @@
       ;; dynamic pointer to gl-delete-textures becomes invalid. So, we
       ;; ignore the error and move on.
       (catch 'misc-error
-        (lambda () (gl-delete-textures (list (texture-id texture))))
+        (lambda () (gl-delete-texture (texture-id texture)))
         (lambda (key . args) #f))
       (loop (texture-guardian)))))
 
@@ -119,8 +120,8 @@
   "Returns the OpenGL pixel format for a surface. RGB and RGBA formats
 are supported."
   (case (SDL:surface:depth surface)
-    ((24) (pixel-format rgb))
-    ((32) (pixel-format rgba))
+    ((24) (pixel-format* rgb))
+    ((32) (pixel-format* rgba))
     (else (throw 'unsupported-pixel-format (SDL:surface:depth surface)))))
 
 (define (surface->texture surface)
@@ -160,7 +161,7 @@ Currently only works with RGBA format surfaces."
   (let ((x2 (+ x w))
         (y2 (+ y h)))
     (with-gl-bind-texture (texture-target texture-2d) (texture-id texture)
-      (gl-begin (begin-mode quads)
+      (gl-begin (primitive-type quads)
         (apply gl-color color)
         (gl-texture-coordinates u v)
         (gl-vertex x y)
@@ -489,7 +490,7 @@ bound."
                                           vertices
                                           #:stride struct-size
                                           #:offset s-offset)
-        (gl-draw-arrays (begin-mode quads)
+        (gl-draw-arrays (primitive-type quads)
                         0
                         (packed-array-length vertices sprite-vertex)))
       (gl-disable-client-state (enable-cap texture-coord-array))
@@ -590,7 +591,7 @@ batched texture vertices first."
                                           vertices
                                           #:stride struct-size
                                           #:offset (packed-struct-offset sprite-vertex s))
-        (gl-draw-arrays (begin-mode quads) 0 vertex-count)))
+        (gl-draw-arrays (primitive-type quads) 0 vertex-count)))
     (gl-disable-client-state (enable-cap texture-coord-array))
     (gl-disable-client-state (enable-cap color-array))
     (gl-disable-client-state (enable-cap vertex-array))
