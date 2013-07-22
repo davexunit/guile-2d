@@ -451,6 +451,7 @@ bound."
                         (- (vy pos) (vy anchor))
                         (vx size)
                         (vy size)
+                        #:color (sprite-color sprite)
                         #:rotation (sprite-rotation sprite)
                         #:scale-x (vx scale)
                         #:scale-y (vy scale)
@@ -531,7 +532,8 @@ bound."
 (define* (%sprite-batch-draw batch texture x y width height
                             #:optional #:key
                             (scale-x 1) (scale-y 1) (rotation 0)
-                            (u 0) (v 0) (u2 1) (v2 1))
+                            (u 0) (v 0) (u2 1) (v2 1)
+                            (color #xffffffff))
   "Adds a textured quad to the sprite batch."
   ;; Render the batch when it's full or the texture changes.
   (cond ((= (sprite-batch-size batch) (sprite-batch-max-size batch))
@@ -539,25 +541,30 @@ bound."
         ((not (equal? texture (sprite-batch-texture batch)))
          (sprite-batch-switch-texture batch texture)))
   ;; Add 4 new vertices.
-  (let ((base (* 4 (sprite-batch-size batch)))
-        (vertices (sprite-batch-vertices batch))
-        (x2 (+ x width))
-        (y2 (+ y height)))
+  (let* ((base (* 4 (sprite-batch-size batch)))
+         (vertices (sprite-batch-vertices batch))
+         (color (rgba->gl-color color))
+         (x2 (+ x width))
+         (y2 (+ y height))
+         (r (vector-ref color 0))
+         (g (vector-ref color 1))
+         (b (vector-ref color 2))
+         (a (vector-ref color 3)))
     (pack vertices base sprite-vertex
           x y
-          1 1 1 1
+          r g b a
           u v)
     (pack vertices (+ base 1) sprite-vertex
           x2 y
-          1 1 1 1
+          r g b a
           u2 v)
     (pack vertices (+ base 2) sprite-vertex
           x2 y2
-          1 1 1 1
+          r g b a
           u2 v2)
     (pack vertices (+ base 3) sprite-vertex
           x y2
-          1 1 1 1
+          r g b a
           u v2))
   ;; Increment batch size
   (set-sprite-batch-size! batch (1+ (sprite-batch-size batch))))
