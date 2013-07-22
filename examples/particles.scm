@@ -2,14 +2,12 @@
 (use-modules ((sdl sdl) #:prefix SDL:)
              (figl gl)
              (srfi srfi-1)
-             (srfi srfi-2)
              (srfi srfi-9)
              (ice-9 format)
              (2d sprite)
              (2d game-loop)
              (2d window)
              (2d vector)
-             (2d input)
              (2d helpers))
 
 (set! *random-state* (random-state-from-platform))
@@ -69,7 +67,7 @@
 (set-key-down-callback (lambda (key mod unicode) (key-down key mod unicode)))
 
 (define (key-down key mod unicode)
-  (cond ((any-equal? key (keycode escape) (keycode q))
+  (cond ((any-equal? key 'escape 'q)
          (close-window)
          (quit))))
 

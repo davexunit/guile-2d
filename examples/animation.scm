@@ -2,7 +2,6 @@
              (2d game-loop)
              (2d window)
              (2d vector)
-             (2d input)
              (2d helpers))
 
 (init-2d)
@@ -12,7 +11,7 @@
 (define sprite #f)
 
 (define (key-down key mod unicode)
-  (cond ((any-equal? key (keycode escape) (keycode q))
+  (cond ((any-equal? key 'escape 'q)
          (close-window)
          (quit))))
 
