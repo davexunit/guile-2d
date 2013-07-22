@@ -37,24 +37,26 @@ the rest of the framework."
   ;; Enable unicode key events
   (SDL:enable-unicode #t))
 
-(define* (open-window width height #:optional #:key (depth 24) (title "guile-2d"))
+(define* (open-window width height #:optional #:key
+                      (depth 24) (title "guile-2d") (resizable #f))
   "Creates the game window with the specified dimensions and
 initializes OpenGL state."
-  ;; Open SDL window in OpenGL mode.
-  (SDL:set-video-mode width height depth 'opengl)
-  (SDL:set-caption title)
-  ;; Initialize OpenGL orthographic view
-  (gl-viewport 0 0 width height)
-  (set-gl-matrix-mode (matrix-mode projection))
-  (gl-load-identity)
-  (gl-ortho 0 width height 0 -1 1)
-  (set-gl-matrix-mode (matrix-mode modelview))
-  (gl-load-identity)
-  ;; Enable texturing and alpha blending
-  (gl-enable (enable-cap texture-2d))
-  (gl-enable (enable-cap blend))
-  (set-gl-blend-function (blending-factor-src src-alpha)
-                         (blending-factor-dest one-minus-src-alpha)))
+  (let ((flags (if resizable '(opengl resizable) 'opengl)))
+    ;; Open SDL window in OpenGL mode.
+    (SDL:set-video-mode width height depth flags)
+    (SDL:set-caption title)
+    ;; Initialize OpenGL orthographic view
+    (gl-viewport 0 0 width height)
+    (set-gl-matrix-mode (matrix-mode projection))
+    (gl-load-identity)
+    (gl-ortho 0 width height 0 -1 1)
+    (set-gl-matrix-mode (matrix-mode modelview))
+    (gl-load-identity)
+    ;; Enable texturing and alpha blending
+    (gl-enable (enable-cap texture-2d))
+    (gl-enable (enable-cap blend))
+    (set-gl-blend-function (blending-factor-src src-alpha)
+                           (blending-factor-dest one-minus-src-alpha))))
 
 (define (close-window)
   "Closes the game window and cleans up. This procedure is typically
