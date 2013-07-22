@@ -25,7 +25,10 @@
   #:use-module ((sdl sdl) #:prefix SDL:)
   #:use-module (figl gl)
   #:use-module (2d agenda)
-  #:export (set-render-callback
+  #:export (set-active-callback
+            set-resize-callback
+            set-quit-callback
+            set-render-callback
             set-update-callback
             set-key-up-callback
             set-key-down-callback
@@ -41,6 +44,9 @@
 ;;; Callbacks
 ;;;
 
+(define active-callback (lambda () #t))
+(define resize-callback (lambda (width height) #t))
+(define quit-callback (lambda () #t))
 (define render-callback (lambda () #t))
 (define update-callback (lambda () #t))
 (define key-up-callback (lambda (key mod unicode) #t))
@@ -48,6 +54,18 @@
 (define mouse-motion-callback (lambda (buttons x y xrel yrel) #t))
 (define mouse-button-down-callback (lambda (button x y) #t))
 (define mouse-button-up-callback (lambda (button x y) #t))
+
+(define (set-active-callback callback)
+  "Sets the active callback procedure."
+  (set! active-callback callback))
+
+(define (set-resize-callback callback)
+  "Sets the resize callback procedure."
+  (set! resize-callback callback))
+
+(define (set-quit-callback callback)
+  "Sets the quit callback procedure."
+  (set! quit-callback callback))
 
 (define (set-render-callback callback)
   "Sets the render callback procedure."
@@ -91,6 +109,13 @@
 (define (handle-event e)
   "Calls the relevant callback for the event."
   (case (SDL:event:type e)
+    ((active)
+     (active-callback))
+    ((video-resize)
+     (resize-callback (SDL:event:resize:w e)
+                      (SDL:event:resize:h e)))
+    ((quit)
+     (quit-callback))
     ((key-down)
      (key-down-callback (SDL:event:key:keysym:sym e)
                         (SDL:event:key:keysym:mod e)
