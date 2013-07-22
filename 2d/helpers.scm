@@ -40,12 +40,12 @@ arguments is non-zero and returns false otherwise."
 
 (define (rgba->gl-color color)
   "Converts an integer color code into OpenGL compatible color
-values. Returns a list of four floating point numbers in range [0,1]."
+values. Returns a vector of four floating point numbers in range [0,1]."
   (define (component offset)
     (let ((mask (bitwise-arithmetic-shift-left #xff offset)))
       (/ (bitwise-arithmetic-shift-right (logand mask color) offset) 255.0)))
 
-  (list (component 24)
-        (component 16)
-        (component 8)
-        (component 0)))
+  (vector (component 24)
+          (component 16)
+          (component 8)
+          (component 0)))
