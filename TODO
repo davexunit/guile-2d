@@ -32,7 +32,7 @@
 
    - [X] Add basic batching for non-scaled, non-rotated sprites
    - [ ] Add transformation logic for scaling and rotating
-   - [ ] Add support for colors
+   - [X] Add support for colors
    - [ ] Add support for different blending modes
 
 ** DONE Tilesets
