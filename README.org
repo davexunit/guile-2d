@@ -175,7 +175,16 @@
 ** Dependencies
 
    - [[https://gitorious.org/guile-figl/guile-figl][guile-figl]]
-   - [[https://www.gnu.org/software/guile-sdl/index.html][guile-sdl]]
+
+     No official release. guile-2d runs off of the latest master
+     version.
+
+     As of this writing, =make= will fail due to errors with building
+     texinfo files. Currently there is an error on line 19188 of
+     =doc/low-level-gl.texi=. To fix, join lines 19188 and 19189
+     together.
+
+   - [[https://www.gnu.org/software/guile-sdl/index.html][guile-sdl]] >= 0.5.0
    - SDL 1.2
 
 ** License
