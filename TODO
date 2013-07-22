@@ -14,15 +14,15 @@
 
    - [X] Keyboard
    - [X] Mouse
-   - [ ] Window
+   - [X] Window (active, resize, quit)
    - [ ] Joystick
 
-** TODO Sprites
+** DONE Sprites
    Encapsulates an image and all of its transformations: position,
    rotation, scale, color, etc.
 
    - [X] Add support for texture regions
-   - [ ] Add support for animations
+   - [X] Add support for animations
    - [X] Use a sprite batch when drawing if one is currently bound
 
 ** TODO Sprite batches
@@ -64,7 +64,11 @@
    - [ ] Matrices
 
 ** TODO Fonts
-   Use Freetype to provide font rendering procedures.
+   - [ ] Fixed width bitmap font rendering
+   - [ ] Truetype font rendering via freetype
+
+** TODO Sound
+   Provide helpful wrappers around SDL sound procedures?
 
 ** TODO A* pathfinding
    A* is a commonly used pathfinding algorithm for games. Pathfinding
@@ -83,3 +87,22 @@
    etc.) and storing them in a cache. Explore using weak keys so that
    assets are removed from the cache when they are no longer
    referenced.
+
+** TODO 0.1 Release
+   An official 0.1 alpha release with basic, minimal functionality
+   will provide a good place for people other than me to try out
+   guile-2d and perhaps even start to hack on it.
+
+   - [ ] Finish sprite batches
+   - [ ] Basic font rendering
+
+     I don't know of any freetype bindings for Guile, so maybe basic
+     fixed-width bitmap font support will be all that is possible for
+     now.
+
+   - [ ] Resolve issues with FIGL
+
+     Can't have a broken dependency.
+
+  - [ ] Texinfo documentation
+  - [ ] Autotools build files
