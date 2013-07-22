@@ -33,7 +33,7 @@
 (define (init-2d)
   "Initializes guile-2d. This procedure must be called before using
 the rest of the framework."
-  (SDL:init '(SDL_INIT_EVERYTHING))
+  (SDL:init 'everything)
   ;; Enable unicode key events
   (SDL:enable-unicode #t))
 
@@ -41,7 +41,7 @@ the rest of the framework."
   "Creates the game window with the specified dimensions and
 initializes OpenGL state."
   ;; Open SDL window in OpenGL mode.
-  (SDL:set-video-mode width height depth '(SDL_OPENGL))
+  (SDL:set-video-mode width height depth 'opengl)
   (SDL:set-caption title)
   ;; Initialize OpenGL orthographic view
   (gl-viewport 0 0 width height)
