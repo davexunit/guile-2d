@@ -88,6 +88,14 @@
    assets are removed from the cache when they are no longer
    referenced.
 
+** TODO Actions
+   Provide a library of coroutines that perform commonly used
+   time-based actions such as linear interpolation. It would be nice
+   to have a way to make these easily composable as well.
+
+   - [ ] Linear interpolation (lerp)
+   - [ ] Move to/move by
+
 ** TODO 0.1 Release
    An official 0.1 alpha release with basic, minimal functionality
    will provide a good place for people other than me to try out
