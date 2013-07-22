@@ -92,12 +92,12 @@
   "Calls the relevant callback for the event."
   (case (SDL:event:type e)
     ((key-down)
-     (key-down-callback (event-keycode e)
-                        (event-keymods e)
+     (key-down-callback (SDL:event:key:keysym:sym e)
+                        (SDL:event:key:keysym:mod e)
                         (SDL:event:key:keysym:unicode e)))
     ((key-up)
-     (key-up-callback (event-keycode e)
-                      (event-keymods e)
+     (key-up-callback (SDL:event:key:keysym:sym e)
+                      (SDL:event:key:keysym:mod e)
                       (SDL:event:key:keysym:unicode e)))
     ((mouse-motion)
      (mouse-motion-callback (SDL:event:motion:state e)
@@ -113,14 +113,6 @@
      (mouse-button-up-callback (SDL:event:button:button e)
                                (SDL:event:button:x e)
                                (SDL:event:button:y e)))))
-
-(define (event-keycode e)
-  "Returns an integer keycode from an SDL event."
-  (SDL:enum->number 'keysym (SDL:event:key:keysym:sym e)))
-
-(define (event-keymods e)
-  "Returns an integer bitmask of keymods from an SDL event"
-  (SDL:flags->number 'keyboard-modifier (SDL:event:key:keysym:mod e)))
 
 ;;;
 ;;; Update and Render
