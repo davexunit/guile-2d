@@ -314,7 +314,6 @@ which frame to show. Returns a new animation-state object."
                       (rotation 0) (color #xffffffff) (anchor 'center))
   "Makes a new sprite object."
   (let ((vertices (make-packed-array sprite-vertex 4))
-        (color (rgba->gl-color color))
         (animation-state (if (animation? drawable)
                              (make-animation-state drawable)
                              #f)))
@@ -395,6 +394,7 @@ sprite."
   (let* ((vertices (sprite-vertices sprite))
          (texture (sprite-texture sprite))
          (size (sprite-drawable-size sprite))
+         (color (rgba->gl-color (sprite-color sprite)))
          (anchor (sprite-anchor-vector sprite))
          (tex-coords (sprite-texture-coords sprite))
          (x (- (vx anchor)))
@@ -404,22 +404,26 @@ sprite."
          (u (first tex-coords))
          (v (second tex-coords))
          (u2 (third tex-coords))
-         (v2 (fourth tex-coords)))
+         (v2 (fourth tex-coords))
+         (r (vector-ref color 0))
+         (g (vector-ref color 1))
+         (b (vector-ref color 2))
+         (a (vector-ref color 3)))
     (pack vertices 0 sprite-vertex
           x y
-          1 1 1 1
+          r g b a
           u v)
     (pack vertices 1 sprite-vertex
           x2 y
-          1 1 1 1
+          r g b a
           u2 v)
     (pack vertices 2 sprite-vertex
           x2 y2
-          1 1 1 1
+          r g b a
           u2 v2)
     (pack vertices 3 sprite-vertex
           x y2
-          1 1 1 1
+          r g b a
           u v2)))
 
 (define (draw-sprite sprite)
