@@ -85,3 +85,6 @@
   "Converts polar coordinates into a cartesian vector."
   (vector (* r (cos theta))
           (* r (sin theta))))
+
+(re-export (vector-map . vector-map)
+           (vector-for-each . vector-for-each))
