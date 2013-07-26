@@ -171,6 +171,33 @@
 
    ** This section needs to be completed. **
 
+** Building
+   guile-2d uses the typical GNU build system. First run `autogen.sh`
+   and then do the usual incantations.
+
+   #+BEGIN_SRC sh
+     ./autogen.sh
+     ./configure
+     make
+     sudo make install
+   #+END_SRC
+
+** Running Examples
+   To run an example when guile-2d has been installed:
+
+   #+BEGIN_SRC sh
+     cd examples
+     guile simple.scm
+   #+END_SRC
+
+   To run an example using the not-yet-installed files (useful when
+   developing):
+
+   #+BEGIN_SRC sh
+     cd examples
+     guile -L .. simple.scm
+   #+END_SRC
+
 ** Dependencies
 
    - [[https://gitorious.org/guile-figl/guile-figl][guile-figl]]
