@@ -104,7 +104,7 @@ Currently only works with RGBA format surfaces."
   (let ((x2 (+ x w))
         (y2 (+ y h)))
     (with-gl-bind-texture (texture-target texture-2d) (texture-id texture)
-      (gl-begin (primitive-type quads)
+      (gl-begin (begin-mode quads)
         (apply gl-color color)
         (gl-texture-coordinates u v)
         (gl-vertex x y)

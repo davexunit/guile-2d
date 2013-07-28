@@ -255,7 +255,7 @@ bound."
                                           vertices
                                           #:stride struct-size
                                           #:offset s-offset)
-        (gl-draw-arrays (primitive-type quads)
+        (gl-draw-arrays (begin-mode quads)
                         0
                         (packed-array-length vertices sprite-vertex)))
       (gl-disable-client-state (enable-cap texture-coord-array))
@@ -397,7 +397,7 @@ batched texture vertices first."
                                           vertices
                                           #:stride struct-size
                                           #:offset (packed-struct-offset sprite-vertex s))
-        (gl-draw-arrays (primitive-type quads) 0 vertex-count)))
+        (gl-draw-arrays (begin-mode quads) 0 vertex-count)))
     (gl-disable-client-state (enable-cap texture-coord-array))
     (gl-disable-client-state (enable-cap color-array))
     (gl-disable-client-state (enable-cap vertex-array))
