@@ -151,43 +151,26 @@
   (render-callback)
   (SDL:gl-swap-buffers))
 
-(define accumulate-fps
-  (let ((last-time (delay (SDL:get-ticks)))
-        (fps 0))
-    (lambda ()
-      "Calculates frames per second."
-      (let ((time (SDL:get-ticks)))
-        (set! fps (1+ fps))
-        (when (>= time (+ (force last-time) 1000))
-          (pk 'FPS fps)
-          (set! last-time (delay time))
-          (set! fps 0))))))
+(define (increment-fps fps fps-time)
+  "Increment frames-per-second counter. Resets to 0 when the
+difference between time and fps-time is greater than or equal to one
+second."
+  (if (>= fps-time 1000)
+      (begin
+        (pk 'FPS fps)
+        0)
+      (1+ fps)))
 
 (define (update accumulator)
   "Call the update callback. The update callback will be called as
 many times as frame-interval can divide accumulator. The return value
 is the unused accumulator time."
   (if (>= accumulator frame-interval)
-      (begin
-        (update-callback)
-        (update-agenda)
-        (update (- accumulator frame-interval)))
-      accumulator))
-
-(define update-and-render
-  (let ((remainder 0)
-        (last-time (delay (SDL:get-ticks))))
-    (lambda ()
-      "Calls update and draw callback when enough time has passed
-since the last tick."
-      (let* ((time (SDL:get-ticks))
-             (elapsed (- time (force last-time)))
-             (accumulator (+ remainder elapsed)))
-        (when (>= accumulator frame-interval)
-          (set! last-time (delay time))
-          (set! remainder (update accumulator))
-          (accumulate-fps)
-          (render))))))
+    (begin
+      (update-callback)
+      (update-agenda)
+      (update (- accumulator frame-interval)))
+    accumulator))
 
 ;;;
 ;;; Game Loop
@@ -195,6 +178,26 @@ since the last tick."
 
 (define (run-game-loop)
   "Runs event handling, update, and render loop."
-  (handle-events)
-  (update-and-render)
-  (run-game-loop))
+  (define (game-loop time last-time fps-time accumulator fps)
+    (handle-events)
+    (let* ((dt (- time last-time))
+           (accumulator (+ accumulator dt))
+           (current-fps-time (+ fps-time dt))
+           (current-time (SDL:get-ticks)))
+      ;; Update and render when the accumulator reaches the threshold.
+      (if (>= accumulator frame-interval)
+          (let ((remainder (update accumulator)))
+            (render)
+            (game-loop current-time
+                       time
+                       (modulo current-fps-time 1000)
+                       remainder
+                       (increment-fps fps current-fps-time)))
+          (game-loop current-time
+                     time
+                     current-fps-time
+                     accumulator
+                     fps))))
+
+  (let ((time (SDL:get-ticks)))
+    (game-loop time time 0 0 0)))
