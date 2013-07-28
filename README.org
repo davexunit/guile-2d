@@ -51,8 +51,9 @@
 
      ;; Load a sprite and center it on the screen.
      ;; Must be done AFTER opening the window.
-     (set! sprite (load-sprite "sprite.png" #:position (vector (/ window-width 2)
-                                                               (/ window-height 2))))
+     (set! sprite (load-sprite "sprite.png"
+                               #:position (vector (/ window-width 2)
+                                                  (/ window-height 2))))
 
      ;; Start the game loop.
      ;; The render callback will be called through this procedure.
@@ -70,8 +71,12 @@
     optional keyword arguments.
 
     #+BEGIN_SRC scheme
-      (define sprite (load-sprite "cirno.png" #:position #(0 0) #:scale (1 1)
-                                  #:rotation (0) #:color #xffffff #:anchor 'center))
+      (define sprite (load-sprite "cirno.png"
+                                  #:position #(0 0)
+                                  #:scale (1 1)
+                                  #:rotation (0)
+                                  #:color #xffffff
+                                  #:anchor 'center))
     #+END_SRC
 
     Alternatively, you can make a sprite from an existing texture. The
@@ -206,8 +211,8 @@
      version.
 
      As of this writing, =make= will fail due to errors with building
-     texinfo files. Currently there is an error on line 19188 of
-     =doc/low-level-gl.texi=. To fix, join lines 19188 and 19189
+     texinfo files. Currently there is an error on line 19152 of
+     =doc/low-level-gl.texi=. To fix, join lines 19152 and 19153
      together.
 
    - [[https://www.gnu.org/software/guile-sdl/index.html][guile-sdl]] >= 0.5.0
