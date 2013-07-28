@@ -22,9 +22,9 @@
   (draw-sprite sprite))
 
 ;; Register callbacks.
-(set-quit-callback (lambda () (quit)))
-(set-render-callback (lambda () (render)))
-(set-key-down-callback (lambda (key mod unicode) (key-down key mod unicode)))
+(add-hook! on-quit-hook (lambda () (quit-demo)))
+(add-hook! on-render-hook (lambda () (render)))
+(add-hook! on-key-down-hook (lambda (key mod unicode) (key-down key mod unicode)))
 
 ;; Open the window.
 (open-window window-width window-height)

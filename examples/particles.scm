@@ -60,9 +60,9 @@
          (draw-sprite sprite)))
      particles)))
 
-(set-render-callback (lambda () (render)))
-(set-update-callback (lambda () (update)))
-(set-key-down-callback (lambda (key mod unicode) (key-down key mod unicode)))
+(add-hook! on-render-hook (lambda () (render)))
+(add-hook! on-update-hook (lambda () (update)))
+(add-hook! on-key-down-hook (lambda (key mod unicode) (key-down key mod unicode)))
 
 (define (key-down key mod unicode)
   (cond ((any-equal? key 'escape 'q)

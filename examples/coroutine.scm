@@ -21,8 +21,8 @@
   (draw-sprite sprite))
 
 ;; Register callbacks.
-(set-render-callback (lambda () (render)))
-(set-key-down-callback (lambda (key mod unicode) (key-down key mod unicode)))
+(add-hook! on-render-hook (lambda () (render)))
+(add-hook! on-key-down-hook (lambda (key mod unicode) (key-down key mod unicode)))
 
 ;; Open the window.
 (open-window window-width window-height)

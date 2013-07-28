@@ -85,8 +85,8 @@
 (define window-width 800)
 (define window-height 600)
 
-(set-key-down-callback (lambda (key mod unicode) (key-down key mod unicode)))
-(set-render-callback (lambda () (render)))
+(add-hook! on-key-down-hook (lambda (key mod unicode) (key-down key mod unicode)))
+(add-hook! on-render-hook (lambda () (render)))
 (open-window window-width window-height)
 
 ;; Load tileset and build map layer
