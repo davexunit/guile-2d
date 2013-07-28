@@ -112,5 +112,5 @@
 
      Can't have a broken dependency.
 
-  - [ ] Texinfo documentation
-  - [ ] Autotools build files
+   - [ ] Texinfo documentation
+   - [X] Autotools build files
