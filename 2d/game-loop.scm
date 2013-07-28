@@ -25,75 +25,35 @@
   #:use-module ((sdl sdl) #:prefix SDL:)
   #:use-module (figl gl)
   #:use-module (2d agenda)
-  #:export (set-active-callback
-            set-resize-callback
-            set-quit-callback
-            set-render-callback
-            set-update-callback
-            set-key-up-callback
-            set-key-down-callback
-            set-mouse-motion-callback
-            set-mouse-button-down-callback
-            set-mouse-button-up-callback
+  #:export (on-active-hook
+            on-resize-hook
+            on-quit-hook
+            on-render-hook
+            on-update-hook
+            on-key-up-hook
+            on-key-down-hook
+            on-mouse-motion-hook
+            on-mouse-button-down-hook
+            on-mouse-button-up-hook
             run-game-loop))
 
 (define target-fps 60)
 (define frame-interval (/ 1000 target-fps))
 
 ;;;
-;;; Callbacks
+;;; Hooks
 ;;;
 
-(define active-callback (lambda () #t))
-(define resize-callback (lambda (width height) #t))
-(define quit-callback (lambda () #t))
-(define render-callback (lambda () #t))
-(define update-callback (lambda () #t))
-(define key-up-callback (lambda (key mod unicode) #t))
-(define key-down-callback (lambda (key mod unicode) #t))
-(define mouse-motion-callback (lambda (buttons x y xrel yrel) #t))
-(define mouse-button-down-callback (lambda (button x y) #t))
-(define mouse-button-up-callback (lambda (button x y) #t))
-
-(define (set-active-callback callback)
-  "Sets the active callback procedure."
-  (set! active-callback callback))
-
-(define (set-resize-callback callback)
-  "Sets the resize callback procedure."
-  (set! resize-callback callback))
-
-(define (set-quit-callback callback)
-  "Sets the quit callback procedure."
-  (set! quit-callback callback))
-
-(define (set-render-callback callback)
-  "Sets the render callback procedure."
-  (set! render-callback callback))
-
-(define (set-update-callback callback)
-  "Sets the update callback procedure."
-  (set! update-callback callback))
-
-(define (set-key-up-callback callback)
-  "Sets the key up callback procedure."
-  (set! key-up-callback callback))
-
-(define (set-key-down-callback callback)
-  "Sets the key down callback procedure."
-  (set! key-down-callback callback))
-
-(define (set-mouse-motion-callback callback)
-  "Sets the mouse motion callback procedure."
-  (set! mouse-motion-callback callback))
-
-(define (set-mouse-button-down-callback callback)
-  "Sets the mouse button down callback procedure."
-  (set! mouse-button-down-callback callback))
-
-(define (set-mouse-button-up-callback callback)
-  "Sets the mouse button up callback procedure."
-  (set! mouse-button-up-callback callback))
+(define on-active-hook (make-hook))
+(define on-resize-hook (make-hook 2))
+(define on-quit-hook (make-hook))
+(define on-render-hook (make-hook))
+(define on-update-hook (make-hook))
+(define on-key-up-hook (make-hook 3))
+(define on-key-down-hook (make-hook 3))
+(define on-mouse-motion-hook (make-hook 5))
+(define on-mouse-button-down-hook (make-hook 3))
+(define on-mouse-button-up-hook (make-hook 3))
 
 ;;;
 ;;; Event Handling
@@ -110,34 +70,39 @@
   "Calls the relevant callback for the event."
   (case (SDL:event:type e)
     ((active)
-     (active-callback))
+     (run-hook on-active-hook))
     ((video-resize)
-     (resize-callback (SDL:event:resize:w e)
-                      (SDL:event:resize:h e)))
+     (run-hook on-resize-hook (SDL:event:resize:w e)
+               (SDL:event:resize:h e)))
     ((quit)
-     (quit-callback))
+     (run-hook on-quit-hook))
     ((key-down)
-     (key-down-callback (SDL:event:key:keysym:sym e)
-                        (SDL:event:key:keysym:mod e)
-                        (SDL:event:key:keysym:unicode e)))
+     (run-hook on-key-down-hook
+               (SDL:event:key:keysym:sym e)
+               (SDL:event:key:keysym:mod e)
+               (SDL:event:key:keysym:unicode e)))
     ((key-up)
-     (key-up-callback (SDL:event:key:keysym:sym e)
-                      (SDL:event:key:keysym:mod e)
-                      (SDL:event:key:keysym:unicode e)))
+     (run-hook on-key-up-hook
+               (SDL:event:key:keysym:sym e)
+               (SDL:event:key:keysym:mod e)
+               (SDL:event:key:keysym:unicode e)))
     ((mouse-motion)
-     (mouse-motion-callback (SDL:event:motion:state e)
-                            (SDL:event:motion:x e)
-                            (SDL:event:motion:y e)
-                            (SDL:event:motion:xrel e)
-                            (SDL:event:motion:yrel e)))
+     (run-hook on-mouse-motion-hook
+               (SDL:event:motion:state e)
+               (SDL:event:motion:x e)
+               (SDL:event:motion:y e)
+               (SDL:event:motion:xrel e)
+               (SDL:event:motion:yrel e)))
     ((mouse-button-down)
-     (mouse-button-down-callback (SDL:event:button:button e)
-                                 (SDL:event:button:x e)
-                                 (SDL:event:button:y e)))
+     (run-hook on-mouse-button-down-hook
+               (SDL:event:button:button e)
+               (SDL:event:button:x e)
+               (SDL:event:button:y e)))
     ((mouse-button-up)
-     (mouse-button-up-callback (SDL:event:button:button e)
-                               (SDL:event:button:x e)
-                               (SDL:event:button:y e)))))
+     (run-hook on-mouse-button-up-hook
+               (SDL:event:button:button e)
+               (SDL:event:button:x e)
+               (SDL:event:button:y e)))))
 
 ;;;
 ;;; Update and Render
@@ -148,7 +113,7 @@
   (set-gl-matrix-mode (matrix-mode modelview))
   (gl-load-identity)
   (gl-clear (clear-buffer-mask color-buffer depth-buffer))
-  (render-callback)
+  (run-hook on-render-hook)
   (SDL:gl-swap-buffers))
 
 (define (increment-fps fps fps-time)
@@ -167,7 +132,7 @@ many times as frame-interval can divide accumulator. The return value
 is the unused accumulator time."
   (if (>= accumulator frame-interval)
     (begin
-      (update-callback)
+      (run-hook on-update-hook)
       (update-agenda)
       (update (- accumulator frame-interval)))
     accumulator))
