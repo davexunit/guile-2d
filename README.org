@@ -42,9 +42,11 @@
      (define (render)
        (draw-sprite sprite))
 
-     ;; Register callbacks.
-     (set-render-callback (lambda () (render)))
-     (set-key-down-callback (lambda (key) (key-down key)))
+     ;; Register hooks. Lambdas are used as "trampolines" so that render
+     ;; and key-down can be redefined later and the hooks will call the
+     ;; updated procedures.
+     (add-hook! on-render-hook (lambda () (render)))
+     (add-hook! on-key-down-hook (lambda (key) (key-down key)))
 
      ;; Open the window.
      (open-window window-width window-height)
