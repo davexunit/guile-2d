@@ -14,7 +14,7 @@
 
 ** Inspiration
    Every programming language should have a fun, easy to use 2D game
-   library. Guile-2d draws it's inspiration from great
+   library. Guile-2d draws its inspiration from great
    libraries/frameworks such as [[http://love2d.org][LÖVE]], [[http://pygame.org][Pygame]], and [[http://pyglet.org][Pyglet]].
 
 ** Example
