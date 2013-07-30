@@ -36,7 +36,7 @@
   #:use-module (2d vector))
 
 ;;;
-;;; Sprites
+;;; Sprite Vertices
 ;;;
 
 ;; Used to build OpenGL vertex array for a sprite.
@@ -53,11 +53,55 @@
   (s float)
   (t float))
 
+(define (pack-sprite-vertices vertices offset x y width height origin-x origin-y
+                              scale-x scale-y rotation u v u2 v2 color)
+  (let* ((color (rgba->gl-color color))
+         (sin (sin-degrees rotation))
+         (cos (cos-degrees rotation))
+         (local-x1 (* (- origin-x) scale-x))
+         (local-y1 (* (- origin-y) scale-y))
+         (local-x2 (* (- width origin-x) scale-x))
+         (local-y2 (* (- height origin-y) scale-y))
+         (x1 (+ x (- (* cos local-x1) (* sin local-y1))))
+         (y1 (+ y (* sin local-x1) (* cos local-y1)))
+         (x2 (+ x (- (* cos local-x1) (* sin local-y2))))
+         (y2 (+ y (* sin local-x1) (* cos local-y2)))
+         (x3 (+ x (- (* cos local-x2) (* sin local-y2))))
+         (y3 (+ y (* sin local-x2) (* cos local-y2)))
+         (x4 (+ x1 (- x3 x2)))
+         (y4 (- y3 (- y2 y1)))
+         (r (vector-ref color 0))
+         (g (vector-ref color 1))
+         (b (vector-ref color 2))
+         (a (vector-ref color 3)))
+    ;; Vertices go counter clockwise, starting from the top-left
+    ;; corner.
+    (pack vertices offset sprite-vertex
+          x1 y1
+          r g b a
+          u v)
+    (pack vertices (+ offset 1) sprite-vertex
+          x2 y2
+          r g b a
+          u v2)
+    (pack vertices (+ offset 2) sprite-vertex
+          x3 y3
+          r g b a
+          u2 v2)
+    (pack vertices (+ offset 3) sprite-vertex
+          x4 y4
+          r g b a
+          u2 v)))
+
+;;;
+;;; Sprites
+;;;
+
 ;; The <sprite> type represents a drawable object (texture,
 ;; texture-region, animation, etc.) with a given position, scale,
 ;; rotation, and color.
 (define-record-type <sprite>
-  (%make-sprite drawable position scale rotation color anchor vertices animation-state)
+  (%make-sprite drawable position scale rotation color anchor vertices dirty animation-state)
   sprite?
   (drawable sprite-drawable set-sprite-drawable!)
   (position sprite-position %set-sprite-position!)
@@ -76,7 +120,7 @@
         (animation-state (if (animation? drawable)
                              (make-animation-state drawable)
                              #f)))
-    (%make-sprite drawable position scale rotation color anchor vertices animation-state)))
+    (%make-sprite drawable position scale rotation color anchor vertices #t animation-state)))
 
 (define-syntax-rule (dirty-sprite-setter setter private-setter)
   "Defines a setter that calls the private version of the given
@@ -164,40 +208,27 @@ sprite."
 
 (define (update-sprite-vertices! sprite)
   "Rebuilds the internal vertex array."
-  (let* ((vertices (sprite-vertices sprite))
-         (texture (sprite-texture sprite))
-         (size (sprite-drawable-size sprite))
-         (color (rgba->gl-color (sprite-color sprite)))
-         (anchor (sprite-anchor-vector sprite))
-         (tex-coords (sprite-texture-coords sprite))
-         (x (- (vx anchor)))
-         (y (- (vy anchor)))
-         (x2 (+ x (vx size)))
-         (y2 (+ y (vy size)))
-         (u (first tex-coords))
-         (v (second tex-coords))
-         (u2 (third tex-coords))
-         (v2 (fourth tex-coords))
-         (r (vector-ref color 0))
-         (g (vector-ref color 1))
-         (b (vector-ref color 2))
-         (a (vector-ref color 3)))
-    (pack vertices 0 sprite-vertex
-          x y
-          r g b a
-          u v)
-    (pack vertices 1 sprite-vertex
-          x2 y
-          r g b a
-          u2 v)
-    (pack vertices 2 sprite-vertex
-          x2 y2
-          r g b a
-          u2 v2)
-    (pack vertices 3 sprite-vertex
-          x y2
-          r g b a
-          u v2)))
+  (let ((pos (sprite-position sprite))
+        (size (sprite-drawable-size sprite))
+        (scale (sprite-scale sprite))
+        (anchor (sprite-anchor-vector sprite))
+        (tex-coords (sprite-texture-coords sprite)))
+    (pack-sprite-vertices (sprite-vertices sprite)
+                          0
+                          (vx pos)
+                          (vy pos)
+                          (vx size)
+                          (vy size)
+                          (vx anchor)
+                          (vy anchor)
+                          (vx scale)
+                          (vy scale)
+                          (sprite-rotation sprite)
+                          (first tex-coords)
+                          (second tex-coords)
+                          (third tex-coords)
+                          (fourth tex-coords)
+                          (sprite-color sprite))))
 
 (define (draw-sprite sprite)
   "Renders a sprite. A sprite batch will be used if one is currently
@@ -226,16 +257,16 @@ bound."
                         (vy pos)
                         (vx size)
                         (vy size)
-                        #:color (sprite-color sprite)
-                        #:rotation (sprite-rotation sprite)
-                        #:origin-x (vx anchor)
-                        #:origin-y (vy anchor)
-                        #:scale-x (vx scale)
-                        #:scale-y (vy scale)
-                        #:u (first tex-coords)
-                        #:v (second tex-coords)
-                        #:u2 (third tex-coords)
-                        #:v2 (fourth tex-coords))))
+                        (vx anchor)
+                        (vy anchor)
+                        (vx scale)
+                        (vy scale)
+                        (sprite-rotation sprite)
+                        (first tex-coords)
+                        (second tex-coords)
+                        (third tex-coords)
+                        (fourth tex-coords)
+                        (sprite-color sprite))))
 
 (define (draw-sprite-vertex-array sprite)
   "Renders a sprite using its internal vertex array."
@@ -248,35 +279,30 @@ bound."
          (r-offset (packed-struct-offset sprite-vertex r))
          (s-offset (packed-struct-offset sprite-vertex s))
          (pointer-type (tex-coord-pointer-type float)))
-    (with-gl-push-matrix
-      (gl-translate (vx pos) (vy pos) 0)
-      (gl-rotate (sprite-rotation sprite) 0 0 1)
-      (gl-scale (vx scale) (vy scale) 0)
-      ;; Draw vertex array
-      (gl-enable-client-state (enable-cap vertex-array))
-      (gl-enable-client-state (enable-cap color-array))
-      (gl-enable-client-state (enable-cap texture-coord-array))
-      (with-gl-bind-texture (texture-target texture-2d) (texture-id texture)
-        (set-gl-vertex-array pointer-type
-                             vertices
-                             2
-                             #:stride struct-size
-                             #:offset x-offset)
-        (set-gl-color-array pointer-type
-                            vertices
-                            4
-                            #:stride struct-size
-                            #:offset r-offset)
-        (set-gl-texture-coordinates-array pointer-type
-                                          vertices
-                                          #:stride struct-size
-                                          #:offset s-offset)
-        (gl-draw-arrays (begin-mode quads)
-                        0
-                        (packed-array-length vertices sprite-vertex)))
-      (gl-disable-client-state (enable-cap texture-coord-array))
-      (gl-disable-client-state (enable-cap color-array))
-      (gl-disable-client-state (enable-cap vertex-array)))))
+    (gl-enable-client-state (enable-cap vertex-array))
+    (gl-enable-client-state (enable-cap color-array))
+    (gl-enable-client-state (enable-cap texture-coord-array))
+    (with-gl-bind-texture (texture-target texture-2d) (texture-id texture)
+      (set-gl-vertex-array pointer-type
+                           vertices
+                           2
+                           #:stride struct-size
+                           #:offset x-offset)
+      (set-gl-color-array pointer-type
+                          vertices
+                          4
+                          #:stride struct-size
+                          #:offset r-offset)
+      (set-gl-texture-coordinates-array pointer-type
+                                        vertices
+                                        #:stride struct-size
+                                        #:offset s-offset)
+      (gl-draw-arrays (begin-mode quads)
+                      0
+                      (packed-array-length vertices sprite-vertex)))
+    (gl-disable-client-state (enable-cap texture-coord-array))
+    (gl-disable-client-state (enable-cap color-array))
+    (gl-disable-client-state (enable-cap vertex-array))))
 
 (export make-sprite
         sprite?
@@ -324,10 +350,8 @@ bound."
   "Adds a textured quad to the current zsprite batch."
   (apply %sprite-batch-draw *sprite-batch* args))
 
-(define* (%sprite-batch-draw batch texture x y width height #:optional #:key
-                             (origin-x 0) (origin-y 0) (scale-x 1) (scale-y 1)
-                             (rotation 0) (u 0) (v 0) (u2 1) (v2 1)
-                             (color #xffffffff))
+(define* (%sprite-batch-draw batch texture x y width height origin-x origin-y
+                             scale-x scale-y rotation u v u2 v2 color)
   "Adds a textured quad to the sprite batch."
   ;; Render the batch when it's full or the texture changes.
   (cond ((= (sprite-batch-size batch) (sprite-batch-max-size batch))
@@ -336,47 +360,11 @@ bound."
          (sprite-batch-switch-texture batch texture)))
 
   ;; Add 4 new vertices, taking into account scaling and rotation.
-  (let* ((base (* 4 (sprite-batch-size batch)))
-         (vertices (sprite-batch-vertices batch))
-         (color (rgba->gl-color color))
-         (sin (sin-degrees rotation))
-         (cos (cos-degrees rotation))
-         (world-origin-x (+ origin-x x))
-         (world-origin-y (+ origin-y y))
-         (local-x1 (* (- origin-x) scale-x))
-         (local-y1 (* (- origin-y) scale-y))
-         (local-x2 (* (- width origin-x) scale-x))
-         (local-y2 (* (- height origin-y) scale-y))
-         (x1 (+ world-origin-x (- (* cos local-x1) (* sin local-y1))))
-         (y1 (+ world-origin-y (* sin local-x1) (* cos local-y1)))
-         (x2 (+ world-origin-x (- (* cos local-x1) (* sin local-y2))))
-         (y2 (+ world-origin-y (* sin local-x1) (* cos local-y2)))
-         (x3 (+ world-origin-x (- (* cos local-x2) (* sin local-y2))))
-         (y3 (+ world-origin-y (* sin local-x2) (* cos local-y2)))
-         (x4 (+ x1 (- x3 x2)))
-         (y4 (- y3 (- y2 y1)))
-         (r (vector-ref color 0))
-         (g (vector-ref color 1))
-         (b (vector-ref color 2))
-         (a (vector-ref color 3)))
-    ;; Vertices go counter clockwise, starting from the top-left
-    ;; corner.
-    (pack vertices base sprite-vertex
-          x1 y1
-          r g b a
-          u v)
-    (pack vertices (+ base 1) sprite-vertex
-          x2 y2
-          r g b a
-          u v2)
-    (pack vertices (+ base 2) sprite-vertex
-          x3 y3
-          r g b a
-          u2 v2)
-    (pack vertices (+ base 3) sprite-vertex
-          x4 y4
-          r g b a
-          u2 v))
+  (pack-sprite-vertices (sprite-batch-vertices batch)
+                        (* 4 (sprite-batch-size batch))
+                        x y width height origin-x origin-y
+                        scale-x scale-y rotation u v u2 v2 color)
+
   ;; Increment batch size
   (set-sprite-batch-size! batch (1+ (sprite-batch-size batch))))
 
