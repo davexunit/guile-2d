@@ -56,42 +56,71 @@
 (define (pack-sprite-vertices vertices offset x y width height origin-x origin-y
                               scale-x scale-y rotation u v u2 v2 color)
   (let* ((color (rgba->gl-color color))
-         (sin (sin-degrees rotation))
-         (cos (cos-degrees rotation))
          (local-x1 (* (- origin-x) scale-x))
          (local-y1 (* (- origin-y) scale-y))
          (local-x2 (* (- width origin-x) scale-x))
          (local-y2 (* (- height origin-y) scale-y))
-         (x1 (+ x (- (* cos local-x1) (* sin local-y1))))
-         (y1 (+ y (* sin local-x1) (* cos local-y1)))
-         (x2 (+ x (- (* cos local-x1) (* sin local-y2))))
-         (y2 (+ y (* sin local-x1) (* cos local-y2)))
-         (x3 (+ x (- (* cos local-x2) (* sin local-y2))))
-         (y3 (+ y (* sin local-x2) (* cos local-y2)))
-         (x4 (+ x1 (- x3 x2)))
-         (y4 (- y3 (- y2 y1)))
          (r (vector-ref color 0))
          (g (vector-ref color 1))
          (b (vector-ref color 2))
          (a (vector-ref color 3)))
-    ;; Vertices go counter clockwise, starting from the top-left
-    ;; corner.
-    (pack vertices offset sprite-vertex
-          x1 y1
-          r g b a
-          u v)
-    (pack vertices (+ offset 1) sprite-vertex
-          x2 y2
-          r g b a
-          u v2)
-    (pack vertices (+ offset 2) sprite-vertex
-          x3 y3
-          r g b a
-          u2 v2)
-    (pack vertices (+ offset 3) sprite-vertex
-          x4 y4
-          r g b a
-          u2 v)))
+    (if (= rotation 0)
+        (begin
+          (let ((x1 (+ x local-x1))
+                (y1 (+ y local-y1))
+                (x2 (+ x local-x1))
+                (y2 (+ y local-y2))
+                (x3 (+ x local-x2))
+                (y3 (+ y local-y2))
+                (x4 (+ x local-x2))
+                (y4 (+ y local-y1)))
+            ;; Vertices go counter clockwise, starting from the top-left
+            ;; corner.
+            (pack vertices offset sprite-vertex
+                  x1 y1
+                  r g b a
+                  u v)
+            (pack vertices (+ offset 1) sprite-vertex
+                  x2 y2
+                  r g b a
+                  u v2)
+            (pack vertices (+ offset 2) sprite-vertex
+                  x3 y3
+                  r g b a
+                  u2 v2)
+            (pack vertices (+ offset 3) sprite-vertex
+                  x4 y4
+                  r g b a
+                  u2 v)))
+        (begin
+          (let* ((sin (sin-degrees rotation))
+                 (cos (cos-degrees rotation))
+                 (x1 (+ x (- (* cos local-x1) (* sin local-y1))))
+                 (y1 (+ y (* sin local-x1) (* cos local-y1)))
+                 (x2 (+ x (- (* cos local-x1) (* sin local-y2))))
+                 (y2 (+ y (* sin local-x1) (* cos local-y2)))
+                 (x3 (+ x (- (* cos local-x2) (* sin local-y2))))
+                 (y3 (+ y (* sin local-x2) (* cos local-y2)))
+                 (x4 (+ x1 (- x3 x2)))
+                 (y4 (- y3 (- y2 y1))))
+            ;; Vertices go counter clockwise, starting from the top-left
+            ;; corner.
+            (pack vertices offset sprite-vertex
+                  x1 y1
+                  r g b a
+                  u v)
+            (pack vertices (+ offset 1) sprite-vertex
+                  x2 y2
+                  r g b a
+                  u v2)
+            (pack vertices (+ offset 2) sprite-vertex
+                  x3 y3
+                  r g b a
+                  u2 v2)
+            (pack vertices (+ offset 3) sprite-vertex
+                  x4 y4
+                  r g b a
+                  u2 v))))))
 
 ;;;
 ;;; Sprites
