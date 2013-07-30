@@ -60,12 +60,13 @@
   (%make-sprite drawable position scale rotation color anchor vertices animation-state)
   sprite?
   (drawable sprite-drawable set-sprite-drawable!)
-  (position sprite-position set-sprite-position!)
-  (scale sprite-scale set-sprite-scale!)
-  (rotation sprite-rotation set-sprite-rotation!)
-  (color sprite-color set-sprite-color!)
-  (anchor sprite-anchor set-sprite-anchor!)
+  (position sprite-position %set-sprite-position!)
+  (scale sprite-scale %set-sprite-scale!)
+  (rotation sprite-rotation %set-sprite-rotation!)
+  (color sprite-color %set-sprite-color!)
+  (anchor sprite-anchor %set-sprite-anchor!)
   (vertices sprite-vertices set-sprite-vertices!)
+  (dirty sprite-dirty? set-sprite-dirty!)
   (animation-state sprite-animation-state set-sprite-animation-state!))
 
 (define* (make-sprite drawable #:optional #:key (position #(0 0)) (scale #(1 1))
@@ -76,6 +77,20 @@
                              (make-animation-state drawable)
                              #f)))
     (%make-sprite drawable position scale rotation color anchor vertices animation-state)))
+
+(define-syntax-rule (dirty-sprite-setter setter private-setter)
+  "Defines a setter that calls the private version of the given
+procedure name (prefix with %) and marks the sprite as dirty. Any
+operation that requires a refresh of the vertex array should use this macro."
+  (define (setter sprite value)
+    (private-setter sprite value)
+    (set-sprite-dirty! sprite #t)))
+
+(dirty-sprite-setter set-sprite-position! %set-sprite-position!)
+(dirty-sprite-setter set-sprite-scale! %set-sprite-scale!)
+(dirty-sprite-setter set-sprite-rotation! %set-sprite-rotation!)
+(dirty-sprite-setter set-sprite-color! %set-sprite-color!)
+(dirty-sprite-setter set-sprite-anchor! %set-sprite-anchor!)
 
 (define* (load-sprite filename #:optional #:key (position #(0 0)) (scale #(1 1))
                       (rotation 0) (color #xffffffff) (anchor 'center))
@@ -147,7 +162,7 @@ sprite."
                 (/ (vy size) 2))))
      (else anchor))))
 
-(define (update-sprite-vertices sprite)
+(define (update-sprite-vertices! sprite)
   "Rebuilds the internal vertex array."
   (let* ((vertices (sprite-vertices sprite))
          (texture (sprite-texture sprite))
@@ -187,6 +202,8 @@ sprite."
 (define (draw-sprite sprite)
   "Renders a sprite. A sprite batch will be used if one is currently
 bound."
+  (when (sprite-dirty? sprite)
+    (update-sprite-vertices! sprite))
   (when (animation? (sprite-drawable sprite))
     (let ((state (tick-animation-state (sprite-animation-state sprite))))
       (set-sprite-animation-state! sprite state)))
@@ -222,7 +239,6 @@ bound."
 
 (define (draw-sprite-vertex-array sprite)
   "Renders a sprite using its internal vertex array."
-  (update-sprite-vertices sprite)
   (let* ((texture (sprite-texture sprite))
          (pos (sprite-position sprite))
          (scale (sprite-scale sprite))
