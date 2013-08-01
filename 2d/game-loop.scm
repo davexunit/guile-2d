@@ -52,6 +52,22 @@
 ;;;
 
 (define *fps* 0)
+(define game-loop-mutex (make-mutex 'unchecked-unlock))
+
+;;;
+;;; REPL Hooks
+;;;
+
+;; Lock game loop mutex before evaluating code from REPL server and
+;; unlock it afterwards.
+(add-hook! before-eval-hook
+           (lambda (exp)
+             (lock-mutex game-loop-mutex)))
+
+(add-hook! after-eval-hook
+           (lambda (exp)
+             (when (equal? (mutex-owner game-loop-mutex) (current-thread))
+               (unlock-mutex game-loop-mutex))))
 
 ;;;
 ;;; Hooks
@@ -180,8 +196,10 @@ is the unused accumulator time."
          (remainder (update accumulator)))
     (render)
     (accumulate-fps! dt)
+    (unlock-mutex game-loop-mutex)
     ;; Sleep for a bit if there's time in between frames
     (SDL:delay (time-left (SDL:get-ticks) next-time))
+    (lock-mutex game-loop-mutex)
     (game-loop time
                (+ next-time tick-interval)
                remainder)))
@@ -189,6 +207,7 @@ is the unused accumulator time."
 (define (run-game-loop)
   "Spawns a REPL server and starts the main game loop."
   (spawn-server)
+  (lock-mutex game-loop-mutex)
   (agenda-schedule show-fps)
   (let ((time (SDL:get-ticks)))
     (game-loop time (+ time tick-interval) 0)))
