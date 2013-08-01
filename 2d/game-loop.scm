@@ -25,6 +25,7 @@
   #:use-module ((sdl sdl) #:prefix SDL:)
   #:use-module (figl gl)
   #:use-module (2d agenda)
+  #:use-module (2d coroutine)
   #:export (on-active-hook
             on-resize-hook
             on-quit-hook
@@ -35,10 +36,12 @@
             on-mouse-motion-hook
             on-mouse-button-down-hook
             on-mouse-button-up-hook
-            run-game-loop))
+            run-game-loop
+            current-fps))
 
 (define target-fps 60)
-(define frame-interval (/ 1000 target-fps))
+(define *fps* 0)
+(define tick-interval (/ 1000 target-fps))
 
 ;;;
 ;;; Hooks
@@ -105,6 +108,30 @@
                (SDL:event:button:y e)))))
 
 ;;;
+;;; Frames Per Second
+;;;
+
+(define accumulate-fps!
+  (let* ((frame-time 0)
+         (alpha 1/5)
+         (inverse-alpha (- 1 alpha)))
+    (lambda (dt)
+      "Computes a weighted average FPS."
+      (set! frame-time (+ (* alpha dt) (* inverse-alpha frame-time)))
+      (unless (zero? frame-time)
+        (set! *fps* (/ 1000 frame-time))))))
+
+(define (current-fps)
+  "Returns the current FPS value."
+  *fps*)
+
+(codefine (show-fps)
+  "Display the current FPS every second."
+  (wait 60)
+  (pk 'FPS (floor *fps*))
+  (show-fps))
+
+;;;
 ;;; Update and Render
 ;;;
 
@@ -116,25 +143,15 @@
   (run-hook on-render-hook)
   (SDL:gl-swap-buffers))
 
-(define (increment-fps fps fps-time)
-  "Increment frames-per-second counter. Resets to 0 when the
-difference between time and fps-time is greater than or equal to one
-second."
-  (if (>= fps-time 1000)
-      (begin
-        (pk 'FPS fps)
-        0)
-      (1+ fps)))
-
 (define (update accumulator)
   "Call the update callback. The update callback will be called as
-many times as frame-interval can divide accumulator. The return value
+many times as tick-interval can divide accumulator. The return value
 is the unused accumulator time."
-  (if (>= accumulator frame-interval)
+  (if (>= accumulator tick-interval)
     (begin
       (run-hook on-update-hook)
       (update-agenda)
-      (update (- accumulator frame-interval)))
+      (update (- accumulator tick-interval)))
     accumulator))
 
 (define (time-left current-time next-time)
@@ -146,21 +163,20 @@ is the unused accumulator time."
 
 (define (run-game-loop)
   "Runs event handling, update, and render loop."
-  (define (game-loop last-time next-time fps-time accumulator fps)
+  (define (game-loop last-time next-time accumulator)
     (handle-events)
     (let* ((time (SDL:get-ticks))
            (dt (- time last-time))
            (accumulator (+ accumulator dt))
-           (current-fps-time (+ fps-time dt))
            (remainder (update accumulator)))
       (render)
+      (accumulate-fps! dt)
       ;; Sleep for a bit if there's time in between frames
       (SDL:delay (time-left (SDL:get-ticks) next-time))
       (game-loop time
-                 (+ next-time frame-interval)
-                 (modulo current-fps-time 1000)
-                 remainder
-                 (increment-fps fps current-fps-time))))
+                 (+ next-time tick-interval)
+                 remainder)))
 
+  (agenda-schedule show-fps)
   (let ((time (SDL:get-ticks)))
-    (game-loop time (+ time frame-interval) 0 0 0)))
+    (game-loop time (+ time tick-interval) 0)))
