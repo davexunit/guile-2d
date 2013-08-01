@@ -138,7 +138,7 @@ is the unused accumulator time."
     accumulator))
 
 (define (time-left current-time next-time)
-  (max (floor (- next-time (SDL:get-ticks))) 0))
+  (max (floor (- next-time current-time)) 0))
 
 ;;;
 ;;; Game Loop
