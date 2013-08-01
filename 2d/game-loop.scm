@@ -26,6 +26,7 @@
   #:use-module (figl gl)
   #:use-module (2d agenda)
   #:use-module (2d coroutine)
+  #:use-module (2d repl server)
   #:export (on-active-hook
             on-resize-hook
             on-quit-hook
@@ -177,6 +178,8 @@ is the unused accumulator time."
                  (+ next-time tick-interval)
                  remainder)))
 
+  ;; Start REPL for live coding wonders.
+  (spawn-server)
   (agenda-schedule show-fps)
   (let ((time (SDL:get-ticks)))
     (game-loop time (+ time tick-interval) 0)))
