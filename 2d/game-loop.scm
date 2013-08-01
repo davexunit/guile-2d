@@ -41,7 +41,7 @@
 
 (define target-fps 60)
 (define *fps* 0)
-(define tick-interval (/ 1000 target-fps))
+(define tick-interval (floor (/ 1000 target-fps)))
 
 ;;;
 ;;; Hooks
