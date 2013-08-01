@@ -137,32 +137,30 @@ is the unused accumulator time."
       (update (- accumulator frame-interval)))
     accumulator))
 
+(define (time-left current-time next-time)
+  (max (floor (- next-time (SDL:get-ticks))) 0))
+
 ;;;
 ;;; Game Loop
 ;;;
 
 (define (run-game-loop)
   "Runs event handling, update, and render loop."
-  (define (game-loop time last-time fps-time accumulator fps)
+  (define (game-loop last-time next-time fps-time accumulator fps)
     (handle-events)
-    (let* ((dt (- time last-time))
+    (let* ((time (SDL:get-ticks))
+           (dt (- time last-time))
            (accumulator (+ accumulator dt))
            (current-fps-time (+ fps-time dt))
-           (current-time (SDL:get-ticks)))
-      ;; Update and render when the accumulator reaches the threshold.
-      (if (>= accumulator frame-interval)
-          (let ((remainder (update accumulator)))
-            (render)
-            (game-loop current-time
-                       time
-                       (modulo current-fps-time 1000)
-                       remainder
-                       (increment-fps fps current-fps-time)))
-          (game-loop current-time
-                     time
-                     current-fps-time
-                     accumulator
-                     fps))))
+           (remainder (update accumulator)))
+      (render)
+      ;; Sleep for a bit if there's time in between frames
+      (SDL:delay (time-left (SDL:get-ticks) next-time))
+      (game-loop time
+                 (+ next-time frame-interval)
+                 (modulo current-fps-time 1000)
+                 remainder
+                 (increment-fps fps current-fps-time))))
 
   (let ((time (SDL:get-ticks)))
-    (game-loop time time 0 0 0)))
+    (game-loop time (+ time frame-interval) 0 0 0)))
