@@ -162,23 +162,23 @@ is the unused accumulator time."
 ;;; Game Loop
 ;;;
 
-(define (run-game-loop)
-  "Runs event handling, update, and render loop."
-  (define (game-loop last-time next-time accumulator)
-    (handle-events)
-    (let* ((time (SDL:get-ticks))
-           (dt (- time last-time))
-           (accumulator (+ accumulator dt))
-           (remainder (update accumulator)))
-      (render)
-      (accumulate-fps! dt)
-      ;; Sleep for a bit if there's time in between frames
-      (SDL:delay (time-left (SDL:get-ticks) next-time))
-      (game-loop time
-                 (+ next-time tick-interval)
-                 remainder)))
+(define (game-loop last-time next-time accumulator)
+  "Runs input, render, and update hooks."
+  (handle-events)
+  (let* ((time (SDL:get-ticks))
+         (dt (- time last-time))
+         (accumulator (+ accumulator dt))
+         (remainder (update accumulator)))
+    (render)
+    (accumulate-fps! dt)
+    ;; Sleep for a bit if there's time in between frames
+    (SDL:delay (time-left (SDL:get-ticks) next-time))
+    (game-loop time
+               (+ next-time tick-interval)
+               remainder)))
 
-  ;; Start REPL for live coding wonders.
+(define (run-game-loop)
+  "Spawns a REPL server and starts the main game loop."
   (spawn-server)
   (agenda-schedule show-fps)
   (let ((time (SDL:get-ticks)))
