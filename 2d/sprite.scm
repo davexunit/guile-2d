@@ -174,90 +174,52 @@ operation that requires a refresh of the vertex array should use this macro."
 (define (sprite-animation-frame sprite)
   (animation-state-frame (sprite-animation-state sprite)))
 
-(define (get-texture drawable)
-  (cond ((texture? drawable)
-         drawable)
-        ((texture-region? drawable)
-         (texture-region-texture drawable))))
-
 (define (sprite-texture sprite)
   "Returns the texture for the sprite's drawable object."
     (let ((drawable (sprite-drawable sprite)))
-      (cond ((or (texture? drawable)
-                 (texture-region? drawable))
-             (get-texture drawable))
+      (cond ((texture? drawable)
+             drawable)
             ((animation? drawable)
-             (get-texture (sprite-animation-frame sprite))))))
-
-(define (drawable-texture-coords drawable)
-  (cond ((texture? drawable)
-         '(0 0 1 1))
-        ((texture-region? drawable)
-         (list (texture-region-u drawable)
-               (texture-region-v drawable)
-               (texture-region-u2 drawable)
-               (texture-region-v2 drawable)))))
-
-(define (sprite-texture-coords sprite)
-  "Returns the texture coordinates for the drawable object."
-  (let ((drawable (sprite-drawable sprite)))
-    (cond ((or (texture? drawable)
-               (texture-region? drawable))
-           (drawable-texture-coords drawable))
-          ((animation? drawable)
-           (drawable-texture-coords (sprite-animation-frame sprite))))))
-
-(define (drawable-size drawable)
-  (cond ((texture? drawable)
-         (vector (texture-width drawable)
-                 (texture-height drawable)))
-        ((texture-region? drawable)
-         (vector (texture-region-width drawable)
-                 (texture-region-height drawable)))))
-
-(define (sprite-drawable-size sprite)
-  "Returns the size of the sprite drawable as a vector"
-  (let ((drawable (sprite-drawable sprite)))
-    (cond ((or (texture? drawable)
-               (texture-region? drawable))
-           (drawable-size drawable))
-          ((animation? drawable)
-           (drawable-size (sprite-animation-frame sprite))))))
+             (sprite-animation-frame sprite)))))
 
 (define (sprite-anchor-vector sprite)
   "Returns a vector of the coordinates for the center point of a
 sprite."
-  (let ((anchor (sprite-anchor sprite)))
+  (let ((anchor (sprite-anchor sprite))
+        (texture (sprite-texture sprite)))
     (cond
      ((eq? anchor 'center)
-      (let ((size (sprite-drawable-size sprite)))
-        (vector (/ (vx size) 2)
-                (/ (vy size) 2))))
+        (vector (/ (texture-width texture) 2)
+                (/ (texture-height texture) 2)))
      (else anchor))))
 
 (define (update-sprite-vertices! sprite)
   "Rebuilds the internal vertex array."
   (let ((pos (sprite-position sprite))
-        (size (sprite-drawable-size sprite))
         (scale (sprite-scale sprite))
         (anchor (sprite-anchor-vector sprite))
-        (tex-coords (sprite-texture-coords sprite)))
+        (texture (sprite-texture sprite)))
     (pack-sprite-vertices (sprite-vertices sprite)
                           0
                           (vx pos)
                           (vy pos)
-                          (vx size)
-                          (vy size)
+                          (texture-width texture)
+                          (texture-height texture)
                           (vx anchor)
                           (vy anchor)
                           (vx scale)
                           (vy scale)
                           (sprite-rotation sprite)
-                          (first tex-coords)
-                          (second tex-coords)
-                          (third tex-coords)
-                          (fourth tex-coords)
+                          (texture-s1 texture)
+                          (texture-t1 texture)
+                          (texture-s2 texture)
+                          (texture-t2 texture)
                           (sprite-color sprite))))
+
+(define (update-sprite-animation-state! sprite)
+  (set-sprite-animation-state!
+   sprite
+   (tick-animation-state (sprite-animation-state sprite))))
 
 (define (draw-sprite sprite)
   "Renders a sprite. A sprite batch will be used if one is currently
@@ -265,9 +227,7 @@ bound."
   (when (sprite-dirty? sprite)
     (update-sprite-vertices! sprite))
   (when (animation? (sprite-drawable sprite))
-    (let ((state (tick-animation-state (sprite-animation-state sprite))))
-      (set-sprite-animation-state! sprite state)))
-
+    (update-sprite-animation-state! sprite))
   (if *sprite-batch*
       (draw-sprite-batched sprite)
       (draw-sprite-vertex-array sprite)))
@@ -276,25 +236,23 @@ bound."
   "Adds a sprite to the batch."
   (let ((texture (sprite-texture sprite))
         (pos (sprite-position sprite))
-        (size (sprite-drawable-size sprite))
         (scale (sprite-scale sprite))
-        (anchor (sprite-anchor-vector sprite))
-        (tex-coords (sprite-texture-coords sprite)))
+        (anchor (sprite-anchor-vector sprite)))
     (%sprite-batch-draw *sprite-batch*
                         texture
                         (vx pos)
                         (vy pos)
-                        (vx size)
-                        (vy size)
+                        (texture-width texture)
+                        (texture-height texture)
                         (vx anchor)
                         (vy anchor)
                         (vx scale)
                         (vy scale)
                         (sprite-rotation sprite)
-                        (first tex-coords)
-                        (second tex-coords)
-                        (third tex-coords)
-                        (fourth tex-coords)
+                        (texture-s1 texture)
+                        (texture-t1 texture)
+                        (texture-s2 texture)
+                        (texture-t2 texture)
                         (sprite-color sprite))))
 
 (define (draw-sprite-vertex-array sprite)
