@@ -53,6 +53,11 @@
   (s float)
   (t float))
 
+(define sprite-vertex-size (packed-struct-size sprite-vertex))
+(define x-offset (packed-struct-offset sprite-vertex x))
+(define r-offset (packed-struct-offset sprite-vertex r))
+(define s-offset (packed-struct-offset sprite-vertex s))
+
 (define (pack-sprite-vertices vertices offset x y width height origin-x origin-y
                               scale-x scale-y rotation u v u2 v2 color)
   (let* ((color (rgba->gl-color color))
@@ -121,6 +126,33 @@
                   x4 y4
                   r g b a
                   u2 v))))))
+
+(define (draw-sprite-vertices texture vertices size)
+  (let ((pointer-type (tex-coord-pointer-type float)))
+    (gl-enable-client-state (enable-cap vertex-array))
+    (gl-enable-client-state (enable-cap color-array))
+    (gl-enable-client-state (enable-cap texture-coord-array))
+    (with-gl-bind-texture (texture-target texture-2d) (texture-id texture)
+      (set-gl-vertex-array pointer-type
+                           vertices
+                           2
+                           #:stride sprite-vertex-size
+                           #:offset x-offset)
+      (set-gl-color-array pointer-type
+                          vertices
+                          4
+                          #:stride sprite-vertex-size
+                          #:offset r-offset)
+      (set-gl-texture-coordinates-array pointer-type
+                                        vertices
+                                        #:stride sprite-vertex-size
+                                        #:offset s-offset)
+      (gl-draw-arrays (begin-mode quads)
+                      0
+                      (packed-array-length vertices sprite-vertex)))
+    (gl-disable-client-state (enable-cap texture-coord-array))
+    (gl-disable-client-state (enable-cap color-array))
+    (gl-disable-client-state (enable-cap vertex-array))))
 
 ;;;
 ;;; Sprites
@@ -230,7 +262,9 @@ bound."
     (update-sprite-animation-state! sprite))
   (if *sprite-batch*
       (draw-sprite-batched sprite)
-      (draw-sprite-vertex-array sprite)))
+      (draw-sprite-vertices (sprite-texture sprite)
+                            (sprite-vertices sprite)
+                            1)))
 
 (define (draw-sprite-batched sprite)
   "Adds a sprite to the batch."
@@ -254,42 +288,6 @@ bound."
                         (texture-s2 texture)
                         (texture-t2 texture)
                         (sprite-color sprite))))
-
-(define (draw-sprite-vertex-array sprite)
-  "Renders a sprite using its internal vertex array."
-  (let* ((texture (sprite-texture sprite))
-         (pos (sprite-position sprite))
-         (scale (sprite-scale sprite))
-         (vertices (sprite-vertices sprite))
-         (struct-size (packed-struct-size sprite-vertex))
-         (x-offset (packed-struct-offset sprite-vertex x))
-         (r-offset (packed-struct-offset sprite-vertex r))
-         (s-offset (packed-struct-offset sprite-vertex s))
-         (pointer-type (tex-coord-pointer-type float)))
-    (gl-enable-client-state (enable-cap vertex-array))
-    (gl-enable-client-state (enable-cap color-array))
-    (gl-enable-client-state (enable-cap texture-coord-array))
-    (with-gl-bind-texture (texture-target texture-2d) (texture-id texture)
-      (set-gl-vertex-array pointer-type
-                           vertices
-                           2
-                           #:stride struct-size
-                           #:offset x-offset)
-      (set-gl-color-array pointer-type
-                          vertices
-                          4
-                          #:stride struct-size
-                          #:offset r-offset)
-      (set-gl-texture-coordinates-array pointer-type
-                                        vertices
-                                        #:stride struct-size
-                                        #:offset s-offset)
-      (gl-draw-arrays (begin-mode quads)
-                      0
-                      (packed-array-length vertices sprite-vertex)))
-    (gl-disable-client-state (enable-cap texture-coord-array))
-    (gl-disable-client-state (enable-cap color-array))
-    (gl-disable-client-state (enable-cap vertex-array))))
 
 (export make-sprite
         sprite?
@@ -364,34 +362,9 @@ batched texture vertices first."
 (define (sprite-batch-render batch)
   "Renders and flushes the currently batched texture vertices."
   (unless (= (sprite-batch-size batch) 0)
-    ;; Draw vertex array.
-    (gl-enable-client-state (enable-cap vertex-array))
-    (gl-enable-client-state (enable-cap color-array))
-    (gl-enable-client-state (enable-cap texture-coord-array))
-    (let* ((texture (sprite-batch-texture batch))
-           (size (sprite-batch-size batch))
-           (struct-size (packed-struct-size sprite-vertex))
-           (vertices (sprite-batch-vertices batch))
-           (vertex-count (* 4 size)))
-      (with-gl-bind-texture (texture-target texture-2d) (texture-id texture)
-        (set-gl-vertex-array (vertex-pointer-type float)
-                             vertices
-                             2
-                             #:stride struct-size
-                             #:offset (packed-struct-offset sprite-vertex x))
-        (set-gl-color-array (color-pointer-type float)
-                            vertices
-                            4
-                            #:stride struct-size
-                            #:offset (packed-struct-offset sprite-vertex r))
-        (set-gl-texture-coordinates-array (tex-coord-pointer-type float)
-                                          vertices
-                                          #:stride struct-size
-                                          #:offset (packed-struct-offset sprite-vertex s))
-        (gl-draw-arrays (begin-mode quads) 0 vertex-count)))
-    (gl-disable-client-state (enable-cap texture-coord-array))
-    (gl-disable-client-state (enable-cap color-array))
-    (gl-disable-client-state (enable-cap vertex-array))
+    (draw-sprite-vertices (sprite-batch-texture batch)
+                          (sprite-batch-vertices batch)
+                          (sprite-batch-size batch))
     ;; Reset batch size to 0.
     (set-sprite-batch-size! batch 0)))
 
