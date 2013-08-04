@@ -96,6 +96,15 @@
    - [ ] Linear interpolation (lerp)
    - [ ] Move to/move by
 
+
+** TODO Combos
+   Provide an Emacs-like way of defining key combinations to that
+   multi-button input is easy for users.
+
+   - [ ] Basic sequences (press A then B)
+   - [ ] Simultaneous key presses (press A and B at the same time)
+   - [ ] Timeouts (combos fail if you don't enter them quick enough)
+
 ** TODO 0.1 Release
    An official 0.1 alpha release with basic, minimal functionality
    will provide a good place for people other than me to try out
