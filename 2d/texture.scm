@@ -52,7 +52,7 @@
 ;; The <texture> object is a simple wrapper around an OpenGL texture
 ;; id.
 (define-record-type <texture>
-  (make-texture id parent width height s1 t1 s2 t2)
+  (%make-texture id parent width height s1 t1 s2 t2)
   texture?
   (id texture-id)
   (parent texture-parent)
@@ -65,6 +65,11 @@
 
 (define (texture-region? texture)
   (texture? (texture-parent texture)))
+
+(define (make-texture id parent width height s1 t1 s2 t2)
+  (let ((texture (%make-texture id parent width height s1 t1 s2 t2)))
+    (texture-guardian texture)
+    texture))
 
 (define (make-texture-region texture x y width height)
   "Creates a new texture region given a texture and a pixel region."
@@ -127,13 +132,11 @@ Currently only works with RGBA format surfaces."
                            pixel-format
                            (color-pointer-type unsigned-byte)
                            (SDL:surface-pixels surface)))
-    (let ((texture (make-texture texture-id
-                                 #f
-                                 (SDL:surface:w surface)
-                                 (SDL:surface:h surface)
-                                 0 0 1 1)))
-      (texture-guardian texture)
-      texture)))
+    (make-texture texture-id
+                  #f
+                  (SDL:surface:w surface)
+                  (SDL:surface:h surface)
+                  0 0 1 1)))
 
 (define (load-texture filename)
   "Loads a texture from a file."
