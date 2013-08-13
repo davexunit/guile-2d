@@ -36,6 +36,7 @@
             rect-move
             rect-inflate
             rect-union
+            rect-clip
             rect-within?
             rect-intesects?
             rect-contains?))
