@@ -27,26 +27,6 @@
   #:use-module ((figl gl low-level) #:renamer (symbol-prefix-proc '%))
   #:export (pixel-format*))
 
-;; Workaround broken figl pixel-fromat enumeration.
-(define-enumeration
-  pixel-format*
-  (color-index 6400)
-  (stencil-index 6401)
-  (depth-component 6402)
-  (red 6403)
-  (green 6404)
-  (blue 6405)
-  (alpha 6406)
-  (rgb 6407)
-  (rgba 6408)
-  (luminance 6409)
-  (luminance-alpha 6410)
-  (abgr-ext 32768)
-  (cmyk-ext 32780)
-  (cmyka-ext 32781)
-  (ycrcb-422-sgix 33211)
-  (ycrcb-444-sgix 33212))
-
 ;;;
 ;;; 3.8.1 Texture Image Specification
 ;;;
