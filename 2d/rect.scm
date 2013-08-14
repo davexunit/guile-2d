@@ -116,9 +116,5 @@ not overlap, a rect of size 0 is returned."
   "Tests if the given point is within rect."
   (and (>= x (rect-x  rect))
        (<= x (rect-x2 rect))
-       (>= x (rect-x  rect))
-       (<= x (rect-x2 rect))
-       (>= y (rect-y  rect))
-       (<= y (rect-y2 rect))
        (>= y (rect-y  rect))
        (<= y (rect-y2 rect))))
