@@ -32,7 +32,7 @@
   #:use-module (2d helpers)
   #:use-module (2d math)
   #:use-module (2d texture)
-  #:use-module (2d gl)
+  #:use-module (2d wrappers gl)
   #:use-module (2d vector))
 
 ;;;

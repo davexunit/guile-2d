@@ -27,7 +27,7 @@
   #:use-module (srfi srfi-42)
   #:use-module ((sdl sdl) #:prefix SDL:)
   #:use-module (figl gl)
-  #:use-module (2d gl)
+  #:use-module (2d wrappers gl)
   #:use-module (2d helpers)
   #:export (make-texture
             make-texture-region

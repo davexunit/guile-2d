@@ -22,7 +22,7 @@
 ;;
 ;;; Code:
 
-(define-module (2d gl)
+(define-module (2d wrappers gl)
   #:use-module (figl runtime)
   #:use-module ((figl gl low-level) #:renamer (symbol-prefix-proc '%))
   #:export (pixel-format*))
