@@ -19,6 +19,7 @@
    Encapsulates an image and all of its transformations: position,
    rotation, scale, color, etc.
 
+   - [X] Use FreeImage
    - [X] Add support for texture regions
    - [X] Add support for animations
    - [X] Use a sprite batch when drawing if one is currently bound
@@ -62,8 +63,8 @@
    - [ ] Matrices
 
 ** TODO Fonts
-   - [ ] Fixed width bitmap font rendering
-   - [ ] Truetype font rendering via freetype
+   - [ ] Write wrappers for needed freetype functions
+   - [ ] OpenGL glyph renderer
 
 ** TODO Sound
    Provide helpful wrappers around SDL sound procedures?
@@ -76,6 +77,9 @@
 ** TODO Bounding box collision detection
    Most games need simple bounding box collision detection. Provide an
    efficient implementation that uses quad trees.
+
+   - [X] Rect module
+   - [ ] Quadtree module
 
 ** TODO Particle systems
    Provide a highly configurible particle simulation system.
@@ -91,6 +95,7 @@
    time-based actions such as linear interpolation. It would be nice
    to have a way to make these easily composable as well.
 
+   - [ ] Make the composable
    - [ ] Linear interpolation (lerp)
    - [ ] Move to/move by
 
@@ -109,12 +114,7 @@
    guile-2d and perhaps even start to hack on it.
 
    - [ ] Finish sprite batches
-   - [ ] Basic font rendering
-
-     I don't know of any freetype bindings for Guile, so maybe basic
-     fixed-width bitmap font support will be all that is possible for
-     now.
-
+   - [ ] Font rendering with freetype
    - [ ] Resolve issues with FIGL
 
      Can't have a broken dependency.
