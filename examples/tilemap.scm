@@ -8,8 +8,6 @@
              (2d vector)
              (2d window))
 
-(init-2d)
-
 ;;;
 ;;; Orthogonal tile map example
 ;;;

@@ -3,11 +3,14 @@
              (2d window)
              (2d helpers))
 
-(init-2d)
-
 (define window-width 800)
 (define window-height 600)
-(define sprite #f)
+
+;; Open the window.
+(open-window window-width window-height)
+
+(define sprite (load-sprite "images/grass.jpg" #:position (vector (/ window-width 2)
+                                                                   (/ window-height 2))))
 
 (define (quit-demo)
   (close-window)
@@ -26,13 +29,10 @@
 (add-hook! on-render-hook (lambda () (render)))
 (add-hook! on-key-down-hook (lambda (key mod unicode) (key-down key mod unicode)))
 
-;; Open the window.
-(open-window window-width window-height)
 
 ;; Load a sprite and center it on the screen.
 ;; Must be done AFTER opening the window.
-(set! sprite (load-sprite "images/sprite.png" #:position (vector (/ window-width 2)
-                                                                 (/ window-height 2))))
+;; (set! )
 
 ;; Start the game loop.
 ;; The render callback will be called through this procedure.

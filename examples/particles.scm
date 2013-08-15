@@ -9,7 +9,6 @@
              (2d window))
 
 (set! *random-state* (random-state-from-platform))
-(init-2d)
 
 ;;;
 ;;; Particles

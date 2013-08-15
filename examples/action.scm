@@ -7,11 +7,17 @@
              (2d actions)
              (2d vector))
 
-(init-2d)
-
 (define window-width 800)
 (define window-height 600)
-(define sprite #f)
+
+;; Open the window.
+(open-window window-width window-height)
+
+;; Load a sprite and center it on the screen.
+(define sprite
+  (load-sprite "images/sprite.png"
+               #:position (vector (/ window-width 2)
+                                  (/ window-height 2))))
 
 (define (key-down key mod unicode)
   (cond ((any-equal? key 'escape 'q)
@@ -25,15 +31,6 @@
 ;; Register callbacks.
 (add-hook! on-render-hook (lambda () (render)))
 (add-hook! on-key-down-hook (lambda (key mod unicode) (key-down key mod unicode)))
-
-;; Open the window.
-(open-window window-width window-height)
-
-;; Load a sprite and center it on the screen.
-(set! sprite
-      (load-sprite "images/sprite.png"
-                   #:position (vector (/ window-width 2)
-                                      (/ window-height 2))))
 
 ;; Simple script that moves the sprite to a random location every
 ;; second.
