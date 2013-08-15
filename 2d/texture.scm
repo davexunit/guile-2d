@@ -25,9 +25,9 @@
 (define-module (2d texture)
   #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-42)
-  #:use-module ((sdl sdl) #:prefix SDL:)
   #:use-module (figl gl)
   #:use-module (2d wrappers gl)
+  #:use-module (2d wrappers freeimage)
   #:use-module (2d helpers)
   #:export (make-texture
             make-texture-region
@@ -103,19 +103,10 @@
 
 (add-hook! after-gc-hook reap-textures)
 
-(define (surface-pixel-format surface)
-  "Returns the OpenGL pixel format for a surface. RGB and RGBA formats
-are supported."
-  (case (SDL:surface:depth surface)
-    ((24) (pixel-format rgb))
-    ((32) (pixel-format rgba))
-    (else (throw 'unsupported-pixel-format (SDL:surface:depth surface)))))
-
-(define (surface->texture surface)
-  "Translates an SDL surface into an OpenGL texture.
-Currently only works with RGBA format surfaces."
+(define (bitmap->texture bitmap)
+  "Translates a freeimage bitmap into an OpenGL texture."
   (let ((texture-id (gl-generate-texture))
-        (pixel-format (surface-pixel-format surface)))
+        (pixels (freeimage-get-bits bitmap)))
     (with-gl-bind-texture (texture-target texture-2d) texture-id
       (gl-texture-parameter (texture-target texture-2d)
                             (texture-parameter-name texture-min-filter)
@@ -125,22 +116,27 @@ Currently only works with RGBA format surfaces."
                             (texture-mag-filter linear))
       (gl-texture-image-2d (texture-target texture-2d)
                            0
-                           pixel-format
-                           (SDL:surface:w surface)
-                           (SDL:surface:h surface)
+                           (pixel-format rgba)
+                           (freeimage-get-width bitmap)
+                           (freeimage-get-height bitmap)
                            0
-                           pixel-format
+                           (version-1-2 bgra)
                            (color-pointer-type unsigned-byte)
-                           (SDL:surface-pixels surface)))
+                           pixels))
     (make-texture texture-id
                   #f
-                  (SDL:surface:w surface)
-                  (SDL:surface:h surface)
+                  (freeimage-get-width bitmap)
+                  (freeimage-get-height bitmap)
                   0 0 1 1)))
 
 (define (load-texture filename)
   "Loads a texture from a file."
-  (surface->texture (SDL:load-image filename)))
+  (let* ((bitmap (freeimage-load (freeimage-get-file-type filename) filename))
+         (32bit-bitmap (freeimage-convert-to-32-bits bitmap))
+         (texture (bitmap->texture 32bit-bitmap)))
+    (freeimage-unload bitmap)
+    (freeimage-unload 32bit-bitmap)
+    texture))
 
 (define* (draw-texture texture x y #:optional (color #xffffffff))
   "Renders a textured quad in GL immediate mode."
