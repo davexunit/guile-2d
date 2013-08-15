@@ -107,8 +107,8 @@
   "Returns the OpenGL pixel format for a surface. RGB and RGBA formats
 are supported."
   (case (SDL:surface:depth surface)
-    ((24) (pixel-format* rgb))
-    ((32) (pixel-format* rgba))
+    ((24) (pixel-format rgb))
+    ((32) (pixel-format rgba))
     (else (throw 'unsupported-pixel-format (SDL:surface:depth surface)))))
 
 (define (surface->texture surface)
