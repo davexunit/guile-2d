@@ -24,18 +24,14 @@
 (define-module (2d window)
   #:use-module (figl gl)
   #:use-module ((sdl sdl) #:prefix SDL:)
-  #:export (init-2d
-            open-window
+  #:export (open-window
             close-window
             window-title
             set-window-title!))
 
-(define (init-2d)
-  "Initializes guile-2d. This procedure must be called before using
-the rest of the framework."
-  (SDL:init 'everything)
-  ;; Enable unicode key events
-  (SDL:enable-unicode #t))
+;; Initialize everything
+(SDL:enable-unicode #t)
+(SDL:init 'everything)
 
 (define* (open-window width height #:optional #:key
                       (depth 24) (title "guile-2d") (resizable #f))
