@@ -129,13 +129,18 @@
                   (freeimage-get-height bitmap)
                   0 0 1 1)))
 
+(define (load-bitmap filename)
+  (let* ((bitmap (freeimage-load (freeimage-get-file-type filename) filename))
+         (32bit-bitmap (freeimage-convert-to-32-bits bitmap)))
+    (freeimage-unload bitmap)
+    (freeimage-flip-vertical 32bit-bitmap)
+    32bit-bitmap))
+
 (define (load-texture filename)
   "Loads a texture from a file."
-  (let* ((bitmap (freeimage-load (freeimage-get-file-type filename) filename))
-         (32bit-bitmap (freeimage-convert-to-32-bits bitmap))
-         (texture (bitmap->texture 32bit-bitmap)))
+  (let* ((bitmap (load-bitmap filename))
+         (texture (bitmap->texture bitmap)))
     (freeimage-unload bitmap)
-    (freeimage-unload 32bit-bitmap)
     texture))
 
 (define* (draw-texture texture x y #:optional (color #xffffffff))
