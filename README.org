@@ -28,7 +28,15 @@
 
      (define window-width 800)
      (define window-height 600)
-     (define sprite #f)
+
+     ;; Open the window.
+     (open-window window-width window-height)
+
+     ;; Load a sprite and center it on the screen.
+     (define sprite
+       (load-sprite "sprite.png"
+                    #:position (vector (/ window-width 2)
+                                       (/ window-height 2))))
 
      (define (key-down key)
        (display key) (newline)
@@ -48,15 +56,6 @@
      (add-hook! on-render-hook (lambda () (render)))
      (add-hook! on-key-down-hook (lambda (key) (key-down key)))
 
-     ;; Open the window.
-     (open-window window-width window-height)
-
-     ;; Load a sprite and center it on the screen.
-     ;; Must be done AFTER opening the window.
-     (set! sprite (load-sprite "sprite.png"
-                               #:position (vector (/ window-width 2)
-                                                  (/ window-height 2))))
-
      ;; Start the game loop.
      ;; The render callback will be called through this procedure.
      (run-game-loop)
@@ -71,6 +70,10 @@
     The simplest way to get started with sprites is to use the
     =load-sprite= procedure. All arguments except the filename are
     optional keyword arguments.
+
+    Guile-2d uses the FreeImage library and can load many different
+    image formats. See the FreeImage [[http://freeimage.sourceforge.net/features.html][features page]] for a full list of
+    support formats.
 
     #+BEGIN_SRC scheme
       (define sprite (load-sprite "cirno.png"
@@ -207,6 +210,7 @@
 
 ** Dependencies
 
+   - GNU Guile >= 2.0 (>= 2.0.9 recommended)
    - [[https://gitorious.org/guile-figl/guile-figl][guile-figl]]
 
      No official release. guile-2d runs off of the latest master
@@ -219,6 +223,8 @@
 
    - [[https://www.gnu.org/software/guile-sdl/index.html][guile-sdl]] >= 0.5.0
    - SDL 1.2
+   - FreeImage >= 3.1
+   - Freetype >= 2.0
 
 ** License
 
