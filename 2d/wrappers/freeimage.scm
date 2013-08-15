@@ -248,3 +248,15 @@
 
 (export freeimage-convert-to-24-bits
         freeimage-convert-to-32-bits)
+
+;;;
+;;; Rotation and flipping
+;;;
+
+(define-foreign %freeimage-flip-vertical uint8 "FreeImage_FlipVertical" '(*))
+
+(define (freeimage-flip-vertical bitmap)
+  (number->boolean
+   (%freeimage-flip-vertical (unwrap-freeimage-bitmap bitmap))))
+
+(export freeimage-flip-vertical)
