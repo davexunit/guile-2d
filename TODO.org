@@ -1,5 +1,3 @@
-# -*- org -*-
-
 * Things To Do
 
 ** DONE Game loop
