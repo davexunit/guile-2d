@@ -138,13 +138,12 @@
               (%freeimage-get-height bitmap)
               (%freeimage-get-bpp bitmap)))))
 
-(define-foreign %freeimage-load '* "FreeImage_Load" (list unsigned-int '*))
+(define-foreign %freeimage-load '* "FreeImage_Load" (list unsigned-int '* unsigned-int))
+(define-foreign %freeimage-unload void "FreeImage_Unload" '(*))
 
 (define (freeimage-load image-format filename)
   (wrap-freeimage-bitmap
-   (%freeimage-load image-format (string->pointer filename))))
-
-(define-foreign %freeimage-unload void "FreeImage_Unload" '(*))
+   (%freeimage-load image-format (string->pointer filename) 0)))
 
 (define (freeimage-unload bitmap)
   (%freeimage-unload (unwrap-freeimage-bitmap bitmap)))
