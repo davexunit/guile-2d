@@ -9,8 +9,10 @@
 ;; Open the window.
 (open-window window-width window-height)
 
-(define sprite (load-sprite "images/grass.jpg" #:position (vector (/ window-width 2)
-                                                                   (/ window-height 2))))
+(define sprite
+  (load-sprite "images/sprite.png"
+               #:position (vector (/ window-width 2)
+                                  (/ window-height 2))))
 
 (define (quit-demo)
   (close-window)
