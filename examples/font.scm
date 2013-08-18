@@ -1,15 +1,12 @@
 (use-modules (2d game-loop)
              (2d window)
              (2d helpers)
-             (figl gl)
-             (2d wrappers ftgl))
+             (2d font))
 
 (define window-width 800)
 (define window-height 600)
-(define font (ftgl-create-texture-font "fonts/Boxy-Bold.ttf"))
+(define font (load-font "fonts/Boxy-Bold.ttf" 48))
 (define text "The quick brown fox jumped over the lazy dog.")
-
-(ftgl-set-font-face-size font 48 72)
 
 ;; Open the window.
 (open-window window-width window-height)
@@ -24,14 +21,13 @@
 
 ;; Draw our sprite
 (define (render)
-  (gl-color 1 1 1)
-  (ftgl-render-font font text (ftgl-render-mode all)))
+  (let ((fps (floor (inexact->exact (current-fps)))))
+    (render-font font (format #f "FPS: ~d" fps) #f #f)))
 
 ;; Register callbacks.
 (add-hook! on-quit-hook (lambda () (quit-demo)))
 (add-hook! on-render-hook (lambda () (render)))
 (add-hook! on-key-down-hook (lambda (key mod unicode) (key-down key mod unicode)))
-
 
 ;; Start the game loop.
 ;; The render callback will be called through this procedure.
