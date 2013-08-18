@@ -26,7 +26,8 @@
   #:use-module (srfi srfi-9)
   #:use-module (system foreign)
   #:use-module (2d wrappers ftgl)
-  #:use-module (2d color))
+  #:use-module (2d color)
+  #:use-module (2d vector))
 
 ;;;
 ;;; Font
@@ -64,15 +65,45 @@
 ;;; Textbox
 ;;;
 
-;; A textbox is a string of text wrapped within certain dimensions.
-;; (define-record-type <textbox>
-;;   (%make-textbox text layout)
-;;   textbox?
-;;   (text textbox-text)
-;;   (layout textbox-layout))
+;; A textbox is a string of word-wrapped text
+(define-record-type <textbox>
+  (%make-textbox font text position color alignment line-length layout)
+  textbox?
+  (font textbox-font)
+  (text textbox-text set-textbox-text!)
+  (position textbox-position set-textbox-position!)
+  (color textbox-color set-textbox-color!)
+  (alignment textbox-alignment)
+  (line-length textbox-line-length)
+  (layout textbox-layout))
 
-;; (define (make-textbox font text rect)
-;;   (let ((layout (ftgl-create-simple-layout)))
-;;     (ftgl-set-layout-font font)
-;;     (ftgl-set-layout-alignment (ftgl-text-alignment left))
-;;     (ftgl-set-layout-line-length (rect-width rect))))
+(define (make-textbox font text position color alignment line-length)
+  (let ((layout (ftgl-create-layout)))
+    (ftgl-set-layout-font layout (font-ftgl-font font))
+    ;; (ftgl-set-layout-alignment layout (ftgl-text-alignment alignment))
+    (ftgl-set-layout-line-length layout line-length)
+    (%make-textbox font text position color alignment line-length layout)))
+
+(define (draw-textbox textbox)
+  (let ((pos (textbox-position textbox)))
+    (with-gl-push-matrix
+      (gl-translate (vx pos) (vy pos) 0)
+      (apply-color (textbox-color textbox))
+      (ftgl-render-layout (textbox-layout textbox)
+                          (textbox-text textbox)
+                          (ftgl-render-mode all)))))
+
+(export <textbox>
+        make-textbox
+        textbox?
+        textbox-font
+        textbox-text
+        set-textbox-text!
+        textbox-position
+        set-textbox-position!
+        textbox-color
+        set-textbox-color!
+        textbox-alignment
+        textbox-line-length
+        textbox-layout
+        draw-textbox)
