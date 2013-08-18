@@ -133,7 +133,6 @@
   (let* ((bitmap (freeimage-load (freeimage-get-file-type filename) filename))
          (32bit-bitmap (freeimage-convert-to-32-bits bitmap)))
     (freeimage-unload bitmap)
-    (freeimage-flip-vertical 32bit-bitmap)
     32bit-bitmap))
 
 (define (load-texture filename)

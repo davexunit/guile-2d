@@ -45,7 +45,7 @@ initializes OpenGL state."
     (gl-viewport 0 0 width height)
     (set-gl-matrix-mode (matrix-mode projection))
     (gl-load-identity)
-    (gl-ortho 0 width height 0 -1 1)
+    (gl-ortho 0 width 0 height -1 1)
     (set-gl-matrix-mode (matrix-mode modelview))
     (gl-load-identity)
     ;; Enable texturing and alpha blending
