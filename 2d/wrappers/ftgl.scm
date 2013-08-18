@@ -87,3 +87,83 @@
 (export ftgl-create-texture-font
         ftgl-set-font-face-size
         ftgl-render-font)
+
+;;;
+;;; SimpleLayout
+;;;
+
+(define-wrapped-pointer-type <ftgl-simple-layout>
+  ftgl-simple-layout?
+  wrap-ftgl-simple-layout unwrap-ftgl-simple-layout
+  (lambda (r port)
+    (let ((simple-layout (unwrap-ftgl-simple-layout r)))
+      (format port
+              "<ftgl-simple-layout ~x>"
+              (pointer-address simple-layout)))))
+
+(define-foreign %ftgl-create-simple-layout
+  '* "ftglCreateSimpleLayout" '())
+
+(define-foreign %ftgl-set-layout-font
+  void "ftglSetLayoutFont" '(* *))
+
+(define-foreign %ftgl-get-layout-font
+  '* "ftglGetLayoutFont" '(*))
+
+(define-foreign %ftgl-set-layout-line-length
+  void "ftglSetLayoutLineLength" (list '* float))
+
+(define-foreign %ftgl-get-layout-line-length
+  float "ftglGetLayoutLineLength" '(*))
+
+(define-foreign %ftgl-set-layout-alignment
+  void "ftglSetLayoutAlignment" (list '* int))
+
+(define-foreign %ftgl-get-layout-alignment
+  int "ftglGetLayoutAlignement" '(*))
+
+(define-foreign %ftgl-set-layout-line-spacing
+  void "ftglSetLayoutLineSpacing" (list '* float))
+
+;; For some reason this symbol is not found.
+;; (define-foreign %ftgl-get-layout-line-spacing
+;;   float "ftglGetLayoutLineSpacing" '(*))
+
+(define (ftgl-create-simple-layout)
+  (wrap-ftgl-simple-layout
+   (%ftgl-create-simple-layout)))
+
+(define (ftgl-set-layout-font layout font)
+  (%ftgl-set-layout-font (unwrap-ftgl-simple-layout layout)
+                         (unwrap-ftgl-font font)))
+
+(define (ftgl-get-layout-font layout)
+  (wrap-ftgl-font
+   (%ftgl-get-layout-font (unwrap-ftgl-simple-layout layout))))
+
+(define (ftgl-set-layout-line-length layout line-length)
+  (%ftgl-set-layout-line-length (unwrap-ftgl-simple-layout layout)
+                                line-length))
+
+(define (ftgl-get-layout-line-length layout)
+  (%ftgl-get-layout-line-length (unwrap-ftgl-simple-layout layout)))
+
+(define (ftgl-set-layout-alignment layout alignment)
+  (%ftgl-set-layout-alignment (unwrap-ftgl-simple-layout layout)
+                              alignment))
+
+(define (ftgl-get-layout-alignment layout)
+  (%ftgl-get-layout-alignment (unwrap-ftgl-simple-layout layout)))
+
+(define (ftgl-set-layout-line-spacing layout spacing)
+  (%ftgl-set-layout-line-spacing (unwrap-ftgl-simple-layout layout)
+                                 spacing))
+
+(export ftgl-create-simple-layout
+        ftgl-set-layout-font
+        ftgl-get-layout-font
+        ftgl-set-layout-line-length
+        ftgl-get-layout-line-length
+        ftgl-set-layout-alignment
+        ftgl-get-layout-alignment
+        ftgl-set-layout-line-spacing)
