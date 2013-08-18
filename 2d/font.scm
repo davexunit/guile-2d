@@ -26,14 +26,11 @@
   #:use-module (srfi srfi-9)
   #:use-module (system foreign)
   #:use-module (2d wrappers ftgl)
-  #:use-module (2d color)
-  #:export (<font>
-            make-font
-            font?
-            font-ftgl-font
-            font-size
-            load-font
-            render-font))
+  #:use-module (2d color))
+
+;;;
+;;; Font
+;;;
 
 ;; Font objects represent an FTGL texture font at a given size.
 (define-record-type <font>
@@ -48,8 +45,35 @@
     (ftgl-set-font-face-size ftgl-font size 72)
     (make-font ftgl-font size)))
 
-(define (render-font font text color alignment)
-  (apply-color color)
-  (ftgl-render-font (font-ftgl-font font)
-                    text
-                    (ftgl-render-mode all)))
+(define (render-font font text x y color alignment)
+  (with-gl-push-matrix
+    (gl-translate x y 0)
+    (apply-color color)
+    (ftgl-render-font (font-ftgl-font font)
+                      text
+                      (ftgl-render-mode all))))
+
+(export <font>
+        make-font
+        font?
+        font-ftgl-font
+        font-size
+        load-font
+        render-font)
+
+;;;
+;;; Textbox
+;;;
+
+;; A textbox is a string of text wrapped within certain dimensions.
+;; (define-record-type <textbox>
+;;   (%make-textbox text layout)
+;;   textbox?
+;;   (text textbox-text)
+;;   (layout textbox-layout))
+
+;; (define (make-textbox font text rect)
+;;   (let ((layout (ftgl-create-simple-layout)))
+;;     (ftgl-set-layout-font font)
+;;     (ftgl-set-layout-alignment (ftgl-text-alignment left))
+;;     (ftgl-set-layout-line-length (rect-width rect))))
