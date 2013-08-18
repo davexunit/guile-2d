@@ -104,6 +104,9 @@
 (define-foreign %ftgl-create-simple-layout
   '* "ftglCreateSimpleLayout" '())
 
+(define-foreign %ftgl-destroy-layout
+  void "ftglDestroyLayout" '(*))
+
 (define-foreign %ftgl-set-layout-font
   void "ftglSetLayoutFont" '(* *))
 
@@ -129,9 +132,15 @@
 ;; (define-foreign %ftgl-get-layout-line-spacing
 ;;   float "ftglGetLayoutLineSpacing" '(*))
 
-(define (ftgl-create-simple-layout)
+(define-foreign %ftgl-render-layout
+  void "ftglRenderLayout" (list '* '* int))
+
+(define (ftgl-create-layout)
   (wrap-ftgl-simple-layout
    (%ftgl-create-simple-layout)))
+
+(define (ftgl-destroy-layout layout)
+  (%ftgl-destroy-layout (unwrap-ftgl-simple-layout layout)))
 
 (define (ftgl-set-layout-font layout font)
   (%ftgl-set-layout-font (unwrap-ftgl-simple-layout layout)
@@ -159,11 +168,18 @@
   (%ftgl-set-layout-line-spacing (unwrap-ftgl-simple-layout layout)
                                  spacing))
 
-(export ftgl-create-simple-layout
+(define (ftgl-render-layout layout text mode)
+  (%ftgl-render-layout (unwrap-ftgl-simple-layout layout)
+                       (string->pointer text)
+                       mode))
+
+(export ftgl-create-layout
+        ftgl-destroy-layout
         ftgl-set-layout-font
         ftgl-get-layout-font
         ftgl-set-layout-line-length
         ftgl-get-layout-line-length
         ftgl-set-layout-alignment
         ftgl-get-layout-alignment
-        ftgl-set-layout-line-spacing)
+        ftgl-set-layout-line-spacing
+        ftgl-render-layout)
