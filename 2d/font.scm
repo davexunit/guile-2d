@@ -26,6 +26,7 @@
   #:use-module (srfi srfi-9)
   #:use-module (system foreign)
   #:use-module (2d wrappers ftgl)
+  #:use-module (2d color)
   #:export (<font>
             make-font
             font?
@@ -48,7 +49,7 @@
     (make-font ftgl-font size)))
 
 (define (render-font font text color alignment)
-  (gl-color 1 1 1)
+  (apply-color color)
   (ftgl-render-font (font-ftgl-font font)
                     text
                     (ftgl-render-mode all)))
