@@ -1,4 +1,5 @@
-(use-modules (2d game-loop)
+(use-modules (2d color)
+             (2d game-loop)
              (2d window)
              (2d helpers)
              (2d font))
@@ -22,7 +23,18 @@
 ;; Draw our sprite
 (define (render)
   (let ((fps (floor (inexact->exact (current-fps)))))
-    (render-font font (format #f "FPS: ~d" fps) #f #f)))
+    (render-font font
+                 (format #f "FPS: ~d" fps)
+                 0
+                 0
+                 white
+                 #f))
+  (render-font font
+               "Hello, world!"
+               320
+               300
+               green
+               #f))
 
 ;; Register callbacks.
 (add-hook! on-quit-hook (lambda () (quit-demo)))
