@@ -1,4 +1,5 @@
-(use-modules (2d color)
+(use-modules (figl gl)
+             (2d color)
              (2d game-loop)
              (2d window)
              (2d helpers)
@@ -8,6 +9,7 @@
 (define window-height 600)
 (define font (load-font "fonts/Boxy-Bold.ttf" 48))
 (define text "The quick brown fox jumped over the lazy dog.")
+(define textbox (make-textbox font text #(320 300) white 'left 200))
 
 ;; Open the window.
 (open-window window-width window-height)
@@ -23,18 +25,10 @@
 ;; Draw our sprite
 (define (render)
   (let ((fps (floor (inexact->exact (current-fps)))))
-    (render-font font
-                 (format #f "FPS: ~d" fps)
-                 0
-                 0
-                 white
-                 #f))
-  (render-font font
-               "Hello, world!"
-               320
-               300
-               green
-               #f))
+    (with-gl-push-matrix
+      (apply-color white)
+      (draw-font font (format #f "FPS: ~d" fps))))
+    (draw-textbox textbox))
 
 ;; Register callbacks.
 (add-hook! on-quit-hook (lambda () (quit-demo)))
