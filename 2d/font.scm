@@ -40,18 +40,17 @@
   (size font-size))
 
 (define (load-font filename size)
+  "Loads a font from a file with a given size in points."
   (let ((ftgl-font (ftgl-create-texture-font filename)))
     ;; Hardcoded 72 dpi for now.
     (ftgl-set-font-face-size ftgl-font size 72)
     (make-font ftgl-font size)))
 
-(define (render-font font text x y color alignment)
-  (with-gl-push-matrix
-    (gl-translate x y 0)
-    (apply-color color)
-    (ftgl-render-font (font-ftgl-font font)
-                      text
-                      (ftgl-render-mode all))))
+(define (draw-font font text)
+  "Renders the string text using the given font."
+  (ftgl-render-font (font-ftgl-font font)
+                    text
+                    (ftgl-render-mode all)))
 
 (export <font>
         make-font
@@ -59,7 +58,7 @@
         font-ftgl-font
         font-size
         load-font
-        render-font)
+        draw-font)
 
 ;;;
 ;;; Textbox
