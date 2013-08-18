@@ -29,6 +29,7 @@
   #:use-module (figl contrib packed-struct)
   #:use-module ((sdl sdl) #:prefix SDL:)
   #:use-module (2d animation)
+  #:use-module (2d color)
   #:use-module (2d helpers)
   #:use-module (2d math)
   #:use-module (2d texture)
@@ -61,11 +62,10 @@
 (define (pack-sprite-vertices vertices offset x y width height origin-x origin-y
                               scale-x scale-y rotation s1 t1 s2 t2 color)
   (define (pack-sprite x1 y1 x2 y2 x3 y3 x4 y4)
-    (let* ((color (rgba->gl-color color))
-           (r (vector-ref color 0))
-           (g (vector-ref color 1))
-           (b (vector-ref color 2))
-           (a (vector-ref color 3)))
+    (let ((r (color-r color))
+          (g (color-g color))
+          (b (color-b color))
+          (a (color-a color)))
       ;; Vertices go counter clockwise, starting from the top-left
       ;; corner.
       (pack vertices offset sprite-vertex
@@ -157,7 +157,7 @@
   (animation-state sprite-animation-state set-sprite-animation-state!))
 
 (define* (make-sprite drawable #:optional #:key (position #(0 0)) (scale #(1 1))
-                      (rotation 0) (color #xffffffff) (anchor 'center))
+                      (rotation 0) (color white) (anchor 'center))
   "Makes a new sprite object."
   (let ((vertices (make-packed-array sprite-vertex 4))
         (animation-state (if (animation? drawable)
@@ -180,7 +180,7 @@ operation that requires a refresh of the vertex array should use this macro."
 (dirty-sprite-setter set-sprite-anchor! %set-sprite-anchor!)
 
 (define* (load-sprite filename #:optional #:key (position #(0 0)) (scale #(1 1))
-                      (rotation 0) (color #xffffffff) (anchor 'center))
+                      (rotation 0) (color white) (anchor 'center))
   "Loads a sprite from file."
   (make-sprite (load-texture filename) #:position position #:scale scale
                #:rotation rotation #:color color #:anchor anchor))
