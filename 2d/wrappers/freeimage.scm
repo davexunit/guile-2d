@@ -22,28 +22,14 @@
 ;;; Code:
 
 (define-module (2d wrappers freeimage)
-  #:use-module (system foreign))
+  #:use-module (system foreign)
+  #:use-module (2d wrappers util))
 
 (define libfreeimage (dynamic-link "libfreeimage"))
 
 (define-syntax-rule (define-foreign name ret string-name args)
   (define name
     (pointer->procedure ret (dynamic-func string-name libfreeimage) args)))
-
-;; Borrowed from guile-figl
-(define-syntax-rule (define-enumeration enumerator (name value) ...)
-  (define-syntax enumerator
-    (lambda (x)
-      (syntax-case x ()
-        ((_)
-         #''(name ...))
-        ((_ enum) (number? (syntax->datum #'enum))
-         #'enum)
-        ((_ enum)
-         (or (assq-ref '((name . value) ...)
-                       (syntax->datum #'enum))
-             (syntax-violation 'enumerator "invalid enumerated value"
-                               #'enum)))))))
 
 (define (number->boolean n)
   (not (zero? n)))
