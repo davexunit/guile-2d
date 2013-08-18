@@ -32,10 +32,6 @@
 (add-hook! on-key-down-hook (lambda (key mod unicode) (key-down key mod unicode)))
 
 
-;; Load a sprite and center it on the screen.
-;; Must be done AFTER opening the window.
-;; (set! )
-
 ;; Start the game loop.
 ;; The render callback will be called through this procedure.
 (run-game-loop)
