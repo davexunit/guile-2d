@@ -223,8 +223,8 @@
 
    - [[https://www.gnu.org/software/guile-sdl/index.html][guile-sdl]] >= 0.5.0
    - SDL 1.2
-   - FreeImage >= 3.1
-   - Freetype >= 2.0
+   - FreeImage >= 3.0
+   - FTGL >= 2.1
 
 ** License
 
