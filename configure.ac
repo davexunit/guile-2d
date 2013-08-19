@@ -19,5 +19,8 @@ AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([env], [chmod +x env])
 
 PKG_CHECK_MODULES([SDL], [sdl <= 1.3 sdl >= 1.2])
+PKG_CHECK_MODULES([FTGL], [ftgl >= 2.1])
+# Why doesn't freeimage have a pkg-config file?
+#PKG_CHECK_MODULES([freeimage], [freeimage >= 3.0])
 
 AC_OUTPUT
