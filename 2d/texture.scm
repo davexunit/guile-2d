@@ -108,12 +108,14 @@
   (let ((texture-id (gl-generate-texture))
         (pixels (freeimage-get-bits bitmap)))
     (with-gl-bind-texture (texture-target texture-2d) texture-id
+      ;; Use "nearest" scaling method so that pixel art doesn't become
+      ;; blurry when scaled.
       (gl-texture-parameter (texture-target texture-2d)
                             (texture-parameter-name texture-min-filter)
-                            (texture-min-filter linear))
+                            (texture-min-filter nearest))
       (gl-texture-parameter (texture-target texture-2d)
                             (texture-parameter-name texture-mag-filter)
-                            (texture-mag-filter linear))
+                            (texture-mag-filter nearest))
       (gl-texture-image-2d (texture-target texture-2d)
                            0
                            (pixel-format rgba)
