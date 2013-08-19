@@ -52,6 +52,9 @@
 ;;;
 
 (define *fps* 0)
+;; The REPL sets this flag when it needs to evaluate something.
+;; Only the REPL server thread will mutate this variable.
+(define *repl-waiting* #f)
 (define game-loop-mutex (make-mutex 'unchecked-unlock))
 
 ;;;
@@ -62,10 +65,12 @@
 ;; unlock it afterwards.
 (add-hook! before-eval-hook
            (lambda (exp)
+             (set! *repl-waiting* #t)
              (lock-mutex game-loop-mutex)))
 
 (add-hook! after-eval-hook
            (lambda (exp)
+             (set! *repl-waiting* #f)
              (when (equal? (mutex-owner game-loop-mutex) (current-thread))
                (unlock-mutex game-loop-mutex))))
 
@@ -183,6 +188,16 @@ is the unused accumulator time."
 (define (time-left current-time next-time)
   (max (floor (- next-time current-time)) 0))
 
+(define (frame-sleep time)
+  "Sleep for time milliseconds. Unlock the mutex beforehand if the
+REPL server is waiting to evaluate something."
+  (if *repl-waiting*
+      (begin
+        (unlock-mutex game-loop-mutex)
+        (SDL:delay time)
+        (lock-mutex game-loop-mutex))
+      (SDL:delay time)))
+
 ;;;
 ;;; Game Loop
 ;;;
@@ -196,10 +211,7 @@ is the unused accumulator time."
          (remainder (update accumulator)))
     (render)
     (accumulate-fps! dt)
-    (unlock-mutex game-loop-mutex)
-    ;; Sleep for a bit if there's time in between frames
-    (SDL:delay (time-left (SDL:get-ticks) next-time))
-    (lock-mutex game-loop-mutex)
+    (frame-sleep (time-left (SDL:get-ticks) next-time))
     (game-loop time
                (+ next-time tick-interval)
                remainder)))
