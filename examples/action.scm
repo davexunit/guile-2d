@@ -32,23 +32,15 @@
 (add-hook! on-render-hook (lambda () (render)))
 (add-hook! on-key-down-hook (lambda (key mod unicode) (key-down key mod unicode)))
 
-;; Simple script that moves the sprite to a random location every
-;; second.
-(agenda-schedule
- (colambda ()
-   (lerp (lambda (i)
-           (set-sprite-position! sprite (vector i (/ window-height 2))))
-         0
-         800
-         120)))
-
-(agenda-schedule
- (colambda ()
-   (lerp (lambda (angle)
-           (set-sprite-rotation! sprite angle))
-         0
-         1080
-         120)))
-
+(schedule-action
+ (action-parallel
+  ;; Move horizontally across the screen in 60 frames.
+  (lerp (lambda (x)
+          (set-sprite-position! sprite (vector x (/ window-height 2))))
+        0 800 60)
+  ;; Rotate 1080 degrees in 120 frames.
+  (lerp (lambda (angle)
+          (set-sprite-rotation! sprite angle))
+        0 1080 60)))
 
 (run-game-loop)
