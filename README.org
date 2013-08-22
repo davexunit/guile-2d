@@ -173,6 +173,51 @@
     second, waiting for 60 updates means that the NPC will wait one
     second in between each step.
 
+*** Actions
+    Actions encapsulate a procedure that operates over a certain
+    period of time. Action objects have two properties: an arbitrary
+    procedure and a duration in game ticks. Action procedures accept
+    one argument: a time delta in the range [0, 1]. Use actions in
+    combination with coroutines for things that are a function of
+    time, such as moving a sprite across the screen.
+
+    #+BEGIN_SRC scheme
+      (schedule-action
+       ;; Move horizontally across the screen, starting at x=0 and moving to
+       ;; x=800, in 60 ticks.
+        (lerp (lambda (x)
+                (set-sprite-position! sprite (vector x (/ window-height 2))))
+              0 800 60))
+    #+END_SRC
+
+    =schedule-action= is used to schedule a coroutine that will
+    perform the given action in the current agenda. =lerp= is a type
+    of action, short for linear interpolation. =lerp= takes an
+    arbitrary procedure to apply at each tick, a start value, an end
+    value, and like all other actions, a duration. The code above
+    interpolates from 0 to 800 over 60 ticks. The result of this
+    action is a sprite moving across the screen from left to right.
+
+    Actions can be combined to run in a sequence or in parallel.
+
+    #+BEGIN_SRC scheme
+      (schedule-action
+       (action-parallel
+        (lerp (lambda (x)
+                (set-sprite-position! sprite (vector x (/ window-height 2))))
+              0 800 60)
+        ;; Rotate sprite 1080 degrees in 120 ticks.
+        (lerp (lambda (angle)
+                (set-sprite-rotation! sprite angle))
+              0 1080 120)))
+    #+END_SRC
+
+    =action-parallel= will combine many actions into one action that
+    does everything at the same time. In the example above, the sprite
+    will still move across the screen from left to right, but while
+    it's doing so (and for 60 ticks after), it will be rotating from 0
+    to 1080 degrees.
+
 ** REPL Driven Development
    The read-eval-print-loop present in Guile allows you to develop
    your game while it is running! This allows you to see in real time
