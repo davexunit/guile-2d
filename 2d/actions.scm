@@ -23,18 +23,121 @@
 ;;; Code:
 
 (define-module (2d actions)
+  #:use-module (srfi srfi-9)
+  #:use-module (srfi srfi-1)
+  #:use-module (2d agenda)
   #:use-module (2d coroutine)
-  #:export (lerp))
+  #:export (<action>
+            make-action
+            action?
+            null-action
+            null-action?
+            action-duration
+            action-proc
+            perform-action
+            schedule-action
+            action-cons
+            action-list
+            action-parallel
+            action-repeat
+            idle
+            lerp))
+
+;;;
+;;; Action Procedures
+;;;
+
+;; Actions encapsulate a procedure that performs an action and the
+;; duration of the action in game ticks.
+(define-record-type <action>
+  (%make-action proc duration)
+  action?
+  (duration action-duration)
+  (proc action-proc))
+
+(define (make-action proc duration)
+  "Returns a new action object. Throws an error if duration is 0."
+  (if (zero? duration)
+      (throw 'action-duration-zero)
+      (%make-action proc duration)))
+
+(define (step-action action t)
+  "Run action proc with given delta t"
+  ((action-proc action) t))
+
+(define (perform-action action)
+  "Perform the given action."
+  (let ((duration (action-duration action)))
+    (define (step time)
+      (if (= duration time)
+          (step-action action 1)
+          (begin
+            (step-action action (/ time duration))
+            (wait)
+            (step (1+ time)))))
+    (step 1)))
+
+(define (schedule-action action)
+  "Schedules a coroutine to run the given action."
+  (agenda-schedule (colambda () (perform-action action))))
+
+(define (action-cons a1 a2)
+  "Returns an action that performs a1 first, followed by a2."
+  (define (real-cons)
+    (let* ((duration (+ (action-duration a1) (action-duration a2)))
+           (t1 (/ (action-duration a1) duration))
+           (t2 (/ (action-duration a2) duration)))
+      (make-action
+       (lambda (t)
+         (if (> t t1)
+             (step-action a2 (/ (- t t1) t2))
+             (step-action a1 (/ t t1))))
+       duration)))
+  ;; a2 can be #f, if this is the last action-cons of an action-list.
+  (if a2 (real-cons) a1))
+
+(define (action-list . actions)
+  "Returns an action that executes actions in sequence."
+  (if (null? actions)
+      #f
+      (action-cons (car actions) (apply action-list (cdr actions)))))
+
+(define (action-parallel . actions)
+  "Perform the given actions in parallel."
+  (let ((max-duration (reduce max 0 (map action-duration actions))))
+    ;; Add idle action to each action to fill the time
+    ;; difference between the action's duration and the
+    ;; max action duration.
+    (define (fill-action action)
+      (if (= (action-duration action) max-duration)
+          action
+          (action-cons action (idle (- max-duration (action-duration action))))))
+
+    (let ((filled-actions (map fill-action actions)))
+      (make-action
+       (lambda (t)
+         (for-each (lambda (a) (step-action a t)) filled-actions))
+       max-duration))))
+
+(define (action-repeat n action)
+  "Repeat an action n times."
+  (apply action-list (make-list n action)))
+
+;;;
+;;; Simple Actions
+;;;
+
+(define (idle duration)
+  "Do nothing."
+  (make-action (lambda (t) #t) duration))
 
 (define (lerp proc start end duration)
   "Linearly interpolate a number from start to end. Calls proc with the
 interpolated value every frame."
   (let ((delta (- end start)))
-    (define (lerp-iter time)
-      (if (< time duration)
-          (begin
-            (proc (+ start (* delta (/ time duration))))
-            (wait)
-            (lerp-iter (1+ time)))
-          (proc end)))
-    (lerp-iter 0)))
+    (make-action
+     (lambda (t)
+       (if (= t 1)
+           (proc end)
+           (proc (+ start (* delta t)))))
+     duration)))
