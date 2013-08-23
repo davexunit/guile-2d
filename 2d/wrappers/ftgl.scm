@@ -23,7 +23,8 @@
 
 (define-module (2d wrappers ftgl)
   #:use-module (system foreign)
-  #:use-module (2d wrappers util))
+  #:use-module (2d wrappers util)
+  #:use-module (ice-9 format))
 
 (define libftgl (dynamic-link "libftgl"))
 
