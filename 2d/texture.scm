@@ -132,7 +132,13 @@
                   0 0 1 1)))
 
 (define (load-bitmap filename)
-  (let* ((bitmap (freeimage-load (freeimage-get-file-type filename) filename))
+  ;; Throw an error if image file does not exist or else we will
+  ;; segfault later.
+  (unless (file-exists? filename)
+    (throw 'image-not-found filename))
+  ;; Load image and convert it to 32 bit color.
+  (let* ((image-type (freeimage-get-file-type filename))
+         (bitmap (freeimage-load image-type filename))
          (32bit-bitmap (freeimage-convert-to-32-bits bitmap)))
     (freeimage-unload bitmap)
     32bit-bitmap))
