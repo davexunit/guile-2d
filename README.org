@@ -75,7 +75,7 @@
 
     Guile-2d uses the FreeImage library and can load many different
     image formats. See the FreeImage [[http://freeimage.sourceforge.net/features.html][features page]] for a full list of
-    support formats.
+    supported formats.
 
     #+BEGIN_SRC scheme
       (define sprite (load-sprite "cirno.png"
