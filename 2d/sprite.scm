@@ -314,7 +314,7 @@ bound."
   (%make-sprite-batch max-size 0 #f (make-packed-array sprite-vertex (* 4 max-size))))
 
 (define (sprite-batch-draw . args)
-  "Adds a textured quad to the current zsprite batch."
+  "Adds a textured quad to the current sprite batch."
   (apply %sprite-batch-draw *sprite-batch* args))
 
 (define* (%sprite-batch-draw batch texture x y width height origin-x origin-y
