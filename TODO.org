@@ -5,6 +5,14 @@
    updates the game state, renders the scene. Use a fixed update
    timestep and cap the maximum FPS.
 
+** TODO Game scenes
+   Games can be broken up into many chunks, called scenes. Examples
+   would be a main menu, a world map, a battle screen, etc.
+
+   - [ ] Create a <scene> type that encapsulates input/render/update
+     callbacks
+   - [ ] Macro for declaratively defining a scene
+
 ** TODO Input
    Provide hooks to respond to keyboard, mouse, and joystick events.
    Wrap SDL keycode, mouse button, etc. constants in our own
@@ -99,7 +107,7 @@
    - [ ] Linear interpolation (lerp)
    - [ ] Move to/move by
 
-** TODO Combos
+** TODO Keymaps
    Provide an Emacs-like way of defining key combinations to that
    multi-button input is easy for users.
 
