@@ -21,8 +21,7 @@
    Here is the simplest Guile-2d application (so far).
 
    #+BEGIN_SRC scheme
-     (use-modules (figl gl)
-                  (2d sprite)
+     (use-modules (2d sprite)
                   (2d game-loop)
                   (2d window))
 
@@ -76,12 +75,13 @@
     support formats.
 
     #+BEGIN_SRC scheme
-      (define sprite (load-sprite "cirno.png"
-                                  #:position #(0 0)
-                                  #:scale (1 1)
-                                  #:rotation (0)
-                                  #:color #xffffff
-                                  #:anchor 'center))
+      (define sprite
+        (load-sprite "cirno.png"
+                     #:position #(0 0)
+                     #:scale (1 1)
+                     #:rotation (0)
+                     #:color white
+                     #:anchor 'center))
     #+END_SRC
 
     Alternatively, you can make a sprite from an existing texture. The
@@ -118,9 +118,7 @@
       (define batch (make-sprite-batch))
 
       (with-sprite-batch batch
-        (for-each
-         (lambda (sprite) (draw-sprite sprite))
-         sprites))
+        (for-each draw-sprite sprites))
     #+END_SRC
 
 *** Coroutines and Agendas
