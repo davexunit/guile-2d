@@ -23,7 +23,8 @@
    #+BEGIN_SRC scheme
      (use-modules (2d sprite)
                   (2d game-loop)
-                  (2d window))
+                  (2d window)
+                  (2d helpers))
 
      (define window-width 800)
      (define window-height 600)
@@ -37,13 +38,13 @@
                     #:position (vector (/ window-width 2)
                                        (/ window-height 2))))
 
-     (define (key-down key)
-       (display key) (newline)
-       (case key
-         ;; Quit program when ESCAPE or Q is pressed.
-         ((any-equal? key 'escape 'q)
-          (close-window)
-          (quit))))
+     (define (quit-demo)
+       (close-window)
+       (quit))
+
+     (define (key-down key mod unicode)
+       (cond ((any-equal? key 'escape 'q)
+              (quit-demo))))
 
      ;; Draw our sprite
      (define (render)
@@ -52,8 +53,9 @@
      ;; Register hooks. Lambdas are used as "trampolines" so that render
      ;; and key-down can be redefined later and the hooks will call the
      ;; updated procedures.
+     (add-hook! on-quit-hook (lambda () (quit-demo)))
      (add-hook! on-render-hook (lambda () (render)))
-     (add-hook! on-key-down-hook (lambda (key) (key-down key)))
+     (add-hook! on-key-down-hook (lambda (key mod unicode) (key-down key mod unicode)))
 
      ;; Start the game loop.
      ;; The render callback will be called through this procedure.
@@ -72,7 +74,7 @@
 
     Guile-2d uses the FreeImage library and can load many different
     image formats. See the FreeImage [[http://freeimage.sourceforge.net/features.html][features page]] for a full list of
-    support formats.
+    supported formats.
 
     #+BEGIN_SRC scheme
       (define sprite

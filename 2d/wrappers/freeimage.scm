@@ -23,7 +23,8 @@
 
 (define-module (2d wrappers freeimage)
   #:use-module (system foreign)
-  #:use-module (2d wrappers util))
+  #:use-module (2d wrappers util)
+  #:use-module (ice-9 format))
 
 (define libfreeimage (dynamic-link "libfreeimage"))
 
@@ -83,7 +84,8 @@
 ;;; General functions
 ;;;
 
-(define-foreign %freeimage-get-version '* "FreeImage_GetVersion" '())
+(define-foreign %freeimage-get-version
+  '* "FreeImage_GetVersion" '())
 (define-foreign %freeimage-set-output-message
   void "FreeImage_SetOutputMessage" '(*))
 
@@ -124,8 +126,10 @@
               (%freeimage-get-height bitmap)
               (%freeimage-get-bpp bitmap)))))
 
-(define-foreign %freeimage-load '* "FreeImage_Load" (list unsigned-int '* unsigned-int))
-(define-foreign %freeimage-unload void "FreeImage_Unload" '(*))
+(define-foreign %freeimage-load
+  '* "FreeImage_Load" (list unsigned-int '* unsigned-int))
+(define-foreign %freeimage-unload
+  void "FreeImage_Unload" '(*))
 
 (define (freeimage-load image-format filename)
   (wrap-freeimage-bitmap
@@ -134,22 +138,33 @@
 (define (freeimage-unload bitmap)
   (%freeimage-unload (unwrap-freeimage-bitmap bitmap)))
 
-(export freeimage-load
+(export <freeimage-bitmap>
+        freeimage-bitmap?
+        freeimage-load
         freeimage-unload)
 
 ;;;
 ;;; Bitmap information functions
 ;;;
 
-(define-foreign %freeimage-get-image-type unsigned-int "FreeImage_GetImageType" '(*))
-(define-foreign %freeimage-get-bpp unsigned-int "FreeImage_GetBPP" '(*))
-(define-foreign %freeimage-get-width unsigned-int "FreeImage_GetWidth" '(*))
-(define-foreign %freeimage-get-height unsigned-int "FreeImage_GetHeight" '(*))
-(define-foreign %freeimage-get-pitch unsigned-int "FreeImage_GetPitch" '(*))
-(define-foreign %freeimage-get-red-mask unsigned-int "FreeImage_GetRedMask" '(*))
-(define-foreign %freeimage-get-green-mask unsigned-int "FreeImage_GetGreenMask" '(*))
-(define-foreign %freeimage-get-blue-mask unsigned-int "FreeImage_GetBlueMask" '(*))
-(define-foreign %freeimage-has-pixels unsigned-int "FreeImage_HasPixels" '(*))
+(define-foreign %freeimage-get-image-type
+  unsigned-int "FreeImage_GetImageType" '(*))
+(define-foreign %freeimage-get-bpp
+  unsigned-int "FreeImage_GetBPP" '(*))
+(define-foreign %freeimage-get-width
+  unsigned-int "FreeImage_GetWidth" '(*))
+(define-foreign %freeimage-get-height
+  unsigned-int "FreeImage_GetHeight" '(*))
+(define-foreign %freeimage-get-pitch
+  unsigned-int "FreeImage_GetPitch" '(*))
+(define-foreign %freeimage-get-red-mask
+  unsigned-int "FreeImage_GetRedMask" '(*))
+(define-foreign %freeimage-get-green-mask
+  unsigned-int "FreeImage_GetGreenMask" '(*))
+(define-foreign %freeimage-get-blue-mask
+  unsigned-int "FreeImage_GetBlueMask" '(*))
+(define-foreign %freeimage-has-pixels
+  unsigned-int "FreeImage_HasPixels" '(*))
 
 (define (freeimage-get-image-type bitmap)
   (%freeimage-get-image-type (unwrap-freeimage-bitmap bitmap)))
@@ -192,10 +207,11 @@
 ;;; Filetype functions
 ;;;
 
-(define-foreign %freeimage-get-file-type unsigned-int "FreeImage_GetFileType" '(*))
+(define-foreign %freeimage-get-file-type
+  unsigned-int "FreeImage_GetFileType" (list '* int))
 
 (define (freeimage-get-file-type filename)
-  (%freeimage-get-file-type (string->pointer filename)))
+  (%freeimage-get-file-type (string->pointer filename) 0))
 
 (export freeimage-get-file-type)
 
@@ -217,11 +233,10 @@
 ;;; Conversion functions
 ;;;
 
-(define-foreign %freeimage-convert-to-24-bits '* "FreeImage_ConvertTo24Bits" '(*))
-(define-foreign %freeimage-convert-to-32-bits '* "FreeImage_ConvertTo32Bits" '(*))
-(define-foreign %freeimage-convert-to-raw-bits
-  void "FreeImage_ConvertToRawBits"
-  (list '* '* int unsigned-int unsigned-int unsigned-int unsigned-int uint8))
+(define-foreign %freeimage-convert-to-24-bits
+  '* "FreeImage_ConvertTo24Bits" '(*))
+(define-foreign %freeimage-convert-to-32-bits
+  '* "FreeImage_ConvertTo32Bits" '(*))
 
 (define (freeimage-convert-to-24-bits bitmap)
   (wrap-freeimage-bitmap
@@ -238,7 +253,8 @@
 ;;; Rotation and flipping
 ;;;
 
-(define-foreign %freeimage-flip-vertical uint8 "FreeImage_FlipVertical" '(*))
+(define-foreign %freeimage-flip-vertical
+  uint8 "FreeImage_FlipVertical" '(*))
 
 (define (freeimage-flip-vertical bitmap)
   (number->boolean
