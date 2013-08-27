@@ -6,7 +6,7 @@
              (2d texture)
              (2d tileset)
              (2d sprite)
-             (2d vector)
+             (2d vector2)
              (2d window))
 
 (define window-width 800)
@@ -55,7 +55,6 @@
 
 (define tile-width 32)
 (define tile-height 32)
-(define map #f)
 
 (define (random-map width height tileset)
   (let ((tiles (make-array 0 height width))
@@ -68,9 +67,9 @@
   (define (build-sprite x y)
     (let ((region (tileset-ref tileset (array-ref tiles y x))))
       (make-sprite region
-                   #:position (vector (* x tile-width)
-                                      (* y tile-height))
-                   #:anchor #(0 0))))
+                   #:position (vector2 (* x tile-width)
+                                       (* y tile-height))
+                   #:anchor null-vector2)))
 
   (let ((sprites (list-ec (: y height)
                           (list-ec (: x width)

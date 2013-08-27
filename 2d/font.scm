@@ -27,7 +27,7 @@
   #:use-module (system foreign)
   #:use-module (2d wrappers ftgl)
   #:use-module (2d color)
-  #:use-module (2d vector))
+  #:use-module (2d vector2))
 
 ;;;
 ;;; Font

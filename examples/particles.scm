@@ -5,7 +5,7 @@
              (2d helpers)
              (2d sprite)
              (2d texture)
-             (2d vector)
+             (2d vector2)
              (2d window))
 
 (set! *random-state* (random-state-from-platform))
@@ -35,7 +35,7 @@
 
 (open-window window-width window-height)
 
-(define stars (load-sprite "images/stars.png" #:anchor #(0 0)))
+(define stars (load-sprite "images/stars.png" #:anchor null-vector2))
 (define particle-image (load-texture "images/bullet.png"))
 (define particle-width (texture-width particle-image))
 (define particle-height (texture-height particle-image))
@@ -44,10 +44,10 @@
   (list-tabulate particle-count
                  (lambda (n)
                    (make-particle (make-sprite particle-image)
-                                  (vector (random window-width)
-                                          (random window-height))
-                                  (vector (* (random:normal) 1)
-                                          (* (random:normal) 1))))))
+                                  (vector2 (random window-width)
+                                           (random window-height))
+                                  (vector2 (* (random:normal) 1)
+                                           (* (random:normal) 1))))))
 (define batch (make-sprite-batch (* particle-count 4)))
 
 (define (draw-particles particles)

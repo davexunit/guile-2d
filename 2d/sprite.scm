@@ -33,8 +33,8 @@
   #:use-module (2d helpers)
   #:use-module (2d math)
   #:use-module (2d texture)
-  #:use-module (2d wrappers gl)
-  #:use-module (2d vector))
+  #:use-module (2d vector2)
+  #:use-module (2d wrappers gl))
 
 ;;;
 ;;; Sprite Vertices
@@ -156,7 +156,8 @@
   (dirty sprite-dirty? set-sprite-dirty!)
   (animation-state sprite-animation-state set-sprite-animation-state!))
 
-(define* (make-sprite drawable #:optional #:key (position #(0 0)) (scale #(1 1))
+(define* (make-sprite drawable #:optional #:key
+                      (position (vector2 0 0)) (scale (vector2 1 1))
                       (rotation 0) (color white) (anchor 'center))
   "Makes a new sprite object."
   (let ((vertices (make-packed-array sprite-vertex 4))
@@ -179,7 +180,8 @@ operation that requires a refresh of the vertex array should use this macro."
 (dirty-sprite-setter set-sprite-color! %set-sprite-color!)
 (dirty-sprite-setter set-sprite-anchor! %set-sprite-anchor!)
 
-(define* (load-sprite filename #:optional #:key (position #(0 0)) (scale #(1 1))
+(define* (load-sprite filename #:optional #:key
+                      (position (vector2 0 0)) (scale (vector2 1 1))
                       (rotation 0) (color white) (anchor 'center))
   "Loads a sprite from file."
   (make-sprite (load-texture filename) #:position position #:scale scale
@@ -203,8 +205,8 @@ sprite."
         (texture (sprite-texture sprite)))
     (cond
      ((eq? anchor 'center)
-        (vector (/ (texture-width texture) 2)
-                (/ (texture-height texture) 2)))
+        (vector2 (/ (texture-width texture) 2)
+                 (/ (texture-height texture) 2)))
      (else anchor))))
 
 (define (update-sprite-vertices! sprite)

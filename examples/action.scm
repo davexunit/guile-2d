@@ -5,7 +5,7 @@
              (2d agenda)
              (2d coroutine)
              (2d actions)
-             (2d vector))
+             (2d vector2))
 
 (define window-width 800)
 (define window-height 600)
@@ -16,8 +16,8 @@
 ;; Load a sprite and center it on the screen.
 (define sprite
   (load-sprite "images/sprite.png"
-               #:position (vector (/ window-width 2)
-                                  (/ window-height 2))))
+               #:position (vector2 (/ window-width 2)
+                                   (/ window-height 2))))
 
 (define (key-down key mod unicode)
   (cond ((any-equal? key 'escape 'q)
@@ -36,7 +36,7 @@
  (action-parallel
   ;; Move horizontally across the screen in 60 frames.
   (lerp (lambda (x)
-          (set-sprite-position! sprite (vector x (/ window-height 2))))
+          (set-sprite-position! sprite (vector2 x (/ window-height 2))))
         0 800 60)
   ;; Rotate 1080 degrees in 120 frames.
   (lerp (lambda (angle)

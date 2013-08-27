@@ -3,7 +3,8 @@
              (2d window)
              (2d helpers)
              (2d agenda)
-             (2d coroutine))
+             (2d coroutine)
+             (2d vector2))
 
 (define window-width 800)
 (define window-height 600)
@@ -13,8 +14,8 @@
 
 (define sprite
   (load-sprite "images/sprite.png"
-               #:position (vector (/ window-width 2)
-                                  (/ window-height 2))))
+               #:position (vector2 (/ window-width 2)
+                                   (/ window-height 2))))
 
 (define (key-down key mod unicode)
   (cond ((any-equal? key 'escape 'q)
@@ -34,8 +35,8 @@
 (agenda-schedule
  (colambda ()
    (while #t
-     (set-sprite-position! sprite (vector (random window-width)
-                                          (random window-height)))
+     (set-sprite-position! sprite (vector2 (random window-width)
+                                           (random window-height)))
      (wait 60))))
 
 (run-game-loop)

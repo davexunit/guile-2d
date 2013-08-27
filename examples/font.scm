@@ -3,13 +3,14 @@
              (2d game-loop)
              (2d window)
              (2d helpers)
-             (2d font))
+             (2d font)
+             (2d vector2))
 
 (define window-width 800)
 (define window-height 600)
 (define font (load-font "fonts/Boxy-Bold.ttf" 48))
 (define text "The quick brown fox jumped over the lazy dog.")
-(define textbox (make-textbox font text #(320 300) white 'left 200))
+(define textbox (make-textbox font text (vector2 320 300) white 'left 200))
 
 ;; Open the window.
 (open-window window-width window-height)

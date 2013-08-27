@@ -1,7 +1,8 @@
 (use-modules (2d sprite)
              (2d game-loop)
              (2d window)
-             (2d helpers))
+             (2d helpers)
+             (2d vector2))
 
 (define window-width 800)
 (define window-height 600)
@@ -11,8 +12,8 @@
 
 (define sprite
   (load-sprite "images/sprite.png"
-               #:position (vector (/ window-width 2)
-                                  (/ window-height 2))))
+               #:position (vector2 (/ window-width 2)
+                                   (/ window-height 2))))
 
 (define (quit-demo)
   (close-window)
