@@ -24,7 +24,6 @@
 
 (define-module (2d texture)
   #:use-module (srfi srfi-9)
-  #:use-module (srfi srfi-42)
   #:use-module (figl gl)
   #:use-module (2d wrappers gl)
   #:use-module (2d wrappers freeimage)
@@ -42,8 +41,7 @@
             texture-s2
             texture-t2
             surface->texture
-            draw-texture
-            split-texture))
+            draw-texture))
 
 ;;;
 ;;; Textures
@@ -176,18 +174,3 @@
         (gl-vertex x2 y2)
         (gl-texture-coordinates s2 t1)
         (gl-vertex x2 y)))))
-
-(define* (split-texture texture width height #:optional #:key
-                        (margin 0) (spacing 0))
-  "Splits a texture into a vector of texture regions of width x height
-size."
-  (define (build-tile tx ty)
-    (let* ((x (+ (* tx (+ width spacing)) margin))
-           (y (+ (* ty (+ height spacing)) margin)))
-      (make-texture-region texture x y width height)))
-
-  (let* ((tw (texture-width texture))
-         (th (texture-height texture))
-         (rows (/ (- tw margin) (+ width spacing)))
-         (columns (/ (- tw margin) (+ height spacing))))
-    (vector-ec (: y rows) (: x columns) (build-tile x y))))
