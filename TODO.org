@@ -45,6 +45,9 @@
 ** DONE Tilesets
    Break an image up into many small pieces. Useful for creating maps.
 
+   - [X] Algorithm to split texture into tiles
+   - [X] <tileset> type
+
 ** DONE Animations
    Create a data type to represent an animated sequence of textures
    and/or texture regions.
@@ -61,6 +64,9 @@
 ** DONE Scripting
    Provide a way for users to easily script 2D games using coroutines
    and a scheduler.
+
+   - [X] Coroutines
+   - [X] Agenda
 
 ** TODO Vectors and matrices
    Vectors and matrices are needed constantly for games. Provide an
@@ -103,8 +109,8 @@
    time-based actions such as linear interpolation. It would be nice
    to have a way to make these easily composable as well.
 
-   - [ ] Make actions composable
-   - [ ] Linear interpolation (lerp)
+   - [X] Make actions composable
+   - [X] Linear interpolation (lerp)
    - [ ] Move to/move by
 
 ** TODO Keymaps
