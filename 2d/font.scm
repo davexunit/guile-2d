@@ -95,14 +95,13 @@ upper-left corner rather than the bottom-left."
     (%make-textbox font text position color alignment line-length layout)))
 
 (define (draw-textbox textbox)
-  (let ((pos (textbox-position textbox)))
-    (with-gl-push-matrix
-      (gl-translate (vx pos) (vy pos) 0)
-      (flip-text (textbox-font textbox))
-      (apply-color (textbox-color textbox))
-      (ftgl-render-layout (textbox-layout textbox)
-                          (textbox-text textbox)
-                          (ftgl-render-mode all)))))
+  (with-gl-push-matrix
+    (vector2-translate (textbox-position textbox))
+    (flip-text (textbox-font textbox))
+    (apply-color (textbox-color textbox))
+    (ftgl-render-layout (textbox-layout textbox)
+                        (textbox-text textbox)
+                        (ftgl-render-mode all))))
 
 (export <textbox>
         make-textbox

@@ -22,6 +22,7 @@
 ;;; Code:
 
 (define-module (2d vector2)
+  #:use-module (figl gl)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
   #:export (<vector2>
@@ -38,7 +39,9 @@
             vmag
             vnorm
             vdot
-            vcross))
+            vcross
+            vector2-translate
+            vector2-scale))
 
 (define-record-type <vector2>
   (vector2 x y)
@@ -105,3 +108,12 @@ vector is not defined. This function instead returns the Z coordinate
 of the cross product as if the vectors were in 3D space."
   (- (* (vx v1) (vy v2))
      (* (vy v1) (vx v2))))
+
+(define (vector2-translate v)
+  "Perform an OpenGL translate matrix operation with the given
+vector2."
+  (gl-translate (vx v) (vy v) 0))
+
+(define (vector2-scale v)
+  "Perform an OpenGL scale matrix operation with the given vector2."
+  (gl-scale (vx v) (vy v) 1))
