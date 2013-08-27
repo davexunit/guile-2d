@@ -4,9 +4,14 @@
              (2d game-loop)
              (2d helpers)
              (2d texture)
+             (2d tileset)
              (2d sprite)
              (2d vector)
              (2d window))
+
+(define window-width 800)
+(define window-height 600)
+(open-window window-width window-height)
 
 ;;;
 ;;; Orthogonal tile map example
@@ -61,7 +66,7 @@
 
 (define (tiles->sprites width height tile-width tile-height tileset tiles)
   (define (build-sprite x y)
-    (let ((region (vector-ref tileset (array-ref tiles y x))))
+    (let ((region (tileset-ref tileset (array-ref tiles y x))))
       (make-sprite region
                    #:position (vector (* x tile-width)
                                       (* y tile-height))
@@ -72,6 +77,19 @@
                                    (build-sprite x y)))))
     (list->array 2 sprites)))
 
+(define (build-map)
+  ;; Load tileset and build map layer
+  (let ((tileset (load-tileset "images/tiles.png" 32 32)))
+    (make-map-layer map-width map-height tile-width tile-height
+                    (tiles->sprites map-width
+                                    map-height
+                                    tile-width
+                                    tile-height
+                                    tileset
+                                    map-tiles))))
+
+(define map (build-map))
+
 (define (key-down key mod unicode)
   (cond ((any-equal? key 'escape 'q)
          (close-window)
@@ -80,22 +98,7 @@
 (define (render)
   (draw-map-layer map))
 
-(define window-width 800)
-(define window-height 600)
-
 (add-hook! on-key-down-hook (lambda (key mod unicode) (key-down key mod unicode)))
 (add-hook! on-render-hook (lambda () (render)))
-(open-window window-width window-height)
-
-;; Load tileset and build map layer
-(let* ((texture (load-texture "images/tiles.png"))
-       (tileset (split-texture texture 32 32)))
-  (set! map (make-map-layer map-width map-height tile-width tile-height
-                            (tiles->sprites map-width
-                                            map-height
-                                            tile-width
-                                            tile-height
-                                            tileset
-                                            map-tiles))))
 
 (run-game-loop)
