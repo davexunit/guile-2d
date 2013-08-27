@@ -47,11 +47,21 @@
     (ftgl-set-font-face-size ftgl-font size 72)
     (make-font ftgl-font size)))
 
+(define (flip-text font)
+  "Flips current GL matrix about the x-axis and translates by the
+negative font ascender value. This is necessary before rendering text
+because guile-2d flips the y-axis so that the origin is in the
+upper-left corner rather than the bottom-left."
+  (gl-scale 1 -1 1)
+  (gl-translate 0 (- (ftgl-get-font-ascender (font-ftgl-font font))) 0))
+
 (define (draw-font font text)
   "Renders the string text using the given font."
-  (ftgl-render-font (font-ftgl-font font)
-                    text
-                    (ftgl-render-mode all)))
+  (with-gl-push-matrix
+    (flip-text font)
+    (ftgl-render-font (font-ftgl-font font)
+                      text
+                      (ftgl-render-mode all))))
 
 (export <font>
         make-font
@@ -88,6 +98,7 @@
   (let ((pos (textbox-position textbox)))
     (with-gl-push-matrix
       (gl-translate (vx pos) (vy pos) 0)
+      (flip-text (textbox-font textbox))
       (apply-color (textbox-color textbox))
       (ftgl-render-layout (textbox-layout textbox)
                           (textbox-text textbox)

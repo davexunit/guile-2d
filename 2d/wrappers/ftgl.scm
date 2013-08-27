@@ -73,6 +73,12 @@
 (define-foreign %ftgl-render-font
   void "ftglRenderFont" (list '* '* unsigned-int))
 
+(define-foreign %ftgl-get-font-descender
+  float "ftglGetFontDescender" '(*))
+
+(define-foreign %ftgl-get-font-ascender
+  float "ftglGetFontAscender" '(*))
+
 (define (ftgl-create-texture-font filename)
   (wrap-ftgl-font
    (%ftgl-create-texture-font (string->pointer filename))))
@@ -85,9 +91,17 @@
                      (string->pointer text)
                      render-mode))
 
+(define (ftgl-get-font-descender font)
+  (%ftgl-get-font-descender (unwrap-ftgl-font font)))
+
+(define (ftgl-get-font-ascender font)
+  (%ftgl-get-font-ascender (unwrap-ftgl-font font)))
+
 (export ftgl-create-texture-font
         ftgl-set-font-face-size
-        ftgl-render-font)
+        ftgl-render-font
+        ftgl-get-font-descender
+        ftgl-get-font-ascender)
 
 ;;;
 ;;; SimpleLayout
