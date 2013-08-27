@@ -32,7 +32,7 @@
             color-g
             color-b
             color-a
-            apply-color
+            use-color
             rgba
             rgb
             white
@@ -50,13 +50,15 @@
   (b color-b)
   (a color-a))
 
-(define (apply-color color)
+(define (use-color color)
+  "Sets the current OpenGL color."
   (gl-color (color-r color)
             (color-g color)
             (color-b color)
             (color-a color)))
 
 (define (color-component color-code offset)
+  "Returns the value of a color channel in the range [0,1]."
   (let ((mask (ash #xff offset)))
     (/ (ash (logand mask color-code)
             (- offset))

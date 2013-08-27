@@ -98,7 +98,7 @@ upper-left corner rather than the bottom-left."
   (with-gl-push-matrix
     (vector2-translate (textbox-position textbox))
     (flip-text (textbox-font textbox))
-    (apply-color (textbox-color textbox))
+    (use-color (textbox-color textbox))
     (ftgl-render-layout (textbox-layout textbox)
                         (textbox-text textbox)
                         (ftgl-render-mode all))))

@@ -27,7 +27,7 @@
 (define (render)
   (let ((fps (floor (inexact->exact (current-fps)))))
     (with-gl-push-matrix
-      (apply-color white)
+      (use-color white)
       (draw-font font (format #f "FPS: ~d" fps))))
     (draw-textbox textbox))
 
