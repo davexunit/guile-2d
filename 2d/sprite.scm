@@ -142,7 +142,8 @@
 ;; texture-region, animation, etc.) with a given position, scale,
 ;; rotation, and color.
 (define-record-type <sprite>
-  (%make-sprite drawable position scale rotation color anchor vertices dirty animation-state)
+  (%make-sprite drawable position scale rotation color anchor vertices
+                dirty animation-state)
   sprite?
   (drawable sprite-drawable set-sprite-drawable!)
   (position sprite-position %set-sprite-position!)
@@ -162,7 +163,8 @@
         (animation-state (if (animation? drawable)
                              (make-animation-state drawable)
                              #f)))
-    (%make-sprite drawable position scale rotation color anchor vertices #t animation-state)))
+    (%make-sprite drawable position scale rotation color anchor vertices
+                  #t animation-state)))
 
 (define-syntax-rule (dirty-sprite-setter setter private-setter)
   "Defines a setter that calls the private version of the given
@@ -311,7 +313,8 @@ bound."
 
 (define* (make-sprite-batch #:optional (max-size 1000))
   "Creates a new sprite batch. The default max-size is 1000."
-  (%make-sprite-batch max-size 0 #f (make-packed-array sprite-vertex (* 4 max-size))))
+  (let ((vertex-array (make-packed-array sprite-vertex (* 4 max-size))))
+    (%make-sprite-batch max-size 0 #f vertex-array)))
 
 (define (sprite-batch-draw . args)
   "Adds a textured quad to the current sprite batch."
