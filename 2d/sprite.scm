@@ -129,9 +129,7 @@
                                         vertices
                                         #:stride sprite-vertex-size
                                         #:offset s-offset)
-      (gl-draw-arrays (begin-mode quads)
-                      0
-                      (packed-array-length vertices sprite-vertex)))
+      (gl-draw-arrays (begin-mode quads) 0 (* size 4)))
     (gl-disable-client-state (enable-cap texture-coord-array))
     (gl-disable-client-state (enable-cap color-array))
     (gl-disable-client-state (enable-cap vertex-array))))
