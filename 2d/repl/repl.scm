@@ -29,7 +29,9 @@
   #:use-module (system repl common)
   #:use-module (system repl command)
   #:use-module (ice-9 control)
-  #:export (start-repl run-repl))
+  #:use-module (2d mvars)
+  #:use-module (2d game-loop)
+  #:export (repl-mvar start-repl run-repl))
 
 
 ;;;
@@ -128,6 +130,8 @@
 ;;; The repl
 ;;;
 
+(define repl-mvar (new-mvar))
+
 (define* (start-repl #:optional (lang (current-language)) #:key debug)
   ;; ,language at the REPL will update the current-language.  Make
   ;; sure that it does so in a new dynamic scope.
@@ -188,10 +192,24 @@
                                        (abort-on-error "parsing expression"
                                          (repl-parse repl exp))))))
                                (run-hook before-eval-hook exp)
-                               (call-with-error-handling
-                                (lambda ()
-                                  (with-stack-and-prompt thunk))
-                                #:on-error (repl-option-ref repl 'on-error)))
+                               ;; Insert thunk into repl-mvar.  The
+                               ;; game loop will schedule it and run
+                               ;; it on the next tick.
+                               (put-mvar
+                                repl-mvar
+                                (list
+                                 (lambda ()
+                                  (call-with-error-handling
+                                   (lambda ()
+                                     (with-stack-and-prompt thunk))
+                                   #:on-error (repl-option-ref repl 'on-error)))
+                                 (current-input-port)
+                                 (current-output-port)
+                                 (current-error-port)))
+                               ;; Read the results back from
+                               ;; game-mvar. Will block until results
+                               ;; are available.
+                               (take-mvar game-mvar))
                              (lambda (k) (values))))
                       (lambda l
                         (for-each (lambda (v)

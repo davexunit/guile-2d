@@ -22,12 +22,18 @@
 ;;; Code:
 
 (define-module (2d game-loop)
+  #:use-module (ice-9 match)
+  #:use-module (srfi srfi-2)
+  #:use-module (srfi srfi-11)
   #:use-module ((sdl sdl) #:prefix SDL:)
   #:use-module (figl gl)
   #:use-module (2d agenda)
   #:use-module (2d coroutine)
   #:use-module (2d repl server)
-  #:export (on-active-hook
+  #:use-module (2d repl repl)
+  #:use-module (2d mvars)
+  #:export (game-mvar
+            on-active-hook
             on-resize-hook
             on-quit-hook
             on-render-hook
@@ -52,10 +58,12 @@
 ;;;
 
 (define *fps* 0)
+(define game-mvar (new-mvar))
+
 ;; The REPL sets this flag when it needs to evaluate something.
 ;; Only the REPL server thread will mutate this variable.
-(define *repl-waiting* #f)
-(define game-loop-mutex (make-mutex 'unchecked-unlock))
+;;(define *repl-waiting* #f)
+;;(define game-loop-mutex (make-mutex 'unchecked-unlock))
 
 ;;;
 ;;; REPL Hooks
@@ -63,16 +71,16 @@
 
 ;; Lock game loop mutex before evaluating code from REPL server and
 ;; unlock it afterwards.
-(add-hook! before-eval-hook
-           (lambda (exp)
-             (set! *repl-waiting* #t)
-             (lock-mutex game-loop-mutex)))
+;; (add-hook! before-eval-hook
+;;            (lambda (exp)
+;;              (set! *repl-waiting* #t)
+;;              (lock-mutex game-loop-mutex)))
 
-(add-hook! after-eval-hook
-           (lambda (exp)
-             (set! *repl-waiting* #f)
-             (when (equal? (mutex-owner game-loop-mutex) (current-thread))
-               (unlock-mutex game-loop-mutex))))
+;; (add-hook! after-eval-hook
+;;            (lambda (exp)
+;;              (set! *repl-waiting* #f)
+;;              (when (equal? (mutex-owner game-loop-mutex) (current-thread))
+;;                (unlock-mutex game-loop-mutex))))
 
 ;;;
 ;;; Hooks
@@ -188,15 +196,22 @@ is the unused accumulator time."
 (define (time-left current-time next-time)
   (max (floor (- next-time current-time)) 0))
 
+(define (run-repl-thunk thunk input output error)
+  (put-mvar
+   game-mvar
+   (with-input-from-port input
+     (lambda ()
+       (with-output-to-port output
+         (lambda ()
+           (with-error-to-port error thunk)))))))
+
 (define (frame-sleep time)
   "Sleep for time milliseconds. Unlock the mutex beforehand if the
 REPL server is waiting to evaluate something."
-  (if *repl-waiting*
-      (begin
-        (unlock-mutex game-loop-mutex)
-        (SDL:delay time)
-        (lock-mutex game-loop-mutex))
-      (SDL:delay time)))
+  (if (mvar-empty? repl-mvar)
+      (SDL:delay time)
+      (and-let* ((vals (try-take-mvar repl-mvar)))
+        (apply run-repl-thunk vals))))
 
 ;;;
 ;;; Game Loop
@@ -219,7 +234,7 @@ REPL server is waiting to evaluate something."
 (define (run-game-loop)
   "Spawns a REPL server and starts the main game loop."
   (spawn-server)
-  (lock-mutex game-loop-mutex)
+  ;;(lock-mutex game-loop-mutex)
   (agenda-schedule show-fps)
   (let ((time (SDL:get-ticks)))
     (game-loop time (+ time tick-interval) 0)))
