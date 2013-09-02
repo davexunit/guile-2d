@@ -125,6 +125,16 @@
    Provide a set of common graphical widgets such as buttons, scroll
    bars, and sliders.
 
+** TODO Primitives
+   Provide a way to draw some primitive shapes.
+
+   - [ ] Lines
+   - [ ] Circles/Ovals
+   - [ ] Rectangles
+   - [ ] N-agons
+   - [ ] Bezier curves
+   - [ ] Stars
+
 ** TODO 0.1 Release
    An official 0.1 alpha release with basic, minimal functionality
    will provide a good place for people other than me to try out
