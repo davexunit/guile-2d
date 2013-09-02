@@ -273,4 +273,4 @@
 
 ** License
 
-   GNU LGPL v3
+   GNU LGPL v3+
