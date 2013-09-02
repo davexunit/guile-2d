@@ -1,38 +1,28 @@
 (use-modules (2d sprite)
+             (2d game)
              (2d game-loop)
-             (2d window)
              (2d helpers)
              (2d vector2))
 
-(define window-width 800)
-(define window-height 600)
-
-;; Open the window.
-(open-window window-width window-height)
-
 (define sprite
-  (load-sprite "images/sprite.png"
-               #:position (vector2 (/ window-width 2)
-                                   (/ window-height 2))))
-
-(define (quit-demo)
-  (close-window)
-  (quit))
+  (delay (load-sprite "images/sprite.png"
+                      #:position (vector2 320 240))))
 
 (define (key-down key mod unicode)
   (cond ((any-equal? key 'escape 'q)
-         (quit-demo))))
+         (quit-game-loop!))))
 
 ;; Draw our sprite
 (define (render)
-  (draw-sprite sprite))
+  (draw-sprite (force sprite)))
 
 ;; Register callbacks.
 (add-hook! on-quit-hook (lambda () (quit-demo)))
 (add-hook! on-render-hook (lambda () (render)))
-(add-hook! on-key-down-hook (lambda (key mod unicode) (key-down key mod unicode)))
+(add-hook! on-key-down-hook (lambda (key mod unicode)
+                              (key-down key mod unicode)))
 
+(define-game simple
+  #:title "Simple Demo")
 
-;; Start the game loop.
-;; The render callback will be called through this procedure.
-(run-game-loop)
+(run-game simple)

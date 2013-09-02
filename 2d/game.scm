@@ -25,16 +25,11 @@
   #:use-module (srfi srfi-9)
   #:use-module (2d game-loop)
   #:use-module (2d window)
-  #:use-module (2d vector2)
-  #:export (<game>
-            make-game
-            define-game
-            game?
-            game-title
-            game-resolution
-            game-fullscreen?
-            game-first-scene
-            run-game))
+  #:use-module (2d vector2))
+
+;;;
+;;; Games
+;;;
 
 (define-record-type <game>
   (%make-game title resolution fullscreen first-scene)
@@ -64,3 +59,13 @@ value."
                (game-fullscreen? game))
   (run-game-loop)
   (close-window))
+
+(export <game>
+        make-game
+        define-game
+        game?
+        game-title
+        game-resolution
+        game-fullscreen?
+        game-first-scene
+        run-game)

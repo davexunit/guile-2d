@@ -42,8 +42,9 @@
             on-mouse-motion-hook
             on-mouse-button-down-hook
             on-mouse-button-up-hook
+            current-fps
             run-game-loop
-            current-fps))
+            quit-game-loop!))
 
 ;;;
 ;;; Constants
@@ -57,6 +58,7 @@
 ;;;
 
 (define *fps* 0)
+(define *running* #f)
 
 ;;;
 ;;; Hooks
@@ -200,23 +202,30 @@ INPUT, OUTPUT, and ERROR ports."
 
 (define (game-loop last-time next-time accumulator)
   "Runs input, render, and update hooks."
-  (handle-events)
-  (let* ((time (SDL:get-ticks))
-         (dt (- time last-time))
-         (accumulator (+ accumulator dt))
-         (remainder (update accumulator)))
-    (run-repl)
-    (render)
-    (accumulate-fps! dt)
-    (SDL:delay (time-left (SDL:get-ticks) next-time))
-    (game-loop time
-               (+ next-time tick-interval)
-               remainder)))
+  (when *running*
+    (handle-events)
+    (let* ((time (SDL:get-ticks))
+           (dt (- time last-time))
+           (accumulator (+ accumulator dt))
+           (remainder (update accumulator)))
+      (run-repl)
+      (render)
+      (accumulate-fps! dt)
+      (SDL:delay (time-left (SDL:get-ticks) next-time))
+      (game-loop time
+                 (+ next-time tick-interval)
+                 remainder))))
 
 (define (run-game-loop)
   "Spawns a REPL server and starts the main game loop."
+  (set! *running* #t)
   (spawn-server)
   ;;(lock-mutex game-loop-mutex)
   (agenda-schedule show-fps)
   (let ((time (SDL:get-ticks)))
     (game-loop time (+ time tick-interval) 0)))
+
+(define (quit-game-loop!)
+  "Tell the game loop to finish up the current frame and then
+terminate."
+  (set! *running* #f))
