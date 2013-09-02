@@ -17,7 +17,7 @@
   (draw-sprite (force sprite)))
 
 ;; Register callbacks.
-(add-hook! on-quit-hook (lambda () (quit-demo)))
+(add-hook! on-quit-hook quit-game-loop!)
 (add-hook! on-render-hook (lambda () (render)))
 (add-hook! on-key-down-hook (lambda (key mod unicode)
                               (key-down key mod unicode)))
