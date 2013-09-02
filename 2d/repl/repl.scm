@@ -193,9 +193,11 @@
                                        (abort-on-error "parsing expression"
                                          (repl-parse repl exp))))))
                                (run-hook before-eval-hook exp)
-                               ;; Insert thunk into repl-mvar.  The
+                               ;; Insert thunk into repl-mvar. The
                                ;; game loop will schedule it and run
-                               ;; it on the next tick.
+                               ;; it on the next tick. We also pass
+                               ;; along the input/output/error ports
+                               ;; and the REPL stack.
                                (put-mvar
                                 repl-input-mvar
                                 (list

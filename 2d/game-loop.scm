@@ -170,9 +170,13 @@ is the unused accumulator time."
     accumulator))
 
 (define (time-left current-time next-time)
+  "Calculate the delta between NEXT-TIME and CURRENT-TIME. If
+NEXT-TIME is less than CURRENT-TIME, 0 is returned."
   (max (floor (- next-time current-time)) 0))
 
 (define (run-repl-thunk thunk input output error stack)
+  "Run THUNK with the given REPL STACK. I/O is redirected to the given
+INPUT, OUTPUT, and ERROR ports."
   (put-mvar
    repl-output-mvar
    (with-input-from-port input
