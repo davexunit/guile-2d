@@ -24,22 +24,21 @@
 (define-module (2d window)
   #:use-module (figl gl)
   #:use-module ((sdl sdl) #:prefix SDL:)
+  #:use-module (2d vector2)
   #:export (open-window
-            close-window
-            window-title
-            set-window-title!))
+            close-window))
 
-;; Initialize everything
-(SDL:enable-unicode #t)
-(SDL:init 'everything)
-
-(define* (open-window width height #:optional #:key
-                      (depth 24) (title "guile-2d") (resizable #f))
+(define* (open-window title resolution fullscreen)
   "Creates the game window with the specified dimensions and
 initializes OpenGL state."
-  (let ((flags (if resizable '(opengl resizable) 'opengl)))
+  (let ((flags (if fullscreen '(opengl fullscreen) 'opengl))
+        (width (vx resolution))
+        (height (vy resolution)))
+    ;; Initialize everything
+    (SDL:enable-unicode #t)
+    (SDL:init 'everything)
     ;; Open SDL window in OpenGL mode.
-    (SDL:set-video-mode width height depth flags)
+    (SDL:set-video-mode width height 24 flags)
     (SDL:set-caption title)
     ;; Initialize OpenGL orthographic view
     (gl-viewport 0 0 width height)
@@ -58,11 +57,3 @@ initializes OpenGL state."
   "Closes the game window and cleans up. This procedure is typically
 called just before calling (quit)."
   (SDL:quit))
-
-(define (window-title)
-  "Returns the window title string."
-  (SDL:get-caption))
-
-(define (set-window-title! title)
-  "Sets the window title string"
-  (SDL:set-caption title))
