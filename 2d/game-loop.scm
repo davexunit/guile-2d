@@ -32,8 +32,7 @@
   #:use-module (2d repl server)
   #:use-module (2d repl repl)
   #:use-module (2d mvars)
-  #:export (game-mvar
-            on-active-hook
+  #:export (on-active-hook
             on-resize-hook
             on-quit-hook
             on-render-hook
@@ -58,29 +57,6 @@
 ;;;
 
 (define *fps* 0)
-(define game-mvar (new-mvar))
-
-;; The REPL sets this flag when it needs to evaluate something.
-;; Only the REPL server thread will mutate this variable.
-;;(define *repl-waiting* #f)
-;;(define game-loop-mutex (make-mutex 'unchecked-unlock))
-
-;;;
-;;; REPL Hooks
-;;;
-
-;; Lock game loop mutex before evaluating code from REPL server and
-;; unlock it afterwards.
-;; (add-hook! before-eval-hook
-;;            (lambda (exp)
-;;              (set! *repl-waiting* #t)
-;;              (lock-mutex game-loop-mutex)))
-
-;; (add-hook! after-eval-hook
-;;            (lambda (exp)
-;;              (set! *repl-waiting* #f)
-;;              (when (equal? (mutex-owner game-loop-mutex) (current-thread))
-;;                (unlock-mutex game-loop-mutex))))
 
 ;;;
 ;;; Hooks
@@ -198,7 +174,7 @@ is the unused accumulator time."
 
 (define (run-repl-thunk thunk input output error)
   (put-mvar
-   game-mvar
+   repl-output-mvar
    (with-input-from-port input
      (lambda ()
        (with-output-to-port output
@@ -207,8 +183,8 @@ is the unused accumulator time."
 
 (define (run-repl)
   "Execute a thunk from the REPL is there is one."
-  (unless (mvar-empty? repl-mvar)
-    (and-let* ((vals (try-take-mvar repl-mvar)))
+  (unless (mvar-empty? repl-input-mvar)
+    (and-let* ((vals (try-take-mvar repl-input-mvar)))
       (apply run-repl-thunk vals))))
 
 ;;;

@@ -31,7 +31,7 @@
   #:use-module (ice-9 control)
   #:use-module (2d mvars)
   #:use-module (2d game-loop)
-  #:export (repl-mvar start-repl run-repl))
+  #:export (repl-input-mvar repl-output-mvar start-repl run-repl))
 
 
 ;;;
@@ -130,7 +130,8 @@
 ;;; The repl
 ;;;
 
-(define repl-mvar (new-mvar))
+(define repl-input-mvar (new-mvar))
+(define repl-output-mvar (new-mvar))
 
 (define* (start-repl #:optional (lang (current-language)) #:key debug)
   ;; ,language at the REPL will update the current-language.  Make
@@ -196,7 +197,7 @@
                                ;; game loop will schedule it and run
                                ;; it on the next tick.
                                (put-mvar
-                                repl-mvar
+                                repl-input-mvar
                                 (list
                                  (lambda ()
                                   (call-with-error-handling
@@ -209,7 +210,7 @@
                                ;; Read the results back from
                                ;; game-mvar. Will block until results
                                ;; are available.
-                               (take-mvar game-mvar))
+                               (take-mvar repl-output-mvar))
                              (lambda (k) (values))))
                       (lambda l
                         (for-each (lambda (v)
