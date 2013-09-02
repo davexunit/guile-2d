@@ -205,13 +205,11 @@ is the unused accumulator time."
          (lambda ()
            (with-error-to-port error thunk)))))))
 
-(define (frame-sleep time)
-  "Sleep for time milliseconds. Unlock the mutex beforehand if the
-REPL server is waiting to evaluate something."
-  (if (mvar-empty? repl-mvar)
-      (SDL:delay time)
-      (and-let* ((vals (try-take-mvar repl-mvar)))
-        (apply run-repl-thunk vals))))
+(define (run-repl)
+  "Execute a thunk from the REPL is there is one."
+  (unless (mvar-empty? repl-mvar)
+    (and-let* ((vals (try-take-mvar repl-mvar)))
+      (apply run-repl-thunk vals))))
 
 ;;;
 ;;; Game Loop
@@ -224,9 +222,10 @@ REPL server is waiting to evaluate something."
          (dt (- time last-time))
          (accumulator (+ accumulator dt))
          (remainder (update accumulator)))
+    (run-repl)
     (render)
     (accumulate-fps! dt)
-    (frame-sleep (time-left (SDL:get-ticks) next-time))
+    (SDL:delay (time-left (SDL:get-ticks) next-time))
     (game-loop time
                (+ next-time tick-interval)
                remainder)))
