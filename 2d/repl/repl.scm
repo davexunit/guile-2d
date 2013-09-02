@@ -206,7 +206,8 @@
                                    #:on-error (repl-option-ref repl 'on-error)))
                                  (current-input-port)
                                  (current-output-port)
-                                 (current-error-port)))
+                                 (current-error-port)
+                                 (fluid-ref *repl-stack*)))
                                ;; Read the results back from
                                ;; game-mvar. Will block until results
                                ;; are available.

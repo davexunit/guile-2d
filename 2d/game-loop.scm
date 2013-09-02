@@ -172,14 +172,17 @@ is the unused accumulator time."
 (define (time-left current-time next-time)
   (max (floor (- next-time current-time)) 0))
 
-(define (run-repl-thunk thunk input output error)
+(define (run-repl-thunk thunk input output error stack)
   (put-mvar
    repl-output-mvar
    (with-input-from-port input
      (lambda ()
        (with-output-to-port output
          (lambda ()
-           (with-error-to-port error thunk)))))))
+           (with-error-to-port error
+             (lambda ()
+               (with-fluids ((*repl-stack* stack))
+                 (thunk))))))))))
 
 (define (run-repl)
   "Execute a thunk from the REPL is there is one."
