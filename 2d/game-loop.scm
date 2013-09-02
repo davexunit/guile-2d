@@ -26,7 +26,7 @@
   #:use-module (figl gl)
   #:use-module (2d agenda)
   #:use-module (2d coroutine)
-  #:use-module (2d repl server)
+  #:use-module (system repl server)
   #:export (on-active-hook
             on-resize-hook
             on-quit-hook

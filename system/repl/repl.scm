@@ -19,7 +19,7 @@
 
 ;;; Code:
 
-(define-module (2d repl repl)
+(define-module (system repl repl)
   #:use-module (system base syntax)
   #:use-module (system base pmatch)
   #:use-module (system base compile)
