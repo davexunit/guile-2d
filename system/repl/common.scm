@@ -137,7 +137,12 @@ See <http://www.gnu.org/licenses/lgpl.html>, for more details.")
            (if (memq x vals)
                x
                (error "Bad on-error value ~a; expected one of ~a" x vals)))))
-     (run-thunk ,(lambda (thunk) (% (thunk))) #f))))
+     (run-thunk
+      ,(lambda (thunk) (% (thunk)))
+      ,(lambda (run-thunk)
+         (if (procedure? run-thunk)
+             run-thunk
+             (error "Invalid run-thunk procedure" run-thunk)))))))
 
 (define %make-repl make-repl)
 (define* (make-repl lang #:optional debug)
