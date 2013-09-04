@@ -19,6 +19,16 @@
        sudo apt-get install libsdl1.2-dev libsdl-image1.2-dev
      #+END_SRC
 
+*** Freeimage
+
+    Freeimage is to used to load textures.
+
+    *Debian*
+
+    #+BEGIN_SRC sh
+      sudo apt-get install libfreeimage3
+    #+END_SRC
+
 *** FTGL
 
     FTGL renders fonts in OpenGL using the Freetype2 library.
