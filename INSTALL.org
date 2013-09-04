@@ -1,0 +1,88 @@
+* Installation Instructions
+
+  Installing guile-2d is rather easy (but not easy enough) if you are
+  on a GNU/Linux system. Currently, only installation instructions for
+  Debian are provided, but the non-apt commands should work without
+  any modifications on any GNU/Linux distro.
+
+  This installation guide assumes that you have the GNU build system
+  and git installed.
+
+** Install dependencies
+
+*** SDL
+    SDL is a very popular, cross-platform game library.
+
+    *Debian*
+
+     #+BEGIN_SRC sh
+       sudo apt-get install libsdl1.2-dev libsdl-image1.2-dev
+     #+END_SRC
+
+*** FTGL
+
+    FTGL renders fonts in OpenGL using the Freetype2 library.
+
+    *Debian*
+
+     #+BEGIN_SRC sh
+       sudo apt-get install libftgl2
+     #+END_SRC
+
+*** guile-sdl
+
+    guile-sdl is the GNU Guile wrapper for SDL.
+
+    Grab the latest release tarball from http://www.gnu.org/software/guile-sdl/.
+
+    *Debian*
+
+    #+BEGIN_SRC sh
+      tar zxf guile-sdl-<version>
+      cd guile-sdl-<version>/
+      ./configure --prefix=/usr
+      make
+      sudo make install
+    #+END_SRC
+
+    *OS X*
+
+    guile-sdl is currently broken on OS X. Please see this issue for
+    more information: https://github.com/davexunit/guile-2d/issues/2
+
+*** guile-figl
+
+    FIGL can be problematic, since it's an as-of-yet unreleased
+    library.
+
+    *Debian*
+
+    #+BEGIN_SRC sh
+      git clone https://gitorious.org/guile-figl/guile-figl
+      cd guile-figl
+      autoreconf -vif
+      ./configure --prefix=/usr
+      make
+      sudo make install
+    #+END_SRC
+
+    You will probably encounter a syntax error in the
+    /low-level-gl.texi/ file. To fix it, you will need to join the
+    lines 19152 and 19153 together. There are a lot of warnings that
+    get output, but only one fatal error. The documentation is
+    auto-generated from the OpenGL docs and it seems that there are
+    still a few bugs in the generator.
+
+** Install guile-2d
+
+   Once the dependencies have been installed, installing guile-2d is
+   pretty straightforward.
+
+   *Debian*
+
+   #+BEGIN_SRC sh
+     ./autogen.sh
+     ./configure --prefix=/usr
+     make
+     sudo make install
+   #+END_SRC
