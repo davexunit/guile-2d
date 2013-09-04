@@ -219,12 +219,29 @@
     to 1080 degrees.
 
 ** REPL Driven Development
+
    The read-eval-print-loop present in Guile allows you to develop
    your game while it is running! This allows you to see in real time
    what your changes do to the game without having to restart the
    program every time.
 
-   ** This section needs to be completed. **
+   Guile-2d uses a modified REPL server that is integrated with the
+   game loop. A REPL server is started when the game loop starts. To
+   connect to it, use the [[http://www.nongnu.org/geiser/][Geiser]] extension for GNU Emacs or telnet.
+
+   *Geiser*
+
+   #+BEGIN_SRC fundamental
+    M-x connect-to-guile
+   #+END_SRC
+
+   Use the default host and port settings.
+
+   *Telnet*
+
+   #+BEGIN_SRC sh
+     telnet localhost 37146
+   #+END_SRC
 
 ** Building
    guile-2d uses the typical GNU build system. First run `autogen.sh`
@@ -236,6 +253,8 @@
      make
      sudo make install
    #+END_SRC
+
+   See =INSTALL.org= for more detailed installation instructions.
 
 ** Running Examples
    To run an example when guile-2d has been installed:
@@ -253,19 +272,16 @@
      guile -L .. simple.scm
    #+END_SRC
 
+** Platforms
+
+   Guile-2d supports GNU/Linux currently. OS X support is in the
+   works, but there are problems with guile-sdl. See
+   https://github.com/davexunit/guile-2d/issues/2 for more details.
+
 ** Dependencies
 
    - GNU Guile >= 2.0 (>= 2.0.9 recommended)
-   - [[https://gitorious.org/guile-figl/guile-figl][guile-figl]]
-
-     No official release. guile-2d runs off of the latest master
-     version.
-
-     As of this writing, =make= will fail due to errors with building
-     texinfo files. Currently there is an error on line 19152 of
-     =doc/low-level-gl.texi=. To fix, join lines 19152 and 19153
-     together.
-
+   - [[https://gitorious.org/guile-figl/guile-figl][guile-figl]] (git master branch)
    - [[https://www.gnu.org/software/guile-sdl/index.html][guile-sdl]] >= 0.5.0
    - SDL 1.2
    - FreeImage >= 3.0
