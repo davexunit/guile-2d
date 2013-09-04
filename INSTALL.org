@@ -81,6 +81,8 @@
    *Debian*
 
    #+BEGIN_SRC sh
+     git clone https://github.com/davexunit/guile-2d.git
+     cd guile-2d/
      ./autogen.sh
      ./configure --prefix=/usr
      make
