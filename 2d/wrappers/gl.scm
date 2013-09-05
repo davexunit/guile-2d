@@ -65,6 +65,25 @@
 
 (re-export  (%glTexParameteri . gl-texture-parameter))
 
+
+;;;
+;;; 3.8.12 Texture Objects
+;;;
+
+;; TODO gl-are-textures-resident? gl-prioritze-textures
+
+(define (gl-generate-textures n)
+  (let ((bv (make-u32vector n 0)))
+    (%glGenTextures n bv)
+    (u32vector->list bv)))
+
+(define (gl-generate-texture)
+  (car (gl-generate-textures 1)))
+
+(define (gl-delete-textures textures)
+  (let ((bv (list->u32vector textures)))
+    (%glDeleteTextures (u32vector-length bv) bv)))
+
 ;; emacs: (put 'with-gl-bind-texture 'scheme-indent-function 2)
 (define-syntax-rule (with-gl-bind-texture target id body ...)
   (begin
@@ -73,4 +92,7 @@
     ...
     (%glBindTexture target 0)))
 
-(export with-gl-bind-texture)
+(export gl-generate-textures
+        gl-generate-texture
+        gl-delete-textures
+        with-gl-bind-texture)
