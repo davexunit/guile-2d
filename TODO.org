@@ -9,9 +9,10 @@
    Games can be broken up into many chunks, called scenes. Examples
    would be a main menu, a world map, a battle screen, etc.
 
-   - [ ] Create a <scene> type that encapsulates input/render/update
+   - [X] Create a <scene> type that encapsulates input/render/update
      callbacks
-   - [ ] Macro for declaratively defining a scene
+   - [X] Macro for declaratively defining a scene
+   - [ ] Scene switching
 
 ** TODO Input
    Provide hooks to respond to keyboard, mouse, and joystick events.
@@ -114,12 +115,37 @@
    - [ ] Move to/move by
 
 ** TODO Keymaps
-   Provide an Emacs-like way of defining key combinations to that
+   Provide an Emacs-like way of defining key combinations so that
    multi-button input is easy for users.
 
-   - [ ] Basic sequences (press A then B)
-   - [ ] Simultaneous key presses (press A and B at the same time)
-   - [ ] Timeouts (combos fail if you don't enter them quick enough)
+   The more I think about what I want, the more I realize that I am
+   describing a system that uses functional reactive programming.
+
+   - [ ] Abstract away input methods
+
+     Controls can be bound to keys, mouse, whatever
+
+   - [ ] Basic sequences
+
+     Press A then B
+
+   - [ ] Simultaneous key presses
+
+     Press A and B at the same time
+
+   - [ ] Composing sequences
+
+     Press A then B + C
+
+   - [ ] Timeouts
+
+     Press A then B then C within 15 frames time
+
+   - [ ] Sequences with actions along the way
+
+     Press A to kick, then forward + B to uppercut, within 30 frames
+     time.
+
 
 ** TODO GUI widgets
    Provide a set of common graphical widgets such as buttons, scroll
