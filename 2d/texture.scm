@@ -92,10 +92,10 @@
       ;; Do not reap texture regions
       (unless (texture-region? texture)
         ;; When attempting to reap structures upon guile exit, the
-        ;; dynamic pointer to gl-delete-textures becomes invalid. So, we
+        ;; dynamic pointer to gl-delete-buffers becomes invalid. So, we
         ;; ignore the error and move on.
         (catch 'misc-error
-          (lambda () (gl-delete-texture (texture-id texture)))
+          (lambda () (gl-delete-buffer (texture-id texture)))
           (lambda (key . args) #f)))
       (loop (texture-guardian)))))
 
@@ -103,7 +103,7 @@
 
 (define (bitmap->texture bitmap)
   "Translates a freeimage bitmap into an OpenGL texture."
-  (let ((texture-id (gl-generate-texture))
+  (let ((texture-id (gl-generate-buffer))
         (pixels (freeimage-get-bits bitmap)))
     (with-gl-bind-texture (texture-target texture-2d) texture-id
       ;; Use "nearest" scaling method so that pixel art doesn't become
