@@ -33,18 +33,9 @@
   #:use-module (2d repl server)
   #:use-module (2d repl repl)
   #:use-module (2d mvars)
-  #:export (on-active-hook
-            on-resize-hook
-            on-quit-hook
-            on-render-hook
-            on-update-hook
-            on-key-up-hook
-            on-key-down-hook
-            on-mouse-motion-hook
-            on-mouse-button-down-hook
-            on-mouse-button-up-hook
-            current-fps
-            run-game-loop
+  #:use-module (2d window)
+  #:export (current-fps
+            run-game
             quit-game-loop!))
 
 ;;;
@@ -55,26 +46,12 @@
 (define tick-interval (floor (/ 1000 target-fps)))
 
 ;;;
-;;; Globals
+;;; Mutable state
 ;;;
 
-(define *fps* 0)
-(define *running* #f)
-
-;;;
-;;; Hooks
-;;;
-
-(define on-active-hook (make-hook))
-(define on-resize-hook (make-hook 2))
-(define on-quit-hook (make-hook))
-(define on-render-hook (make-hook))
-(define on-update-hook (make-hook))
-(define on-key-up-hook (make-hook 3))
-(define on-key-down-hook (make-hook 3))
-(define on-mouse-motion-hook (make-hook 5))
-(define on-mouse-button-down-hook (make-hook 3))
-(define on-mouse-button-up-hook (make-hook 3))
+(define game-fps 0)
+(define game-running #f)
+(define game-scene #f)
 
 ;;;
 ;;; Event Handling
@@ -91,39 +68,46 @@
   "Calls the relevant callback for the event."
   (case (SDL:event:type e)
     ((active)
-     (run-hook on-active-hook))
+     (scene-trigger game-scene 'active))
     ((video-resize)
-     (run-hook on-resize-hook (SDL:event:resize:w e)
-               (SDL:event:resize:h e)))
+     (scene-trigger game-scene
+                    'resize
+                    (SDL:event:resize:w e)
+                    (SDL:event:resize:h e)))
     ((quit)
-     (run-hook on-quit-hook))
+     (scene-trigger game-scene 'quit))
     ((key-down)
-     (run-hook on-key-down-hook
-               (SDL:event:key:keysym:sym e)
-               (SDL:event:key:keysym:mod e)
-               (SDL:event:key:keysym:unicode e)))
+     (scene-trigger game-scene
+                    'key-down
+                    (SDL:event:key:keysym:sym e)
+                    (SDL:event:key:keysym:mod e)
+                    (SDL:event:key:keysym:unicode e)))
     ((key-up)
-     (run-hook on-key-up-hook
-               (SDL:event:key:keysym:sym e)
-               (SDL:event:key:keysym:mod e)
-               (SDL:event:key:keysym:unicode e)))
+     (scene-trigger game-scene
+                    'key-up
+                    (SDL:event:key:keysym:sym e)
+                    (SDL:event:key:keysym:mod e)
+                    (SDL:event:key:keysym:unicode e)))
     ((mouse-motion)
-     (run-hook on-mouse-motion-hook
-               (SDL:event:motion:state e)
-               (SDL:event:motion:x e)
-               (SDL:event:motion:y e)
-               (SDL:event:motion:xrel e)
-               (SDL:event:motion:yrel e)))
+     (scene-trigger game-scene
+                    'mouse-motion
+                    (SDL:event:motion:state e)
+                    (SDL:event:motion:x e)
+                    (SDL:event:motion:y e)
+                    (SDL:event:motion:xrel e)
+                    (SDL:event:motion:yrel e)))
     ((mouse-button-down)
-     (run-hook on-mouse-button-down-hook
-               (SDL:event:button:button e)
-               (SDL:event:button:x e)
-               (SDL:event:button:y e)))
+     (scene-trigger game-scene
+                    'mouse-press
+                    (SDL:event:button:button e)
+                    (SDL:event:button:x e)
+                    (SDL:event:button:y e)))
     ((mouse-button-up)
-     (run-hook on-mouse-button-up-hook
-               (SDL:event:button:button e)
-               (SDL:event:button:x e)
-               (SDL:event:button:y e)))))
+     (scene-trigger game-scene
+                    'mouse-click
+                    (SDL:event:button:button e)
+                    (SDL:event:button:x e)
+                    (SDL:event:button:y e)))))
 
 ;;;
 ;;; Frames Per Second
@@ -137,16 +121,16 @@
       "Computes a weighted average FPS."
       (set! frame-time (+ (* alpha dt) (* inverse-alpha frame-time)))
       (unless (zero? frame-time)
-        (set! *fps* (/ 1000 frame-time))))))
+        (set! game-fps (/ 1000 frame-time))))))
 
 (define (current-fps)
   "Returns the current FPS value."
-  *fps*)
+  game-fps)
 
 (codefine (show-fps)
   "Display the current FPS every second."
   (wait 60)
-  (pk 'FPS (floor *fps*))
+  (pk 'FPS (floor game-fps))
   (show-fps))
 
 ;;;
@@ -158,7 +142,7 @@
   (set-gl-matrix-mode (matrix-mode modelview))
   (gl-load-identity)
   (gl-clear (clear-buffer-mask color-buffer depth-buffer))
-  (run-hook on-render-hook)
+  (scene-draw game-scene)
   (SDL:gl-swap-buffers))
 
 (define (update accumulator)
@@ -167,7 +151,7 @@ many times as tick-interval can divide accumulator. The return value
 is the unused accumulator time."
   (if (>= accumulator tick-interval)
     (begin
-      (run-hook on-update-hook)
+      (scene-update game-scene)
       (update-agenda)
       (update (- accumulator tick-interval)))
     accumulator))
@@ -176,6 +160,10 @@ is the unused accumulator time."
   "Calculate the delta between NEXT-TIME and CURRENT-TIME. If
 NEXT-TIME is less than CURRENT-TIME, 0 is returned."
   (max (floor (- next-time current-time)) 0))
+
+;;;
+;;; REPL
+;;;
 
 (define (run-repl-thunk thunk input output error stack)
   "Run THUNK with the given REPL STACK. I/O is redirected to the given
@@ -203,7 +191,7 @@ INPUT, OUTPUT, and ERROR ports."
 
 (define (game-loop last-time next-time accumulator)
   "Runs input, render, and update hooks."
-  (when *running*
+  (when game-running
     (handle-events)
     (let* ((time (SDL:get-ticks))
            (dt (- time last-time))
@@ -217,16 +205,20 @@ INPUT, OUTPUT, and ERROR ports."
                  (+ next-time tick-interval)
                  remainder))))
 
-(define (run-game-loop)
-  "Spawns a REPL server and starts the main game loop."
-  (set! *running* #t)
+(define (run-game game)
+  "Open a window and start playing GAME."
+  (open-window (game-title game)
+               (game-resolution game)
+               (game-fullscreen? game))
+  (set! game-running #t)
+  (set! game-scene ((game-first-scene game)))
   (spawn-server)
-  ;;(lock-mutex game-loop-mutex)
   (agenda-schedule show-fps)
   (let ((time (SDL:get-ticks)))
-    (game-loop time (+ time tick-interval) 0)))
+    (game-loop time (+ time tick-interval) 0))
+  (close-window))
 
 (define (quit-game-loop!)
   "Tell the game loop to finish up the current frame and then
 terminate."
-  (set! *running* #f))
+  (set! game-running #f))
