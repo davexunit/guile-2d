@@ -130,8 +130,8 @@
 ;;; The repl
 ;;;
 
-(define repl-input-mvar (new-mvar))
-(define repl-output-mvar (new-mvar))
+(define repl-input-mvar  (new-empty-mvar))
+(define repl-output-mvar (new-empty-mvar))
 
 (define* (start-repl #:optional (lang (current-language)) #:key debug)
   ;; ,language at the REPL will update the current-language.  Make
