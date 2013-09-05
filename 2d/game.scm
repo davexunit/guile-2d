@@ -22,22 +22,59 @@
 ;;; Code:
 
 (define-module (2d game)
-  #:use-module (srfi srfi-9)
+  #:use-module (2d private game)
   #:use-module (2d game-loop)
-  #:use-module (2d window)
+  #:use-module (2d helpers)
+  #:use-module (2d observer)
   #:use-module (2d vector2))
+
+;;;
+;;; Scenes
+;;;
+
+;; When no event callbacks are specified for a scene, these
+;; (hopefully) convenient defaults will be used.
+(define default-scene-events
+  `((quit     . ,(lambda (state) (quit-game-loop!)))
+    (key-down . ,(lambda (state key mode unicode)
+                   (when (any-equal? key 'escape 'q)
+                     (quit-game-loop!))))))
+
+(define* (make-scene #:optional #:key
+                     (title "A Guile-2D Scene")
+                     (events default-scene-events)
+                     (update (lambda (s) #f))
+                     (draw (lambda (s) #f))
+                     (state #f))
+  "Return a new scene. TITLE is a human readable name for the
+scene. EVENTS is an alist of event handlers. UPDATE is a procedure
+that updates the scene. DRAW is a procedure that renders the
+scene. STATE is an object that encapsulates the scene state."
+  (%make-scene title (alist->observer events) update draw state))
+
+(define-syntax-rule (define-scene name kwargs ...)
+  "Syntactic sugar over define and make-scene. Return a procedure that
+creates a new scene."
+  (define (name) (make-scene kwargs ...)))
+
+(re-export <scene>
+           scene?
+           scene-title
+           scene-observer
+           scene-update-proc
+           scene-draw-proc
+           scene-state
+           scene-trigger
+           scene-update
+           scene-draw)
+
+(export make-scene
+        define-scene
+        default-scene-events)
 
 ;;;
 ;;; Games
 ;;;
-
-(define-record-type <game>
-  (%make-game title resolution fullscreen first-scene)
-  game?
-  (title game-title)
-  (resolution game-resolution)
-  (fullscreen game-fullscreen?)
-  (first-scene game-first-scene))
 
 (define* (make-game #:optional #:key
                     (title "A Guile-2D Game")
@@ -49,23 +86,16 @@ value."
   (%make-game title resolution fullscreen first-scene))
 
 (define-syntax-rule (define-game name kwargs ...)
-  "Syntactic sugar for define and make-game."
+  "Syntactic sugar over define and make-game."
   (define name (make-game kwargs ...)))
 
-(define (run-game game)
-  "Open a window and start playing GAME."
-  (open-window (game-title game)
-               (game-resolution game)
-               (game-fullscreen? game))
-  (run-game-loop)
-  (close-window))
+(re-export <game>
+           game?
+           game-title
+           game-resolution
+           game-fullscreen?
+           game-first-scene
+           run-game)
 
-(export <game>
-        make-game
-        define-game
-        game?
-        game-title
-        game-resolution
-        game-fullscreen?
-        game-first-scene
-        run-game)
+(export make-game
+        define-game)

@@ -29,6 +29,7 @@
   #:use-module (figl gl)
   #:use-module (2d agenda)
   #:use-module (2d coroutine)
+  #:use-module (2d private game)
   #:use-module (2d repl server)
   #:use-module (2d repl repl)
   #:use-module (2d mvars)
