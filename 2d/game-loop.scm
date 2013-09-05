@@ -52,6 +52,7 @@
 (define game-fps 0)
 (define game-running #f)
 (define game-scene #f)
+(define game-next-scene #f)
 
 ;;;
 ;;; Event Handling
@@ -183,7 +184,17 @@ INPUT, OUTPUT, and ERROR ports."
   "Execute a thunk from the REPL is there is one."
   (unless (mvar-empty? repl-input-mvar)
     (and-let* ((vals (try-take-mvar repl-input-mvar)))
-      (apply run-repl-thunk vals))))
+              (apply run-repl-thunk vals))))
+
+;;;
+;;; Scene management
+;;;
+
+(define (set-game-scene scene)
+  (when game-scene
+    (scene-trigger game-scene 'stop))
+  (scene-trigger scene 'start)
+  (set! game-scene scene))
 
 ;;;
 ;;; Game Loop
@@ -211,7 +222,7 @@ INPUT, OUTPUT, and ERROR ports."
                (game-resolution game)
                (game-fullscreen? game))
   (set! game-running #t)
-  (set! game-scene ((game-first-scene game)))
+  (set-game-scene ((game-first-scene game)))
   (spawn-server)
   (agenda-schedule show-fps)
   (let ((time (SDL:get-ticks)))
