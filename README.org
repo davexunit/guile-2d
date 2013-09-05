@@ -22,44 +22,23 @@
 
    #+BEGIN_SRC scheme
      (use-modules (2d sprite)
-                  (2d game-loop)
-                  (2d window)
-                  (2d helpers))
+                  (2d game)
+                  (2d vector2))
 
-     (define window-width 800)
-     (define window-height 600)
+     (define (demo-sprite)
+       (load-sprite "images/sprite.png"
+                    #:position (vector2 320 240)))
 
-     ;; Open the window.
-     (open-window window-width window-height)
+     (define-scene demo
+       #:title  "Demo"
+       #:draw   (lambda (sprite) (draw-sprite sprite))
+       #:state  (demo-sprite))
 
-     ;; Load a sprite and center it on the screen.
-     (define sprite
-       (load-sprite "sprite.png"
-                    #:position (vector (/ window-width 2)
-                                       (/ window-height 2))))
+     (define-game simple
+       #:title       "Simple Demo"
+       #:first-scene demo)
 
-     (define (quit-demo)
-       (close-window)
-       (quit))
-
-     (define (key-down key mod unicode)
-       (cond ((any-equal? key 'escape 'q)
-              (quit-demo))))
-
-     ;; Draw our sprite
-     (define (render)
-       (draw-sprite sprite))
-
-     ;; Register hooks. Lambdas are used as "trampolines" so that render
-     ;; and key-down can be redefined later and the hooks will call the
-     ;; updated procedures.
-     (add-hook! on-quit-hook (lambda () (quit-demo)))
-     (add-hook! on-render-hook (lambda () (render)))
-     (add-hook! on-key-down-hook (lambda (key mod unicode) (key-down key mod unicode)))
-
-     ;; Start the game loop.
-     ;; The render callback will be called through this procedure.
-     (run-game-loop)
+     (run-game simple)
    #+END_SRC
 
 ** Features
@@ -271,6 +250,10 @@
      cd examples
      guile -L .. simple.scm
    #+END_SRC
+
+   To quit an example:
+   - Close the window
+   - Press the =ESCAPE= or =Q= key
 
 ** Platforms
 
