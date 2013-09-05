@@ -1,46 +1,39 @@
-(use-modules (2d sprite)
-             (2d game-loop)
-             (2d window)
-             (2d helpers)
+(use-modules (2d actions)
              (2d agenda)
              (2d coroutine)
-             (2d actions)
+             (2d game)
+             (2d sprite)
              (2d vector2))
 
-(define window-width 800)
-(define window-height 600)
-
-;; Open the window.
-(open-window window-width window-height)
-
-;; Load a sprite and center it on the screen.
-(define sprite
+(define (demo-sprite)
   (load-sprite "images/sprite.png"
-               #:position (vector2 (/ window-width 2)
-                                   (/ window-height 2))))
+               #:position (vector2 320 240)))
 
-(define (key-down key mod unicode)
-  (cond ((any-equal? key 'escape 'q)
-         (close-window)
-         (quit))))
+(define (start sprite)
+  (let ((size (game-resolution actions)))
+    (schedule-action
+     (action-parallel
+      ;; Move horizontally across the screen in 60 frames.
+      (lerp (lambda (x)
+              (set-sprite-position!
+               sprite
+               (vector2 x (/ (vy size) 2))))
+            0 (vx size) 120)
+      ;; Rotate 1080 degrees in 120 frames.
+      (lerp (lambda (angle)
+              (set-sprite-rotation! sprite angle))
+            0 360 120)))))
 
-;; Draw our sprite
-(define (render)
-  (draw-sprite sprite))
+(define-scene demo
+  #:title  "Demo"
+  #:draw   (lambda (sprite) (draw-sprite sprite))
+  #:events (append
+            (default-scene-events)
+            `((start . ,(lambda (sprite) (start sprite)))))
+  #:state  (demo-sprite))
 
-;; Register callbacks.
-(add-hook! on-render-hook (lambda () (render)))
-(add-hook! on-key-down-hook (lambda (key mod unicode) (key-down key mod unicode)))
+(define-game actions
+  #:title       "actions"
+  #:first-scene demo)
 
-(schedule-action
- (action-parallel
-  ;; Move horizontally across the screen in 60 frames.
-  (lerp (lambda (x)
-          (set-sprite-position! sprite (vector2 x (/ window-height 2))))
-        0 800 60)
-  ;; Rotate 1080 degrees in 120 frames.
-  (lerp (lambda (angle)
-          (set-sprite-rotation! sprite angle))
-        0 1080 60)))
-
-(run-game-loop)
+(run-game actions)

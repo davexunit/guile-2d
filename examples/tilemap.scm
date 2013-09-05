@@ -1,17 +1,11 @@
 (use-modules (srfi srfi-1)
              (srfi srfi-9)
              (srfi srfi-42)
-             (2d game-loop)
-             (2d helpers)
+             (2d game)
              (2d texture)
              (2d tileset)
              (2d sprite)
-             (2d vector2)
-             (2d window))
-
-(define window-width 800)
-(define window-height 600)
-(open-window window-width window-height)
+             (2d vector2))
 
 ;;;
 ;;; Orthogonal tile map example
@@ -87,17 +81,13 @@
                                     tileset
                                     map-tiles))))
 
-(define map (build-map))
+(define-scene demo
+  #:title  "Demo"
+  #:draw   (lambda (map) (draw-map-layer map))
+  #:state  (build-map))
 
-(define (key-down key mod unicode)
-  (cond ((any-equal? key 'escape 'q)
-         (close-window)
-         (quit))))
+(define-game tilemap
+  #:title       "Tilemap"
+  #:first-scene demo)
 
-(define (render)
-  (draw-map-layer map))
-
-(add-hook! on-key-down-hook (lambda (key mod unicode) (key-down key mod unicode)))
-(add-hook! on-render-hook (lambda () (render)))
-
-(run-game-loop)
+(run-game tilemap)

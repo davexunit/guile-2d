@@ -1,41 +1,25 @@
-(use-modules (figl gl)
+(use-modules (srfi srfi-9)
+             (figl gl)
              (2d color)
-             (2d game-loop)
-             (2d window)
-             (2d helpers)
              (2d font)
+             (2d game)
              (2d vector2))
 
-(define window-width 800)
-(define window-height 600)
-(define font (load-font "fonts/Boxy-Bold.ttf" 48))
-(define text "The quick brown fox jumped over the lazy dog.")
-(define textbox (make-textbox font text (vector2 320 300) white 'left 200))
+(define (demo-textbox)
+  (make-textbox (load-font "fonts/Boxy-Bold.ttf" 48)
+                "The quick brown fox jumped over the lazy dog."
+                (vector2 240 160)
+                white
+                'left
+                200))
 
-;; Open the window.
-(open-window window-width window-height)
+(define-scene demo
+  #:title  "Demo"
+  #:draw   (lambda (textbox) (draw-textbox textbox))
+  #:state  (demo-textbox))
 
-(define (quit-demo)
-  (close-window)
-  (quit))
+(define-game fonts
+  #:title       "Fonts"
+  #:first-scene demo)
 
-(define (key-down key mod unicode)
-  (cond ((any-equal? key 'escape 'q)
-         (quit-demo))))
-
-;; Draw our sprite
-(define (render)
-  (let ((fps (floor (inexact->exact (current-fps)))))
-    (with-gl-push-matrix
-      (use-color white)
-      (draw-font font (format #f "FPS: ~d" fps))))
-    (draw-textbox textbox))
-
-;; Register callbacks.
-(add-hook! on-quit-hook (lambda () (quit-demo)))
-(add-hook! on-render-hook (lambda () (render)))
-(add-hook! on-key-down-hook (lambda (key mod unicode) (key-down key mod unicode)))
-
-;; Start the game loop.
-;; The render callback will be called through this procedure.
-(run-game-loop)
+(run-game fonts)
