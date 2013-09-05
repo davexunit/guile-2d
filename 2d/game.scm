@@ -34,15 +34,18 @@
 
 ;; When no event callbacks are specified for a scene, these
 ;; (hopefully) convenient defaults will be used.
-(define default-scene-events
+(define %default-scene-events
   `((quit     . ,(lambda (state) (quit-game-loop!)))
     (key-down . ,(lambda (state key mode unicode)
                    (when (any-equal? key 'escape 'q)
                      (quit-game-loop!))))))
 
+(define (default-scene-events)
+  (copy-tree %default-scene-events))
+
 (define* (make-scene #:optional #:key
                      (title "A Guile-2D Scene")
-                     (events default-scene-events)
+                     (events (default-scene-events))
                      (update (lambda (s) #f))
                      (draw (lambda (s) #f))
                      (state #f))
