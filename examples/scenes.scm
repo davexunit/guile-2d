@@ -2,6 +2,8 @@
              (2d game)
              (2d vector2))
 
+;; Press the RETURN key to toggle between the 2 scenes.
+
 ;;;
 ;;; Scene 1
 ;;;
