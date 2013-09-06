@@ -69,7 +69,10 @@ creates a new scene."
            scene-state
            scene-trigger
            scene-update
-           scene-draw)
+           scene-draw
+           push-scene
+           replace-scene
+           pop-scene)
 
 (export make-scene
         define-scene

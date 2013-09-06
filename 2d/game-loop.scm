@@ -35,6 +35,9 @@
   #:use-module (2d mvars)
   #:use-module (2d window)
   #:export (current-fps
+            push-scene
+            replace-scene
+            pop-scene
             run-game
             quit-game-loop!))
 
@@ -50,9 +53,7 @@
 ;;;
 
 (define game-fps 0)
-(define game-running #f)
-(define game-scene #f)
-(define game-next-scene #f)
+(define running #f)
 
 ;;;
 ;;; Event Handling
@@ -69,28 +70,28 @@
   "Calls the relevant callback for the event."
   (case (SDL:event:type e)
     ((active)
-     (scene-trigger game-scene 'active))
+     (scene-trigger current-scene 'active))
     ((video-resize)
-     (scene-trigger game-scene
+     (scene-trigger current-scene
                     'resize
                     (SDL:event:resize:w e)
                     (SDL:event:resize:h e)))
     ((quit)
-     (scene-trigger game-scene 'quit))
+     (scene-trigger current-scene 'quit))
     ((key-down)
-     (scene-trigger game-scene
+     (scene-trigger current-scene
                     'key-down
                     (SDL:event:key:keysym:sym e)
                     (SDL:event:key:keysym:mod e)
                     (SDL:event:key:keysym:unicode e)))
     ((key-up)
-     (scene-trigger game-scene
+     (scene-trigger current-scene
                     'key-up
                     (SDL:event:key:keysym:sym e)
                     (SDL:event:key:keysym:mod e)
                     (SDL:event:key:keysym:unicode e)))
     ((mouse-motion)
-     (scene-trigger game-scene
+     (scene-trigger current-scene
                     'mouse-motion
                     (SDL:event:motion:state e)
                     (SDL:event:motion:x e)
@@ -98,13 +99,13 @@
                     (SDL:event:motion:xrel e)
                     (SDL:event:motion:yrel e)))
     ((mouse-button-down)
-     (scene-trigger game-scene
+     (scene-trigger current-scene
                     'mouse-press
                     (SDL:event:button:button e)
                     (SDL:event:button:x e)
                     (SDL:event:button:y e)))
     ((mouse-button-up)
-     (scene-trigger game-scene
+     (scene-trigger current-scene
                     'mouse-click
                     (SDL:event:button:button e)
                     (SDL:event:button:x e)
@@ -143,7 +144,7 @@
   (set-gl-matrix-mode (matrix-mode modelview))
   (gl-load-identity)
   (gl-clear (clear-buffer-mask color-buffer depth-buffer))
-  (scene-draw game-scene)
+  (scene-draw current-scene)
   (SDL:gl-swap-buffers))
 
 (define (update accumulator)
@@ -152,7 +153,7 @@ many times as tick-interval can divide accumulator. The return value
 is the unused accumulator time."
   (if (>= accumulator tick-interval)
     (begin
-      (scene-update game-scene)
+      (scene-update current-scene)
       (update-agenda)
       (update (- accumulator tick-interval)))
     accumulator))
@@ -190,11 +191,43 @@ INPUT, OUTPUT, and ERROR ports."
 ;;; Scene management
 ;;;
 
-(define (set-game-scene scene)
-  (when game-scene
-    (scene-trigger game-scene 'stop))
+(define scenes '())
+(define current-scene #f)
+(define next-scene #f)
+
+(define (push-scene scene)
+  "Pause the current scene and start SCENE upon next game tick."
+  (set! scenes (cons scene scenes))
+  (set! next-scene scene))
+
+(define (replace-scene scene)
+  (set! scenes (cons scene (cdr scenes)))
+  (set! next-scene scene))
+
+(define (pop-scene)
+  "Exit the current scene and resume the previous scene. If there is
+no previous scene, the game loop will terminate."
+  (if (null? scenes)
+      (quit-game-loop!)
+      (begin
+        (set! next-scene (car scenes))
+        (set! scenes (cdr scenes)))))
+
+(define (switch-scenes-maybe)
+  "Switch scenes if the current scene is not the scene at the top of
+the stack."
+  (when next-scene
+    (scene-trigger current-scene 'stop)
+    (set-current-scene next-scene)
+    (set! next-scene #f)))
+
+(define (set-current-scene scene)
   (scene-trigger scene 'start)
-  (set! game-scene scene))
+  (set! current-scene scene))
+
+(define (set-initial-scene scene)
+  (set! scenes (list scene))
+  (set-current-scene scene))
 
 ;;;
 ;;; Game Loop
@@ -202,7 +235,7 @@ INPUT, OUTPUT, and ERROR ports."
 
 (define (game-loop last-time next-time accumulator)
   "Runs input, render, and update hooks."
-  (when game-running
+  (when running
     (handle-events)
     (let* ((time (SDL:get-ticks))
            (dt (- time last-time))
@@ -210,6 +243,7 @@ INPUT, OUTPUT, and ERROR ports."
            (remainder (update accumulator)))
       (run-repl)
       (render)
+      (switch-scenes-maybe)
       (accumulate-fps! dt)
       (SDL:delay (time-left (SDL:get-ticks) next-time))
       (game-loop time
@@ -221,8 +255,8 @@ INPUT, OUTPUT, and ERROR ports."
   (open-window (game-title game)
                (game-resolution game)
                (game-fullscreen? game))
-  (set! game-running #t)
-  (set-game-scene ((game-first-scene game)))
+  (set! running #t)
+  (set-initial-scene ((game-first-scene game)))
   (spawn-server)
   (agenda-schedule show-fps)
   (let ((time (SDL:get-ticks)))
@@ -232,4 +266,4 @@ INPUT, OUTPUT, and ERROR ports."
 (define (quit-game-loop!)
   "Tell the game loop to finish up the current frame and then
 terminate."
-  (set! game-running #f))
+  (set! running #f))
