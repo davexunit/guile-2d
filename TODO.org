@@ -5,14 +5,14 @@
    updates the game state, renders the scene. Use a fixed update
    timestep and cap the maximum FPS.
 
-** TODO Game scenes
+** DONE Game scenes
    Games can be broken up into many chunks, called scenes. Examples
    would be a main menu, a world map, a battle screen, etc.
 
    - [X] Create a <scene> type that encapsulates input/render/update
      callbacks
    - [X] Macro for declaratively defining a scene
-   - [ ] Scene switching
+   - [X] Scene switching
 
 ** TODO Input
    Provide hooks to respond to keyboard, mouse, and joystick events.
