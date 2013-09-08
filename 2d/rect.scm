@@ -24,6 +24,7 @@
 
 (define-module (2d rect)
   #:use-module (srfi srfi-9)
+  #:use-module (2d vector2)
   #:export (<rect>
             make-rect
             rect?
@@ -33,6 +34,8 @@
             rect-y2
             rect-width
             rect-height
+            rect-position
+            rect-size
             rect-move
             rect-inflate
             rect-union
@@ -40,6 +43,10 @@
             rect-within?
             rect-intesects?
             rect-contains?))
+
+;;;
+;;; Rectangles
+;;;
 
 ;; The rect API is very similar to the Pygame rect API, but rects are
 ;; immutable.
@@ -58,20 +65,50 @@
 (define (rect-y2 rect)
   (+ (rect-y rect) (rect-height rect) -1))
 
-(define (rect-move rect x y)
-  "Moves a rect by the given offset."
+(define (rect-position rect)
+  "Return the top-left corner of RECT as a vector2."
+  (vector2 (rect-x rect)
+           (rect-y rect)))
+
+(define (rect-size rect)
+  "Return the size of RECT as a vector2."
+  (vector2 (rect-width rect)
+           (rect-height rect)))
+
+(define (%rect-move rect x y)
+  "Move a rect by the given offset."
   (make-rect (+ (rect-x rect) x)
              (+ (rect-y rect) y)
              (rect-width rect)
              (rect-height rect)))
 
-(define (rect-inflate rect width height)
+(define rect-move
+  (case-lambda
+    "Create a new rectangle by moving RECT by the given
+offset. rect-move accepts a vector2 or x and y coordinates as separate
+arguments."
+    ((rect v)
+     (%rect-move rect (vx v) (vy v)))
+    ((rect x y)
+     (%rect-move rect x y))))
+
+(define (%rect-inflate rect width height)
   "Grows the rect by the given amount. The rect stays centered around
 its current center."
   (make-rect (+ (rect-x rect) (/ width 2))
              (+ (rect-y rect) (/ height 2))
              (+ (rect-width rect) width)
              (+ (rect-height rect) height)))
+
+(define rect-inflate
+  (case-lambda
+    "Create a new rectangle by growing RECT by the given amount
+without changing the center point. rect-inflate accepts a vector2 or x
+and y coordinates as separate arguments."
+    ((rect v)
+     (%rect-inflate rect (vx v) (vy v)))
+    ((rect x y)
+     (%rect-inflate rect x y))))
 
 (define (rect-union rect1 rect2)
   "Returns a rect that covers the area of rect1 and rect2."
@@ -112,9 +149,16 @@ not overlap, a rect of size 0 is returned."
       (and (>= (rect-y2 rect2) (rect-y  rect1))
            (<= (rect-y2 rect2) (rect-y2 rect1)))))
 
-(define (rect-contains? rect x y)
-  "Tests if the given point is within rect."
+(define (%rect-contains? rect x y)
   (and (>= x (rect-x  rect))
        (<= x (rect-x2 rect))
        (>= y (rect-y  rect))
        (<= y (rect-y2 rect))))
+
+(define rect-contains?
+  (case-lambda
+    "Tests if the given point is within rect."
+    ((rect v)
+     (%rect-contains? rect (vx v) (vy v)))
+    ((rect x y)
+     (%rect-contains? rect x y))))
