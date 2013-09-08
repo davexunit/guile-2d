@@ -101,7 +101,8 @@ value."
            game-resolution
            game-fullscreen?
            game-first-scene
-           run-game)
+           run-game
+           current-fps)
 
 (export make-game
         define-game)
