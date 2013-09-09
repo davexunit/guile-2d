@@ -24,7 +24,7 @@
 (define-module (2d math)
   #:export (pi
             degrees->radians
-            radians->degress
+            radians->degrees
             sin-degrees
             cos-degrees
             tan-degrees
