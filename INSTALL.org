@@ -10,6 +10,16 @@
 
 ** Install dependencies
 
+*** Guile
+
+    *Debian*
+
+    #+BEGIN_SRC sh
+      sudo apt-get install guile-2.0-dev
+    #+END_SRC
+
+    Guile 2.0.9 or higher is highly recommended.
+
 *** SDL
     SDL is a very popular, cross-platform game library.
 
@@ -26,7 +36,7 @@
     *Debian*
 
     #+BEGIN_SRC sh
-      sudo apt-get install libfreeimage3
+      sudo apt-get install libfreeimage-dev
     #+END_SRC
 
 *** FTGL
@@ -36,7 +46,7 @@
     *Debian*
 
      #+BEGIN_SRC sh
-       sudo apt-get install libftgl2
+       sudo apt-get install libftgl-dev
      #+END_SRC
 
 *** guile-sdl
@@ -48,7 +58,7 @@
     *Debian*
 
     #+BEGIN_SRC sh
-      tar zxf guile-sdl-<version>
+      tar xf guile-sdl-<version>.tar.xz
       cd guile-sdl-<version>/
       ./configure --prefix=/usr
       make
@@ -68,7 +78,7 @@
     *Debian*
 
     #+BEGIN_SRC sh
-      git clone https://gitorious.org/guile-figl/guile-figl
+      git clone https://gitorious.org/guile-figl/guile-figl.git
       cd guile-figl
       autoreconf -vif
       ./configure --prefix=/usr
