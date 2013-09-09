@@ -263,7 +263,7 @@
 
 ** Dependencies
 
-   - GNU Guile >= 2.0 (>= 2.0.9 recommended)
+   - GNU Guile >= 2.0.9
    - [[https://gitorious.org/guile-figl/guile-figl][guile-figl]] (git master branch)
    - [[https://www.gnu.org/software/guile-sdl/index.html][guile-sdl]] >= 0.5.0
    - SDL 1.2

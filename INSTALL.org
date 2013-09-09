@@ -18,7 +18,10 @@
       sudo apt-get install guile-2.0-dev
     #+END_SRC
 
-    Guile 2.0.9 or higher is highly recommended.
+    This assumes that the version of Debian you are running has Guile
+    2.0.9.
+
+    Check the versions available to you with =sudo apt-cache show guile-2.0-dev=.
 
 *** SDL
     SDL is a very popular, cross-platform game library.
