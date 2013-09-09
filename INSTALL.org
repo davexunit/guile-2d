@@ -6,7 +6,7 @@
   any modifications on any GNU/Linux distro.
 
   This installation guide assumes that you have the GNU build system
-  and git installed.
+  (automake, autoconf, texinfo, pkg-config) and git installed.
 
 ** Install dependencies
 
