@@ -32,6 +32,10 @@
             rect-y
             rect-x2
             rect-y2
+            rect-center-x
+            rect-center-y
+            rect-half-width
+            rect-half-height
             rect-width
             rect-height
             rect-position
@@ -41,7 +45,7 @@
             rect-union
             rect-clip
             rect-within?
-            rect-intesects?
+            rect-intersects?
             rect-contains?))
 
 ;;;
@@ -64,6 +68,18 @@
 
 (define (rect-y2 rect)
   (+ (rect-y rect) (rect-height rect) -1))
+
+(define (rect-center-x rect)
+  (+ (rect-x rect) (rect-half-width rect)))
+
+(define (rect-center-y rect)
+  (+ (rect-y rect) (rect-half-height rect)))
+
+(define (rect-half-width rect)
+  (/ (rect-width rect) 2))
+
+(define (rect-half-height rect)
+  (/ (rect-height rect) 2))
 
 (define (rect-position rect)
   "Return the top-left corner of RECT as a vector2."
