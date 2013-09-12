@@ -24,6 +24,7 @@
 (define-module (2d window)
   #:use-module (figl gl)
   #:use-module ((sdl sdl) #:prefix SDL:)
+  #:use-module ((sdl mixer) #:prefix SDL:)
   #:use-module (2d vector2)
   #:export (open-window
             close-window))
@@ -37,6 +38,7 @@ initializes OpenGL state."
     ;; Initialize everything
     (SDL:enable-unicode #t)
     (SDL:init 'everything)
+    (SDL:open-audio)
     ;; Open SDL window in OpenGL mode.
     (SDL:set-video-mode width height 24 flags)
     (SDL:set-caption title)
@@ -56,4 +58,5 @@ initializes OpenGL state."
 (define (close-window)
   "Closes the game window and cleans up. This procedure is typically
 called just before calling (quit)."
+  (SDL:close-audio)
   (SDL:quit))
