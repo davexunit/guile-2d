@@ -167,11 +167,9 @@
    will provide a good place for people other than me to try out
    guile-2d and perhaps even start to hack on it.
 
-   - [ ] Finish sprite batches
    - [X] Font rendering with FTGL
    - [ ] Resolve issues with FIGL
-
-     Can't have a broken dependency.
-
    - [ ] Texinfo documentation
    - [X] Autotools build files
+   - [ ] Fix spiral-of-death bug
+   - [ ] Fix animation bug
