@@ -43,11 +43,21 @@
   "Play SAMPLE."
   (SDL:play-channel (sample-audio sample)))
 
+(define (sample-volume)
+  "Return volume that samples are played at."
+  (SDL:volume))
+
+(define (set-sample-volume volume)
+  "Set the volume that samples are played at."
+  (SDL:volume volume))
+
 (export make-sample
         load-sample
         sample?
         sample-audio
-        sample-play)
+        sample-play
+        sample-volume
+        set-sample-volume)
 
 ;; Wrapper over SDL music objects.
 (define-record-type <music>
@@ -66,11 +76,21 @@
   "Play MUSIC."
   (SDL:play-music (music-audio music)))
 
+(define (music-volume)
+  "Return volume that music is played at."
+  (SDL:music-volume))
+
+(define (set-music-volume volume)
+  "Set the volume that music is played at."
+  (SDL:volume volume))
+
 (export make-music
         load-music
         music?
         music-audio
-        music-play)
+        music-play
+        music-volume
+        set-music-volume)
 
 (re-export (SDL:pause-music . music-pause)
            (SDL:resume-music . music-resume)
