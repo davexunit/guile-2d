@@ -133,6 +133,8 @@
   "Display the current FPS every second."
   (wait 60)
   (pk 'FPS (floor game-fps))
+  (pk 'Updates *updates*)
+  (set! *updates* 0)
   (show-fps))
 
 ;;;
@@ -147,21 +149,22 @@
   (scene-draw current-scene)
   (SDL:gl-swap-buffers))
 
+(define *updates* 0)
+
 (define (update accumulator)
   "Call the update callback. The update callback will be called as
 many times as tick-interval can divide accumulator. The return value
 is the unused accumulator time."
   (if (>= accumulator tick-interval)
-    (begin
-      (scene-update current-scene)
-      (update-agenda)
-      (update (- accumulator tick-interval)))
-    accumulator))
-
-(define (time-left current-time next-time)
-  "Calculate the delta between NEXT-TIME and CURRENT-TIME. If
-NEXT-TIME is less than CURRENT-TIME, 0 is returned."
-  (max (floor (- next-time current-time)) 0))
+      (begin
+        (set! *updates* (1+ *updates*))
+        (handle-events)
+        (update-agenda)
+        ;; (scene-update current-scene)
+        ;; (update (- accumulator tick-interval))
+        (- accumulator tick-interval)
+        )
+      accumulator))
 
 ;;;
 ;;; REPL
@@ -233,21 +236,27 @@ the stack."
 ;;; Game Loop
 ;;;
 
-(define (game-loop last-time next-time accumulator)
+;; (define (time-left current-time next-time)
+;;   "Calculate the delta between NEXT-TIME and CURRENT-TIME. If
+;; NEXT-TIME is less than CURRENT-TIME, 0 is returned."
+;;   (max (floor (- next-time current-time)) 0))
+
+;; (define (frame-sleep time)
+;;   (unless (zero? time)
+;;     (SDL:delay time)))
+
+(define (game-loop last-time accumulator)
   "Runs input, render, and update hooks."
   (when running
-    (handle-events)
-    (let* ((time (SDL:get-ticks))
-           (dt (- time last-time))
-           (accumulator (+ accumulator dt))
-           (remainder (update accumulator)))
-      (run-repl)
-      (render)
-      (switch-scenes-maybe)
+    (let* ((current-time (SDL:get-ticks))
+           (dt (- current-time last-time))
+           (remainder (update (+ accumulator dt))))
+      ;; (run-repl)
+      ;; (render)
       (accumulate-fps! dt)
-      (SDL:delay (time-left (SDL:get-ticks) next-time))
-      (game-loop time
-                 (+ next-time tick-interval)
+      (switch-scenes-maybe)
+      ;; (frame-sleep (time-left (SDL:get-ticks) next-time))
+      (game-loop current-time
                  remainder))))
 
 (define (run-game game)
@@ -257,10 +266,9 @@ the stack."
                (game-fullscreen? game))
   (set! running #t)
   (set-initial-scene ((game-first-scene game)))
-  (spawn-server)
+  ;; (spawn-server)
   (agenda-schedule show-fps)
-  (let ((time (SDL:get-ticks)))
-    (game-loop time (+ time tick-interval) 0))
+  (game-loop (SDL:get-ticks) 0)
   (close-window))
 
 (define (quit-game-loop!)
