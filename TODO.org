@@ -171,5 +171,4 @@
    - [ ] Resolve issues with FIGL
    - [ ] Texinfo documentation
    - [X] Autotools build files
-   - [ ] Fix spiral-of-death bug
    - [ ] Fix animation bug
