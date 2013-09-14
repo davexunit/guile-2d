@@ -116,40 +116,37 @@
 ;;;
 
 (define accumulate-fps!
-  (let* ((frame-time 0)
-         (alpha 1/5)
-         (inverse-alpha (- 1 alpha)))
+  (let* ((elapsed-time 0)
+         (fps 0))
     (lambda (dt)
-      "Computes a weighted average FPS."
-      (set! frame-time (+ (* alpha dt) (* inverse-alpha frame-time)))
-      (unless (zero? frame-time)
-        (set! game-fps (/ 1000 frame-time))))))
+      "Increments. Resets to 0 every second."
+      (let ((new-time (+ elapsed-time dt))
+            (new-fps (1+ fps)))
+        (if (>= new-time 1000)
+            (begin
+              (set! game-fps new-fps)
+              (set! fps 0)
+              (set! elapsed-time 0))
+            (begin
+              (set! fps new-fps)
+              (set! elapsed-time new-time)))))))
 
 (define (current-fps)
   "Returns the current FPS value."
   game-fps)
 
-(codefine (show-fps)
-  "Display the current FPS every second."
-  (wait 60)
-  (pk 'FPS (floor game-fps))
-  (pk 'Updates *updates*)
-  (set! *updates* 0)
-  (show-fps))
-
 ;;;
 ;;; Update and Render
 ;;;
 
-(define (render)
+(define (render dt)
   "Renders a frame."
   (set-gl-matrix-mode (matrix-mode modelview))
   (gl-load-identity)
   (gl-clear (clear-buffer-mask color-buffer depth-buffer))
   (scene-draw current-scene)
-  (SDL:gl-swap-buffers))
-
-(define *updates* 0)
+  (SDL:gl-swap-buffers)
+  (accumulate-fps! dt))
 
 (define (update accumulator)
   "Call the update callback. The update callback will be called as
@@ -157,13 +154,10 @@ many times as tick-interval can divide accumulator. The return value
 is the unused accumulator time."
   (if (>= accumulator tick-interval)
       (begin
-        (set! *updates* (1+ *updates*))
         (handle-events)
         (update-agenda)
-        ;; (scene-update current-scene)
-        ;; (update (- accumulator tick-interval))
-        (- accumulator tick-interval)
-        )
+        (scene-update current-scene)
+        (update (- accumulator tick-interval)))
       accumulator))
 
 ;;;
@@ -236,26 +230,15 @@ the stack."
 ;;; Game Loop
 ;;;
 
-;; (define (time-left current-time next-time)
-;;   "Calculate the delta between NEXT-TIME and CURRENT-TIME. If
-;; NEXT-TIME is less than CURRENT-TIME, 0 is returned."
-;;   (max (floor (- next-time current-time)) 0))
-
-;; (define (frame-sleep time)
-;;   (unless (zero? time)
-;;     (SDL:delay time)))
-
 (define (game-loop last-time accumulator)
   "Runs input, render, and update hooks."
   (when running
     (let* ((current-time (SDL:get-ticks))
            (dt (- current-time last-time))
            (remainder (update (+ accumulator dt))))
-      ;; (run-repl)
-      ;; (render)
-      (accumulate-fps! dt)
+      (run-repl)
+      (render dt)
       (switch-scenes-maybe)
-      ;; (frame-sleep (time-left (SDL:get-ticks) next-time))
       (game-loop current-time
                  remainder))))
 
@@ -266,8 +249,7 @@ the stack."
                (game-fullscreen? game))
   (set! running #t)
   (set-initial-scene ((game-first-scene game)))
-  ;; (spawn-server)
-  (agenda-schedule show-fps)
+  (spawn-server)
   (game-loop (SDL:get-ticks) 0)
   (close-window))
 
