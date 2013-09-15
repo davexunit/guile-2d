@@ -32,80 +32,91 @@
 ;; The <animation> type represents a vector of textures or texture
 ;; regions that are to be played in sequence and possibly looped.
 (define-record-type <animation>
-  (make-animation frames duration loop)
+  (make-animation frames frame-duration loop)
   animation?
   (frames animation-frames)
-  (duration animation-duration)
+  (frame-duration animation-frame-duration)
   (loop animation-loop?))
 
 (define (animation-frame animation index)
-  "Returns the frame for the given index."
+  "Return the texture for the given frame INDEX."
   (vector-ref (animation-frames animation) index))
 
 (define (animation-length animation)
-  "Returns the number of frames in the animation"
+  "Return the number of frames in the ANIMATION."
   (vector-length (animation-frames animation)))
+
+(define (animation-duration animation)
+  "Return the total duration of ANIMATION in ticks."
+  (* (animation-length animation)
+     (animation-frame-duration animation)))
 
 (export make-animation
         animation?
         animation-frames
-        animation-duration
+        animation-frame-duration
         animation-loop?
         animation-frame
-        animation-length)
+        animation-length
+        animation-duration)
 
-;; The <animation-state> type encapsulates the state for playing an
+;; The <animator> type encapsulates the state for playing an
 ;; animation.
-(define-record-type <animation-state>
-  (%make-animation-state animation frame-index frame-time playing)
-  animation-state?
-  (animation animation-state-animation)
-  (frame-index animation-state-frame-index)
-  (frame-time animation-state-frame-time)
-  (playing animation-state-playing?))
+(define-record-type <animator>
+  (%make-animator animation frame time)
+  animator?
+  (animation animator-animation)
+  (frame animator-frame set-animator-frame!)
+  (time animator-time set-animator-time!))
 
-(define (make-animation-state animation)
+(define (make-animator animation)
   "Creates a new animation state object."
-  (%make-animation-state animation 0 0 #t))
+  (%make-animator animation 0 0))
 
-(define (tick-animation-state state)
-  "Increments the frame time for the animation state and determines
-which frame to show. Returns a new animation state object when the
-animation is playing. Otherwise the state passed in is returned."
-  (let ((frame-time (1+ (animation-state-frame-time state)))
-        (frame-index (animation-state-frame-index state))
-        (playing (animation-state-playing? state))
-        (animation (animation-state-animation state)))
+(define (animator-frame-complete? state)
+  (>= (animator-time state)
+      (animation-frame-duration (animator-animation state))))
 
-    ;; Return the same state object if the animation is not playing.
-    (cond ((not playing)
-           state)
-          ;; Return a new state object with a reset frame-index and
-          ;; frame-time if we've reached the end of the animation.
-          ;; Stops playing the animation if the animation does not
-          ;; loop.
-          ((and playing (= frame-time (animation-duration animation)))
-           (let* ((frame-index (modulo (1+ frame-index)
-                                       (animation-length animation)))
-                  (frame-time 0)
-                  (playing (or (not (= frame-index 0))
-                               (animation-loop? animation))))
-             (%make-animation-state animation frame-index frame-time playing)))
-          ;; Return a new state object with an incremented frame index.
-          (else
-           (%make-animation-state animation frame-index frame-time playing)))))
+(define (animator-playing? state)
+  "Return true if animation STATE is not done playing the
+animation. This will always return #t if the animation loops."
+  (not (= (animator-frame state) -1)))
 
-(define (animation-state-frame state)
-  "Returns the texture or texture region for the state's animation at
-the current frame index."
-  (animation-frame (animation-state-animation state)
-                   (animation-state-frame-index state)))
+(define (animator-next-frame state)
+  "Return the next frame index for the animation STATE. Return -1 when
+the animation is complete."
+  (let ((frame (1+ (animator-frame state)))
+        (animation (animator-animation state)))
+    (cond ((< frame (animation-length animation)) frame)
+          ((animation-loop? animation) 0)
+          (else -1))))
 
-(export make-animation-state
-        animation-state?
-        animation-state-animation
-        animation-state-frame-index
-        animation-state-frame-time
-        animation-state-playing?
-        animation-state-frame
-        tick-animation-state)
+(define (animator-texture state)
+  "Returns the texture for the animation at the current frame index."
+  (animation-frame (animator-animation state)
+                   (animator-frame state)))
+
+(define (animator-next! state)
+  "Advance to the next animation frame for the given animation STATE."
+  (set-animator-time! state 0)
+  (set-animator-frame! state (animator-next-frame state)))
+
+(define (animator-update! state)
+  "Increments the frame time for the animation STATE and advances to
+the next frame in the animation if necessary."
+  (when (animator-playing? state)
+    (set-animator-time! state (1+ (animator-time state)))
+    (when (animator-frame-complete? state)
+      (animator-next! state))))
+
+(export make-animator
+        animator?
+        animator-animation
+        animator-frame
+        animator-time
+        animator-frame-complete?
+        animator-playing?
+        animator-next-frame
+        animator-texture
+        animator-next!
+        animator-update!)

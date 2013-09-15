@@ -142,8 +142,8 @@
 ;; texture-region, animation, etc.) with a given position, scale,
 ;; rotation, and color.
 (define-record-type <sprite>
-  (%make-sprite drawable position scale rotation color anchor vertices
-                dirty animation-state)
+  (%make-sprite drawable position scale rotation color anchor
+                vertices dirty animator)
   sprite?
   (drawable sprite-drawable set-sprite-drawable!)
   (position sprite-position %set-sprite-position!)
@@ -153,18 +153,18 @@
   (anchor sprite-anchor %set-sprite-anchor!)
   (vertices sprite-vertices set-sprite-vertices!)
   (dirty sprite-dirty? set-sprite-dirty!)
-  (animation-state sprite-animation-state set-sprite-animation-state!))
+  (animator sprite-animator))
 
 (define* (make-sprite drawable #:optional #:key
                       (position (vector2 0 0)) (scale (vector2 1 1))
                       (rotation 0) (color white) (anchor 'center))
   "Makes a new sprite object."
   (let ((vertices (make-packed-array sprite-vertex 4))
-        (animation-state (if (animation? drawable)
-                             (make-animation-state drawable)
-                             #f)))
+        (animator (if (animation? drawable)
+                      (make-animator drawable)
+                      #f)))
     (%make-sprite drawable position scale rotation color anchor vertices
-                  #t animation-state)))
+                  #t animator)))
 
 (define-syntax-rule (dirty-sprite-setter setter private-setter)
   "Defines a setter that calls the private version of the given
@@ -187,16 +187,16 @@ operation that requires a refresh of the vertex array should use this macro."
   (make-sprite (load-texture filename) #:position position #:scale scale
                #:rotation rotation #:color color #:anchor anchor))
 
-(define (sprite-animation-frame sprite)
-  (animation-state-frame (sprite-animation-state sprite)))
+(define (sprite-animation-texture sprite)
+  (animator-texture (sprite-animator sprite)))
 
 (define (sprite-texture sprite)
   "Returns the texture for the sprite's drawable object."
-    (let ((drawable (sprite-drawable sprite)))
-      (cond ((texture? drawable)
-             drawable)
-            ((animation? drawable)
-             (sprite-animation-frame sprite)))))
+  (let ((drawable (sprite-drawable sprite)))
+    (cond ((texture? drawable)
+           drawable)
+          ((animation? drawable)
+           (sprite-animation-texture sprite)))))
 
 (define (sprite-anchor-vector sprite)
   "Returns a vector of the coordinates for the center point of a
@@ -205,8 +205,8 @@ sprite."
         (texture (sprite-texture sprite)))
     (cond
      ((eq? anchor 'center)
-        (vector2 (/ (texture-width texture) 2)
-                 (/ (texture-height texture) 2)))
+      (vector2 (/ (texture-width texture) 2)
+               (/ (texture-height texture) 2)))
      (else anchor))))
 
 (define (update-sprite-vertices! sprite)
@@ -232,10 +232,8 @@ sprite."
                           (texture-t2 texture)
                           (sprite-color sprite))))
 
-(define (update-sprite-animation-state! sprite)
-  (set-sprite-animation-state!
-   sprite
-   (tick-animation-state (sprite-animation-state sprite))))
+(define (update-sprite-animator! sprite)
+  (animator-update! (sprite-animator sprite)))
 
 (define (draw-sprite sprite)
   "Renders a sprite. A sprite batch will be used if one is currently
@@ -243,7 +241,7 @@ bound."
   (when (sprite-dirty? sprite)
     (update-sprite-vertices! sprite))
   (when (animation? (sprite-drawable sprite))
-    (update-sprite-animation-state! sprite))
+    (update-sprite-animator! sprite))
   (if *sprite-batch*
       (draw-sprite-batched sprite)
       (draw-sprite-vertices (sprite-texture sprite)
