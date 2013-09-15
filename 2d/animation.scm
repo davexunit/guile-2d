@@ -71,41 +71,40 @@
   (playing animator-playing? set-animator-playing!))
 
 (define (make-animator animation)
-  "Creates a new animation state object."
+  "Creates a new animation animator object."
   (%make-animator animation 0 0 #t))
 
-(define (animator-frame-complete? state)
-  (>= (animator-time state)
-      (animation-frame-duration (animator-animation state))))
+(define (animator-frame-complete? animator)
+  (>= (animator-time animator)
+      (animation-frame-duration (animator-animation animator))))
 
-(define (animator-next-frame state)
-  "Return the next frame index for the animation STATE. Return -1 when
+(define (animator-next-frame animator)
+  "Return the next frame index for the animation ANIMATOR. Return -1 when
 the animation is complete."
-  (modulo (1+ (animator-frame state))
-          (animation-length (animator-animation state))))
+  (modulo (1+ (animator-frame animator))
+          (animation-length (animator-animation animator))))
 
-(define (animator-texture state)
+(define (animator-texture animator)
   "Returns the texture for the animation at the current frame index."
-  (animation-frame (animator-animation state)
-                   (animator-frame state)))
+  (animation-frame (animator-animation animator)
+                   (animator-frame animator)))
 
-(define (animator-next! state)
-  "Advance to the next animation frame for the given animation STATE."
-  (let ((next-frame (animator-next-frame state)))
-    (define (keep-playing?)
-      (or (not (= 0 next-frame))
-          (animation-loop? (animator-animation state))))
-    (set-animator-time! state 0)
-    (set-animator-frame! state next-frame)
-    (set-animator-playing! state (keep-playing?))))
+(define (animator-next! animator)
+  "Advance to the next animation frame for the given animation ANIMATOR."
+  (let ((next-frame (animator-next-frame animator))
+        (animation (animator-animation animator)))
+    (set-animator-time! animator 0)
+    (set-animator-frame! animator next-frame)
+    (set-animator-playing! animator (or (not (zero? next-frame))
+                                        (animation-loop? animation)))))
 
-(define (animator-update! state)
-  "Increments the frame time for the animation STATE and advances to
+(define (animator-update! animator)
+  "Increments the frame time for the animation ANIMATOR and advances to
 the next frame in the animation if necessary."
-  (when (animator-playing? state)
-    (set-animator-time! state (1+ (animator-time state)))
-    (when (animator-frame-complete? state)
-      (animator-next! state))))
+  (when (animator-playing? animator)
+    (set-animator-time! animator (1+ (animator-time animator)))
+    (when (animator-frame-complete? animator)
+      (animator-next! animator))))
 
 (export make-animator
         animator?
