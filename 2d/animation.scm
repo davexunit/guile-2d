@@ -63,33 +63,26 @@
 ;; The <animator> type encapsulates the state for playing an
 ;; animation.
 (define-record-type <animator>
-  (%make-animator animation frame time)
+  (%make-animator animation frame time playing)
   animator?
   (animation animator-animation)
   (frame animator-frame set-animator-frame!)
-  (time animator-time set-animator-time!))
+  (time animator-time set-animator-time!)
+  (playing animator-playing? set-animator-playing!))
 
 (define (make-animator animation)
   "Creates a new animation state object."
-  (%make-animator animation 0 0))
+  (%make-animator animation 0 0 #t))
 
 (define (animator-frame-complete? state)
   (>= (animator-time state)
       (animation-frame-duration (animator-animation state))))
 
-(define (animator-playing? state)
-  "Return true if animation STATE is not done playing the
-animation. This will always return #t if the animation loops."
-  (not (= (animator-frame state) -1)))
-
 (define (animator-next-frame state)
   "Return the next frame index for the animation STATE. Return -1 when
 the animation is complete."
-  (let ((frame (1+ (animator-frame state)))
-        (animation (animator-animation state)))
-    (cond ((< frame (animation-length animation)) frame)
-          ((animation-loop? animation) 0)
-          (else -1))))
+  (modulo (1+ (animator-frame state))
+          (animation-length (animator-animation state))))
 
 (define (animator-texture state)
   "Returns the texture for the animation at the current frame index."
@@ -98,8 +91,13 @@ the animation is complete."
 
 (define (animator-next! state)
   "Advance to the next animation frame for the given animation STATE."
-  (set-animator-time! state 0)
-  (set-animator-frame! state (animator-next-frame state)))
+  (let ((next-frame (animator-next-frame state)))
+    (define (keep-playing?)
+      (or (not (= 0 next-frame))
+          (animation-loop? (animator-animation state))))
+    (set-animator-time! state 0)
+    (set-animator-frame! state next-frame)
+    (set-animator-playing! state (keep-playing?))))
 
 (define (animator-update! state)
   "Increments the frame time for the animation STATE and advances to
