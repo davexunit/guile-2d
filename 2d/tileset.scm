@@ -47,8 +47,10 @@
   (spacing tileset-spacing))
 
 (define (split-texture texture width height margin spacing)
-  "Splits a texture into a vector of texture regions of width x height
-size."
+  "Split TEXTURE into a vector of texture regions of WIDTH x HEIGHT
+size. SPACING refers to the number of pixels separating each
+tile. MARGIN refers to the number of pixels on the top and left of
+TEXTURE before the first tile begins."
   (define (build-tile tx ty)
     (let* ((x (+ (* tx (+ width spacing)) margin))
            (y (+ (* ty (+ height spacing)) margin)))
@@ -62,8 +64,8 @@ size."
 
 (define* (make-tileset texture width height
                        #:optional #:key (margin 0) (spacing 0))
-  "Returns a new tileset that is built by splitting the given texture
-into tiles."
+  "Return a new tileset that is built by splitting TEXTURE into
+tiles."
   (let ((tiles (split-texture texture
                               width
                               height
@@ -73,8 +75,8 @@ into tiles."
 
 (define* (load-tileset filename width height
                        #:optional #:key (margin 0) (spacing 0))
-  "Returns a new tileset that is built by loading the given texture
-file and splitting the texture into tiles."
+  "Return a new tileset that is built by loading the texture at
+FILENAME and splitting the texture into tiles."
   (let* ((tiles (split-texture (load-texture filename)
                                width
                                height
@@ -83,5 +85,5 @@ file and splitting the texture into tiles."
     (%make-tileset tiles width height margin spacing)))
 
 (define (tileset-ref tileset i)
-  "Returns the tile at index i."
+  "Return the tile texture of TILESET at index I."
   (vector-ref (tileset-tiles tileset) i))
