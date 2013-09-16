@@ -58,25 +58,25 @@
 (define pi 3.141592654)
 
 (define (degrees->radians angle)
-  "Converts angle in degrees to radians."
+  "Convert ANGLE in degrees to radians."
   (* angle (/ pi 180)))
 
 (define (radians->degrees angle)
-  "Converts angle in radians to degrees."
+  "Convert ANGLE in radians to degrees."
   (* angle (/ 180 pi)))
 
 (define (sin-degrees angle)
-  "Computes the sin of the angle expressed in degrees."
+  "Compute the sin of ANGLE expressed in degrees."
   (sin (degrees->radians angle)))
 
 (define (cos-degrees angle)
-  "Computes the cosine of the angle expressed in degrees."
+  "Compute the cosine of ANGLE expressed in degrees."
   (cos (degrees->radians angle)))
 
 (define (tan-degrees angle)
-  "Computes the tangent of the angle expressed in degrees."
+  "Compute the tangent of ANGLE expressed in degrees."
   (tan (degrees->radians angle)))
 
 (define (atan-degrees y x)
-  "Computes the arctangent in degrees of the coordinates x and y."
+  "Compute the arctangent in degrees of the coordinates Y and X."
   (radians->degrees (atan y x)))
