@@ -29,11 +29,10 @@
             rgba->gl-color))
 
 (define (any-equal? elem . args)
-  "Returns true if elem equals any of the arguments and returns false
-otherwise."
+  "Return #t if ELEM equals any of the elements in the list ARGS."
   (any (lambda (e) (equal? elem e)) args))
 
 (define (logand? . args)
-  "Returns true if the result of a bitwise AND of the integer
-arguments is non-zero and returns false otherwise."
+  "Return #t if the result of a bitwise AND of the integers in list
+ARGS is non-zero."
   (not (zero? (apply logand args))))
