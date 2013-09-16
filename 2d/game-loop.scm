@@ -144,7 +144,7 @@
   (set-gl-matrix-mode (matrix-mode modelview))
   (gl-load-identity)
   (gl-clear (clear-buffer-mask color-buffer depth-buffer))
-  (scene-draw current-scene)
+  (draw-scene current-scene)
   (SDL:gl-swap-buffers)
   (accumulate-fps! dt))
 
@@ -156,7 +156,7 @@ is the unused accumulator time."
       (begin
         (handle-events)
         (update-agenda)
-        (scene-update current-scene)
+        (update-scene current-scene)
         (update (- accumulator tick-interval)))
       accumulator))
 

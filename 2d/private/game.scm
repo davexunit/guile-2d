@@ -46,12 +46,12 @@
          (scene-state scene)
          args))
 
-(define (scene-draw scene)
-  "Draw scene."
+(define (draw-scene scene)
+  "Draw SCENE."
   ((scene-draw-proc scene) (scene-state scene)))
 
-(define (scene-update scene)
-  "Update scene."
+(define (update-scene scene)
+  "Update SCENE."
   ((scene-update-proc scene) (scene-state scene)))
 
 (export <scene>
@@ -63,8 +63,8 @@
         scene-draw-proc
         scene-state
         scene-trigger
-        scene-update
-        scene-draw)
+        update-scene
+        draw-scene)
 
 ;;;
 ;;; Games

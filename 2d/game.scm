@@ -68,8 +68,8 @@ creates a new scene."
            scene-draw-proc
            scene-state
            scene-trigger
-           scene-update
-           scene-draw
+           update-scene
+           draw-scene
            push-scene
            replace-scene
            pop-scene)
