@@ -39,11 +39,11 @@
   (loop animation-loop?))
 
 (define (animation-frame animation index)
-  "Return the texture for the given frame INDEX."
+  "Return the texture for the given frame INDEX of ANIMATION."
   (vector-ref (animation-frames animation) index))
 
 (define (animation-length animation)
-  "Return the number of frames in the ANIMATION."
+  "Return the number of frames in ANIMATION."
   (vector-length (animation-frames animation)))
 
 (define (animation-duration animation)
@@ -71,26 +71,26 @@
   (playing animator-playing? set-animator-playing!))
 
 (define (make-animator animation)
-  "Creates a new animation animator object."
+  "Create a new animator for ANIMATION."
   (%make-animator animation 0 0 #t))
 
 (define (animator-frame-complete? animator)
+  "Return #t when ANIMATOR is done displaying the current frame."
   (>= (animator-time animator)
       (animation-frame-duration (animator-animation animator))))
 
 (define (animator-next-frame animator)
-  "Return the next frame index for the animation ANIMATOR. Return -1 when
-the animation is complete."
+  "Return the next frame index for ANIMATOR."
   (modulo (1+ (animator-frame animator))
           (animation-length (animator-animation animator))))
 
 (define (animator-texture animator)
-  "Returns the texture for the animation at the current frame index."
+  "Return a texture for the ANIMATOR's current frame."
   (animation-frame (animator-animation animator)
                    (animator-frame animator)))
 
 (define (animator-next! animator)
-  "Advance to the next animation frame for the given animation ANIMATOR."
+  "Advance ANIMATOR to the next frame of its animation."
   (let ((next-frame (animator-next-frame animator))
         (animation (animator-animation animator)))
     (set-animator-time! animator 0)
@@ -99,8 +99,8 @@ the animation is complete."
                                         (animation-loop? animation)))))
 
 (define (animator-update! animator)
-  "Increments the frame time for the animation ANIMATOR and advances to
-the next frame in the animation if necessary."
+  "Increment the frame time for the ANIMATOR and advance to the next
+frame when necessary."
   (when (animator-playing? animator)
     (set-animator-time! animator (1+ (animator-time animator)))
     (when (animator-frame-complete? animator)
