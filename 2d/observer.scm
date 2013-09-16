@@ -42,14 +42,14 @@
   (events observer-events))
 
 (define (make-observer)
-  "Return a new observer."
+  "Create a new observer."
   (%make-observer (make-hash-table)))
 
 (define (alist->observer alst)
   "Return a new observer that registers the callbacks for events in
-the given alist. Each pair in the alist should map one event type to
-one callback procedure. For multiple event handlers of the same type,
-use multiple pairs."
+the alist ALST. Each pair in ALST should map one event type to one
+callback procedure. For multiple event handlers of the same type, use
+multiple pairs."
   (let ((observer (make-observer)))
     (for-each (lambda (e) (observer-on observer (car e) (cdr e))) alst)
     observer))
