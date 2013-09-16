@@ -28,6 +28,7 @@
   #:use-module (figl gl)
   #:use-module (figl contrib packed-struct)
   #:use-module ((sdl sdl) #:prefix SDL:)
+  #:use-module (2d agenda)
   #:use-module (2d animation)
   #:use-module (2d color)
   #:use-module (2d helpers)
@@ -187,6 +188,10 @@ operation that requires a refresh of the vertex array should use this macro."
   (make-sprite (load-texture filename) #:position position #:scale scale
                #:rotation rotation #:color color #:anchor anchor))
 
+(define (animated-sprite? sprite)
+  "Return #t if SPRITE has an animation as its drawable object."
+  (animation? (sprite-drawable sprite)))
+
 (define (sprite-animation-texture sprite)
   (animator-texture (sprite-animator sprite)))
 
@@ -240,8 +245,7 @@ sprite."
 bound."
   (when (sprite-dirty? sprite)
     (update-sprite-vertices! sprite))
-  (when (animation? (sprite-drawable sprite))
-    (update-sprite-animator! sprite))
+  (register-animated-sprite-maybe sprite)
   (if *sprite-batch*
       (draw-sprite-batched sprite)
       (draw-sprite-vertices (sprite-texture sprite)
@@ -254,6 +258,7 @@ bound."
         (pos (sprite-position sprite))
         (scale (sprite-scale sprite))
         (anchor (sprite-anchor-vector sprite)))
+    (register-animated-sprite-maybe sprite)
     (%sprite-batch-draw *sprite-batch*
                         texture
                         (vx pos)
@@ -271,6 +276,24 @@ bound."
                         (texture-t2 texture)
                         (sprite-color sprite))))
 
+;; A hash table for all of the animated sprites that have been drawn
+;; since the last game update. It is cleared after every game update.
+(define animated-sprites (make-hash-table))
+
+(define (register-animated-sprite-maybe sprite)
+  (when (animated-sprite? sprite)
+    (hash-set! animated-sprites sprite sprite)))
+
+(define (update-animated-sprites!)
+  "Update all animators for sprites that have been drawn this frame."
+  (hash-for-each (lambda (key val)
+                   (update-sprite-animator! val))
+                 animated-sprites)
+  (hash-clear! animated-sprites))
+
+;; Update animated sprites upon every update.
+(agenda-schedule-interval update-animated-sprites!)
+
 (export make-sprite
         sprite?
         sprite-drawable
@@ -287,6 +310,7 @@ bound."
         set-sprite-anchor!
         sprite-vertices
         set-sprite-vertices!
+        animated-sprite?
         load-sprite
         draw-sprite)
 
