@@ -56,17 +56,20 @@
   (proc action-proc))
 
 (define (make-action proc duration)
-  "Returns a new action object. Throws an error if duration is 0."
+  "Create a new action object that takes DURATION updates to
+complete. PROC is a procedure that takes a value in the range [0, 1]
+as its only argument. An error is thrown if DURATION is 0."
   (if (zero? duration)
       (throw 'action-duration-zero)
       (%make-action proc duration)))
 
 (define (step-action action t)
-  "Run action proc with given delta t"
+  "Apply ACTION procedure to the time delta, T."
   ((action-proc action) t))
 
 (define (perform-action action)
-  "Perform the given action."
+  "Execute ACTION. `perform-action` must be called from within a
+coroutine, as it yields back to the agenda after each step."
   (let ((duration (action-duration action)))
     (define (step time)
       (if (= duration time)
@@ -78,11 +81,12 @@
     (step 1)))
 
 (define (schedule-action action)
-  "Schedules a coroutine to run the given action."
+  "Schedules a coroutine in the current agenda that will perform
+ACTION on the next update."
   (agenda-schedule (colambda () (perform-action action))))
 
 (define (action-cons a1 a2)
-  "Returns an action that performs a1 first, followed by a2."
+  "Return an action that performs A1 first, followed by A2."
   (define (real-cons)
     (let* ((duration (+ (action-duration a1) (action-duration a2)))
            (t1 (/ (action-duration a1) duration))
@@ -97,13 +101,13 @@
   (if a2 (real-cons) a1))
 
 (define (action-list . actions)
-  "Returns an action that executes actions in sequence."
+  "Return an action that performs every action in the list ACTIONS."
   (if (null? actions)
       #f
       (action-cons (car actions) (apply action-list (cdr actions)))))
 
 (define (action-parallel . actions)
-  "Perform the given actions in parallel."
+  "Perform every action in the list ACTIONS in parallel."
   (let ((max-duration (reduce max 0 (map action-duration actions))))
     ;; Add idle action to each action to fill the time
     ;; difference between the action's duration and the
@@ -120,7 +124,7 @@
        max-duration))))
 
 (define (action-repeat n action)
-  "Repeat an action n times."
+  "Return an action that will perform ACTION N times."
   (apply action-list (make-list n action)))
 
 ;;;
@@ -128,12 +132,12 @@
 ;;;
 
 (define (idle duration)
-  "Do nothing."
+  "Return an action that does nothing."
   (make-action (lambda (t) #t) duration))
 
 (define (lerp proc start end duration)
-  "Linearly interpolate a number from start to end. Calls proc with the
-interpolated value every frame."
+  "Linearly interpolate a number from START to END that takes DURATION
+updates. Apply PROC to the linearly interpolated at each step."
   (let ((delta (- end start)))
     (make-action
      (lambda (t)
