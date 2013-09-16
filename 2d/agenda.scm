@@ -28,6 +28,7 @@
   #:export (make-agenda
             with-agenda
             agenda-schedule
+            agenda-schedule-interval
             update-agenda
             clear-agenda))
 
@@ -170,8 +171,20 @@ in the list"
   (set-agenda-segments! agenda '()))
 
 (define* (agenda-schedule thunk #:optional (delay 1))
-  "Schedules thunk in the current agenda."
+  "Schedules THUNK in the current agenda to run after DELAY
+updates (1 by default)."
   (%agenda-schedule *current-agenda* thunk delay))
+
+(define* (agenda-schedule-interval thunk #:optional (interval 1) (delay 1))
+  "Schedules THUNK in the current agenda to run after DELAY updates
+and run every INTERVAL updates thereafter. Both DELAY and INTERVAL
+default to 1. Simply pass THUNK and nothing else to schedule THUNK to
+be run upon every update."
+  (%agenda-schedule *current-agenda*
+                    (lambda ()
+                      (thunk)
+                      (agenda-schedule-interval thunk interval interval))
+                    delay))
 
 (define (update-agenda)
   "Updates the current agenda."
