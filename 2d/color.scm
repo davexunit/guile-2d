@@ -51,30 +51,33 @@
   (a color-a))
 
 (define (use-color color)
-  "Sets the current OpenGL color."
+  "Set the current OpenGL color state to the contents of COLOR."
   (gl-color (color-r color)
             (color-g color)
             (color-b color)
             (color-a color)))
 
 (define (color-component color-code offset)
-  "Returns the value of a color channel in the range [0,1]."
+  "Return the value of an 8-bit color channel in the range [0,1] for
+the integer COLOR-CODE, given an OFFSET in bits."
   (let ((mask (ash #xff offset)))
     (/ (ash (logand mask color-code)
             (- offset))
        255.0)))
 
 (define (rgba color-code)
-  "Translates an RGBA format color code into a color object. For
-example: #xffffffff will return a color with RGBA values 1, 1, 1, 1."
+  "Translate an RGBA format string COLOR-CODE into a color object.
+For example: #xffffffff will return a color with RGBA values 1, 1, 1,
+1."
   (make-color (color-component color-code 24)
               (color-component color-code 16)
               (color-component color-code 8)
               (color-component color-code 0)))
 
 (define (rgb color-code)
-  "Translates an RGB format color code into a color object. For
-example: #xffffff will return a color with RGBA values 1, 1, 1, 1."
+  "Translate an RGB format string COLOR-CODE into a color object.
+For example: #xffffff will return a color with RGBA values 1, 1, 1,
+1."
   (make-color (color-component color-code 16)
               (color-component color-code 8)
               (color-component color-code 0)
