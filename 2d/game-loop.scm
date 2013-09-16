@@ -62,12 +62,12 @@
 (define handle-events
   (let ((e (SDL:make-event)))
     (lambda ()
-      "Handles all events in the SDL event queue."
+      "Handle all events in the SDL event queue."
       (while (SDL:poll-event e)
         (handle-event e)))))
 
 (define (handle-event e)
-  "Calls the relevant callback for the event."
+  "Call the relevant callbacks for the event, E."
   (case (SDL:event:type e)
     ((active)
      (scene-trigger current-scene 'active))
@@ -119,7 +119,8 @@
   (let* ((elapsed-time 0)
          (fps 0))
     (lambda (dt)
-      "Increments. Resets to 0 every second."
+      "Increment the frames-per-second counter. Resets to 0 every
+second."
       (let ((new-time (+ elapsed-time dt))
             (new-fps (1+ fps)))
         (if (>= new-time 1000)
@@ -132,7 +133,7 @@
               (set! elapsed-time new-time)))))))
 
 (define (current-fps)
-  "Returns the current FPS value."
+  "Return the current FPS value."
   game-fps)
 
 ;;;
@@ -140,7 +141,7 @@
 ;;;
 
 (define (render dt)
-  "Renders a frame."
+  "Render a frame."
   (set-gl-matrix-mode (matrix-mode modelview))
   (gl-load-identity)
   (gl-clear (clear-buffer-mask color-buffer depth-buffer))
@@ -150,7 +151,7 @@
 
 (define (update accumulator)
   "Call the update callback. The update callback will be called as
-many times as tick-interval can divide accumulator. The return value
+many times as `tick-interval` can divide ACCUMULATOR. The return value
 is the unused accumulator time."
   (if (>= accumulator tick-interval)
       (begin
@@ -231,7 +232,9 @@ the stack."
 ;;;
 
 (define (game-loop last-time accumulator)
-  "Runs input, render, and update hooks."
+  "Update game state, and render. LAST-TIME is the time in
+milliseconds of the last iteration of the loop. ACCUMULATOR is the
+time in milliseconds that has passed since the last game update."
   (when running
     (let* ((current-time (SDL:get-ticks))
            (dt (- current-time last-time))
@@ -243,7 +246,7 @@ the stack."
                  remainder))))
 
 (define (run-game game)
-  "Open a window and start playing GAME."
+  "Open a window and start the game loop for GAME."
   (open-window (game-title game)
                (game-resolution game)
                (game-fullscreen? game))
@@ -254,6 +257,5 @@ the stack."
   (close-window))
 
 (define (quit-game-loop!)
-  "Tell the game loop to finish up the current frame and then
-terminate."
+  "Finish the current frame and terminate the game loop."
   (set! running #f))
