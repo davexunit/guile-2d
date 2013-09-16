@@ -41,14 +41,14 @@
   (size font-size))
 
 (define (load-font filename size)
-  "Loads a font from a file with a given size in points."
+  "Load a font from FILENAME with the given SIZE in points."
   (let ((ftgl-font (ftgl-create-texture-font filename)))
     ;; Hardcoded 72 dpi for now.
     (ftgl-set-font-face-size ftgl-font size 72)
     (make-font ftgl-font size)))
 
 (define (flip-text font)
-  "Flips current GL matrix about the x-axis and translates by the
+  "Flip current GL matrix about the x-axis and translates by the
 negative font ascender value. This is necessary before rendering text
 because guile-2d flips the y-axis so that the origin is in the
 upper-left corner rather than the bottom-left."
@@ -88,6 +88,8 @@ upper-left corner rather than the bottom-left."
   (layout textbox-layout))
 
 (define (make-textbox font text position color alignment line-length)
+  "Create a textbox that will draw TEXT with the given FONT, at vector
+POSITION, with ALIGNMENT, and a maximum LINE-LENGTH."
   (let ((layout (ftgl-create-layout)))
     (ftgl-set-layout-font layout (font-ftgl-font font))
     ;; (ftgl-set-layout-alignment layout (ftgl-text-alignment alignment))
@@ -95,6 +97,7 @@ upper-left corner rather than the bottom-left."
     (%make-textbox font text position color alignment line-length layout)))
 
 (define (draw-textbox textbox)
+  "Draw TEXTBOX."
   (with-gl-push-matrix
     (vector2-translate (textbox-position textbox))
     (flip-text (textbox-font textbox))
