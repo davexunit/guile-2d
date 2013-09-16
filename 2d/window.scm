@@ -30,8 +30,8 @@
             close-window))
 
 (define* (open-window title resolution fullscreen)
-  "Creates the game window with the specified dimensions and
-initializes OpenGL state."
+  "Open the game window with the given TITLE and RESOLUTION. If
+FULLSCREEN is #t, open a fullscreen window."
   (let ((flags (if fullscreen '(opengl fullscreen) 'opengl))
         (width (vx resolution))
         (height (vy resolution)))
@@ -56,7 +56,6 @@ initializes OpenGL state."
                            (blending-factor-dest one-minus-src-alpha))))
 
 (define (close-window)
-  "Closes the game window and cleans up. This procedure is typically
-called just before calling (quit)."
+  "Close the game window and audio."
   (SDL:close-audio)
   (SDL:quit))
