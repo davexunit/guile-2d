@@ -74,10 +74,10 @@ keyword arguments that is run as a coroutine."
       (lambda () (name ...)))))
 
 (define (yield callback)
-  "Yield continuation to a callback procedure."
+  "Yield continuation to a CALLBACK procedure."
   (abort-to-prompt 'coroutine-prompt callback))
 
 (define* (wait #:optional (delay 1))
-  "Yield coroutine and schdule the continuation to be run after delay
+  "Yield coroutine and schdule the continuation to be run after DELAY
 ticks."
   (yield (lambda (resume) (agenda-schedule resume delay))))
