@@ -92,7 +92,7 @@
            (rect-height rect)))
 
 (define (%rect-move rect x y)
-  "Move a rect by the given offset."
+  "Move RECT by the offset X, Y."
   (make-rect (+ (rect-x rect) x)
              (+ (rect-y rect) y)
              (rect-width rect)
@@ -127,7 +127,7 @@ and y coordinates as separate arguments."
      (%rect-inflate rect x y))))
 
 (define (rect-union rect1 rect2)
-  "Returns a rect that covers the area of rect1 and rect2."
+  "Return a rect that covers the area of RECT1 and RECT2."
   (let ((x1 (min (rect-x  rect1) (rect-x  rect2)))
         (x2 (max (rect-x2 rect1) (rect-x2 rect2)))
         (y1 (min (rect-y  rect1) (rect-y  rect2)))
@@ -135,7 +135,7 @@ and y coordinates as separate arguments."
     (make-rect x1 y1 (- x2 x1) (- y2 y1))))
 
 (define (rect-clip rect1 rect2)
-  "Returns the overlapping region of rect1 and rect2. If the rects do
+  "Return the overlapping region of RECT1 and RECT2. If the rects do
 not overlap, a rect of size 0 is returned."
   (let ((x1 (max (rect-x  rect1) (rect-x  rect2)))
         (x2 (min (rect-x2 rect1) (rect-x2 rect2)))
@@ -144,7 +144,7 @@ not overlap, a rect of size 0 is returned."
     (make-rect x1 y1 (max (- x2 x1) 0) (max (- y2 y1) 0))))
 
 (define (rect-within? rect1 rect2)
-  "Tests if rect2 is completely within rect1."
+  "Return #t if RECT2 is completely within RECT1."
   (and (>= (rect-x  rect2) (rect-x  rect1))
        (<= (rect-x  rect2) (rect-x2 rect1))
        (>= (rect-x2 rect2) (rect-x  rect1))
@@ -155,7 +155,7 @@ not overlap, a rect of size 0 is returned."
        (<= (rect-y2 rect2) (rect-y2 rect1))))
 
 (define (rect-intersects? rect1 rect2)
-  "Tests if rect2 overlaps rect1."
+  "Return #t if RECT2 overlaps RECT1."
   (or (and (>= (rect-x  rect2) (rect-x  rect1))
            (<= (rect-x  rect2) (rect-x2 rect1)))
       (and (>= (rect-x2 rect2) (rect-x  rect1))
@@ -173,7 +173,7 @@ not overlap, a rect of size 0 is returned."
 
 (define rect-contains?
   (case-lambda
-    "Tests if the given point is within rect."
+    "Return #t if the given point is within RECT."
     ((rect v)
      (%rect-contains? rect (vx v) (vy v)))
     ((rect x y)
