@@ -40,7 +40,7 @@
         #f)))
 
 (define (sample-play sample)
-  "Play SAMPLE."
+  "Play audio SAMPLE."
   (SDL:play-channel (sample-audio sample)))
 
 (define (sample-volume)
@@ -48,7 +48,7 @@
   (SDL:volume))
 
 (define (set-sample-volume volume)
-  "Set the volume that samples are played at."
+  "Set the volume that samples are played at to VOLUME."
   (SDL:volume volume))
 
 (export make-sample
@@ -77,7 +77,7 @@
   (SDL:play-music (music-audio music)))
 
 (define (music-volume)
-  "Return volume that music is played at."
+  "Return the volume that music is played at."
   (SDL:music-volume))
 
 (define (set-music-volume volume)
