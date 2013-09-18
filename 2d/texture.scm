@@ -159,7 +159,7 @@ that will be rendered, in pixels."
     texture))
 
 (define* (draw-texture texture x y #:optional (color #xffffffff))
-  "Renders a textured quad in GL immediate mode."
+  "Render a textured quad in GL immediate mode."
   (let* ((x2 (+ x (texture-width texture)))
         (y2 (+ y (texture-height texture)))
         (color (rgba->gl-color color))

@@ -159,7 +159,15 @@
 (define* (make-sprite drawable #:optional #:key
                       (position (vector2 0 0)) (scale (vector2 1 1))
                       (rotation 0) (color white) (anchor 'center))
-  "Makes a new sprite object."
+  "Create a new sprite object. DRAWABLE is either a texture or
+animation object. All keyword arguments are optional. POSITION is a
+vector2 object with a default of (0, 0). SCALE is a vector2 object
+that describes how much DRAWABLE should be strected on the x and y
+axes, with a default of 1x scale. ROTATION is an angle in degrees with
+a default of 0. COLOR is a color object with a default of
+white. ANCHOR is either a vector2 that represents the center point of
+the sprite, or 'center which will place the anchor at the center of
+DRAWABLE. Sprites are centered by default."
   (let ((vertices (make-packed-array sprite-vertex 4))
         (animator (if (animation? drawable)
                       (make-animator drawable)
@@ -184,7 +192,8 @@ operation that requires a refresh of the vertex array should use this macro."
 (define* (load-sprite filename #:optional #:key
                       (position (vector2 0 0)) (scale (vector2 1 1))
                       (rotation 0) (color white) (anchor 'center))
-  "Loads a sprite from file."
+  "Load a sprite from the file at FILENAME. See make-sprite for
+optional keyword arguments."
   (make-sprite (load-texture filename) #:position position #:scale scale
                #:rotation rotation #:color color #:anchor anchor))
 
@@ -196,7 +205,7 @@ operation that requires a refresh of the vertex array should use this macro."
   (animator-texture (sprite-animator sprite)))
 
 (define (sprite-texture sprite)
-  "Returns the texture for the sprite's drawable object."
+  "Return the texture for the SPRITE's drawable object."
   (let ((drawable (sprite-drawable sprite)))
     (cond ((texture? drawable)
            drawable)
@@ -204,7 +213,7 @@ operation that requires a refresh of the vertex array should use this macro."
            (sprite-animation-texture sprite)))))
 
 (define (sprite-anchor-vector sprite)
-  "Returns a vector of the coordinates for the center point of a
+  "Return a vector2 of the coordinates for the center point of a
 sprite."
   (let ((anchor (sprite-anchor sprite))
         (texture (sprite-texture sprite)))
@@ -215,7 +224,7 @@ sprite."
      (else anchor))))
 
 (define (update-sprite-vertices! sprite)
-  "Rebuilds the internal vertex array."
+  "Rebuild the internal vertex array."
   (let ((pos (sprite-position sprite))
         (scale (sprite-scale sprite))
         (anchor (sprite-anchor-vector sprite))
@@ -241,8 +250,8 @@ sprite."
   (animator-update! (sprite-animator sprite)))
 
 (define (draw-sprite sprite)
-  "Renders a sprite. A sprite batch will be used if one is currently
-bound."
+  "Render SPRITE to the screen. A sprite batch will be used if one is
+currently bound."
   (when (sprite-dirty? sprite)
     (update-sprite-vertices! sprite))
   (register-animated-sprite-maybe sprite)
@@ -253,7 +262,7 @@ bound."
                             1)))
 
 (define (draw-sprite-batched sprite)
-  "Adds a sprite to the batch."
+  "Add SPRITE to the current sprite batch batch."
   (let ((texture (sprite-texture sprite))
         (pos (sprite-position sprite))
         (scale (sprite-scale sprite))
@@ -339,12 +348,18 @@ bound."
     (%make-sprite-batch max-size 0 #f vertex-array)))
 
 (define (sprite-batch-draw . args)
-  "Adds a textured quad to the current sprite batch."
+  "Add a textured quad to the current sprite batch. X, Y, WIDTH, and
+HEIGHT represent the quad in pixels. ORIGIN-X and ORIGIN-Y represent
+the center point of the quad which is used for rotation. SCALE-X and
+SCALE-Y are the scaling factors for the x and y axis,
+respectively. ROTATION is the angle in degrees to rotate the quad. U,
+V, U2, and V2 represent the texture coordinate region to texture the
+quad with. COLOR is a color object."
   (apply %sprite-batch-draw *sprite-batch* args))
 
 (define* (%sprite-batch-draw batch texture x y width height origin-x origin-y
                              scale-x scale-y rotation u v u2 v2 color)
-  "Adds a textured quad to the sprite batch."
+  "Add a textured quad to the sprite batch."
   ;; Render the batch when it's full or the texture changes.
   (cond ((= (sprite-batch-size batch) (sprite-batch-max-size batch))
          (sprite-batch-render batch))
@@ -361,13 +376,14 @@ bound."
   (set-sprite-batch-size! batch (1+ (sprite-batch-size batch))))
 
 (define (sprite-batch-switch-texture batch texture)
-  "Change the currently bound texture. This requires flushing the
-batched texture vertices first."
+  "Change the currently bound texture for BATCH to TEXTURE. This
+requires flushing the batched texture vertices first."
   (sprite-batch-render batch)
   (set-sprite-batch-texture! batch texture))
 
 (define (sprite-batch-render batch)
-  "Renders and flushes the currently batched texture vertices."
+  "Render and flushes the currently batched texture vertices within
+BATCH."
   (unless (= (sprite-batch-size batch) 0)
     (draw-sprite-vertices (sprite-batch-texture batch)
                           (sprite-batch-vertices batch)
