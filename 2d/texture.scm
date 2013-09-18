@@ -62,15 +62,23 @@
   (t2 texture-t2))
 
 (define (texture-region? texture)
+  "Return #t if TEXTURE has a parent texture."
   (texture? (texture-parent texture)))
 
 (define (make-texture id parent width height s1 t1 s2 t2)
+  "Create a new texture object. ID is the OpenGL texture id. PARENT is
+a texture object (if this texture only represents a region of another
+texture) or #f. WIDTH and HEIGHT are the texture dimensions in
+pixels. S1, T1, S2, and T2 are the OpenGL texture coordinates
+representing the area of the texture that will be rendered."
   (let ((texture (%make-texture id parent width height s1 t1 s2 t2)))
     (texture-guardian texture)
     texture))
 
 (define (make-texture-region texture x y width height)
-  "Creates a new texture region given a texture and a pixel region."
+  "Creates new texture region object. TEXTURE is the region's parent
+texture. X, Y, WIDTH, and HEIGHT represent the region of the texture
+that will be rendered, in pixels."
   (let* ((w (texture-width texture))
          (h (texture-height texture)))
     (make-texture (texture-id texture)
@@ -144,7 +152,7 @@
     32bit-bitmap))
 
 (define (load-texture filename)
-  "Loads a texture from a file."
+  "Load a texture from an image file at FILENAME."
   (let* ((bitmap (load-bitmap filename))
          (texture (bitmap->texture bitmap)))
     (freeimage-unload bitmap)
