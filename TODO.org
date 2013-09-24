@@ -168,9 +168,9 @@
    guile-2d and perhaps even start to hack on it.
 
    - [X] Font rendering with FTGL
-   - [ ] Resolve issues with FIGL
+   - [X] Resolve issues with FIGL
    - [ ] Texinfo documentation
-   - [ ] Clean up docstrings
+   - [X] Clean up docstrings
    - [X] Autotools build files
    - [X] Fix animation bug
    - [ ] Screencast
