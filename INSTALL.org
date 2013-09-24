@@ -58,7 +58,7 @@
 
     Grab the latest release tarball from http://www.gnu.org/software/guile-sdl/.
 
-    *Debian*
+    *Source*
 
     #+BEGIN_SRC sh
       tar xf guile-sdl-<version>.tar.xz
@@ -68,17 +68,27 @@
       sudo make install
     #+END_SRC
 
-    *OS X*
-
-    guile-sdl is currently broken on OS X. Please see this issue for
-    more information: https://github.com/davexunit/guile-2d/issues/2
+    Note: guile-sdl is currently broken on OS X. Please see this issue
+    for more information:
+    https://github.com/davexunit/guile-2d/issues/2
 
 *** guile-figl
 
-    FIGL can be problematic, since it's an as-of-yet unreleased
-    library.
+    *Source*
 
-    *Debian*
+    FIGL is an unreleased library. You can find an unofficial
+    source tarball that is compatible with guile-2d here:
+    http://dthompson.us/static/src/guile-figl.tar.gz
+
+    #+BEGIN_SRC sh
+      tar -xvf guile-figl.tar.gz
+      cd guile-figl/
+      ./configure --prefix=/usr
+      make
+      sudo make install
+    #+END_SRC
+
+    *Git*
 
     #+BEGIN_SRC sh
       git clone https://gitorious.org/guile-figl/guile-figl.git
