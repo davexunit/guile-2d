@@ -1,0 +1,6 @@
+@node Introduction
+@chapter Introduction
+
+Guile-2D is a 2D game development framework for GNU Guile. Guile-2D
+aims to be simple for beginners to learn and to provide users with all
+of the necessary tools for making 2D computer games.
