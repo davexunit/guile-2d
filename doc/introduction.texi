@@ -3,7 +3,7 @@
 
 Guile-2D is a 2D game development framework for GNU Guile. Guile-2D
 aims to be simple for beginners to learn and to provide users with all
-of the necessary tools for making 2D computer games, such as: Sprites,
+of the necessary tools for making 2D computer games, such as sprites,
 tilesets, audio, scripting, and collision detection.
 
 This manual is a work in progress. You will find that it is lacking in
