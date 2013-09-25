@@ -5,8 +5,8 @@ Guile-2D provides a simple wrapper over SDL's mixer API for working
 with music and sound effects.
 
 @menu
-* Music
-* Samples
+* Music::
+* Samples::
 @end menu
 
 @node Music

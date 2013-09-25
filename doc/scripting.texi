@@ -11,9 +11,9 @@ points in game time, and actions provide an API to describe
 transformations that happen over a period of game time.
 
 @menu
-* Coroutines
-* Agendas
-* Actions
+* Coroutines::
+* Agendas::
+* Actions::
 @end menu
 
 @include scripting/coroutine.texi

@@ -47,14 +47,14 @@ The document was typeset with
 
 @c Generate the nodes for this menu with `C-c C-u C-m'.
 @menu
-* Copying This Manual::
-* Index::
 * Introduction::
 * Games and Scenes::
 * Graphics::
 * Audio::
 * Scripting::
 * Math::
+* Copying This Manual::
+* Index::
 @end menu
 
 @c Update all node entries with `C-c C-u C-n'.
@@ -74,6 +74,8 @@ The document was typeset with
 @end menu
 
 @c Get fdl.texi from http://www.gnu.org/licenses/fdl.html
+@node GNU Free Documentation License
+@section GNU Free Documentation License
 @include fdl.texi
 
 @node Index

@@ -7,9 +7,9 @@ math, degree to/from radian conversions, and axis-aligned bounding box
 collision tests.
 
 @menu
-* Vectors
-* Rectangles
-* Miscellaneous
+* Vectors::
+* Rectangles::
+* Miscellaneous::
 @end menu
 
 @include math/vector2.texi

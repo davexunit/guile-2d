@@ -6,6 +6,11 @@ things such as the title and screen resolution. Games are composed of
 many scenes, which encapsulate a particular aspect of the
 game. Examples would be a main menu, a world map, or a battle screen.
 
+@menu
+* Games::
+* Scenes::
+@end menu
+
 @node Games
 @section Games
 

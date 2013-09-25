@@ -11,8 +11,8 @@ many areas. If Guile-2D interests you, please consider helping to
 improve the documentation.
 
 @menu
-* Purpose
-* The Game Loop
+* Purpose::
+* The Game Loop::
 @end menu
 
 @node Purpose
