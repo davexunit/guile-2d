@@ -10,3 +10,16 @@ Makefile.in
 /config.status
 /config.log
 /aclocal.m4
+/doc/guile-2d.aux
+/doc/guile-2d.cp
+/doc/guile-2d.fn
+/doc/guile-2d.fns
+/doc/guile-2d.info
+/doc/guile-2d.ky
+/doc/guile-2d.log
+/doc/guile-2d.pdf
+/doc/guile-2d.pg
+/doc/guile-2d.toc
+/doc/guile-2d.tp
+/doc/guile-2d.vr
+/doc/guile-2d.vrs
