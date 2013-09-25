@@ -1,0 +1,90 @@
+@node Rectangles
+@section Rectangles
+
+Rects are axis-aligned bounding boxes that can be used for performing
+simple collision detection.
+
+@anchor{2d rect make-rect}@defspec make-rect
+@end defspec
+
+@anchor{2d rect rect?}@defspec rect?
+@end defspec
+
+@anchor{2d rect rect-x}@defspec rect-x
+@end defspec
+
+@anchor{2d rect rect-y}@defspec rect-y
+@end defspec
+
+@anchor{2d rect rect-x2}@defun rect-x2 rect
+@end defun
+
+@anchor{2d rect rect-y2}@defun rect-y2 rect
+@end defun
+
+@anchor{2d rect rect-center-x}@defun rect-center-x rect
+@end defun
+
+@anchor{2d rect rect-center-y}@defun rect-center-y rect
+@end defun
+
+@anchor{2d rect rect-half-width}@defun rect-half-width rect
+@end defun
+
+@anchor{2d rect rect-half-height}@defun rect-half-height rect
+@end defun
+
+@anchor{2d rect rect-width}@defspec rect-width
+@end defspec
+
+@anchor{2d rect rect-height}@defspec rect-height
+@end defspec
+
+@anchor{2d rect rect-position}@defun rect-position rect
+Return the top-left corner of RECT as a vector2.
+
+@end defun
+
+@anchor{2d rect rect-size}@defun rect-size rect
+Return the size of RECT as a vector2.
+
+@end defun
+
+@anchor{2d rect rect-move}@defun rect-move rect v
+Create a new rectangle by moving RECT by the given offset.  rect-move
+accepts a vector2 or x and y coordinates as separate arguments.
+
+@end defun
+
+@anchor{2d rect rect-inflate}@defun rect-inflate rect v
+Create a new rectangle by growing RECT by the given amount without
+changing the center point.  rect-inflate accepts a vector2 or x and y
+coordinates as separate arguments.
+
+@end defun
+
+@anchor{2d rect rect-union}@defun rect-union rect1 rect2
+Return a rect that covers the area of RECT1 and RECT2.
+
+@end defun
+
+@anchor{2d rect rect-clip}@defun rect-clip rect1 rect2
+Return the overlapping region of RECT1 and RECT2.  If the rects do not
+overlap, a rect of size 0 is returned.
+
+@end defun
+
+@anchor{2d rect rect-within?}@defun rect-within? rect1 rect2
+Return #t if RECT2 is completely within RECT1.
+
+@end defun
+
+@anchor{2d rect rect-intersects?}@defun rect-intersects? rect1 rect2
+Return #t if RECT2 overlaps RECT1.
+
+@end defun
+
+@anchor{2d rect rect-contains?}@defun rect-contains? rect v
+Return #t if the given point is within RECT.
+
+@end defun

@@ -1,0 +1,64 @@
+@node Colors
+@section Colors
+
+Colors store RGBA data in OpenGL format. Each color channel has a
+value in the range [0, 1].
+
+@anchor{2d color make-color}@defspec make-color
+@end defspec
+
+@anchor{2d color color?}@defspec color?
+@end defspec
+
+@anchor{2d color color-r}@defspec color-r
+@end defspec
+
+@anchor{2d color color-g}@defspec color-g
+@end defspec
+
+@anchor{2d color color-b}@defspec color-b
+@end defspec
+
+@anchor{2d color color-a}@defspec color-a
+@end defspec
+
+@anchor{2d color use-color}@defun use-color color
+Set the current OpenGL color state to the contents of COLOR.
+
+@end defun
+
+A lot of people are used to working with colors as hexadecimal values,
+so the following procedures are provided to convert hexadecimal color
+codes into color objects.
+
+@anchor{2d color rgba}@defun rgba color-code
+Translate an RGBA format string COLOR-CODE into a color object.  For
+example: #xffffffff will return a color with RGBA values 1, 1, 1, 1.
+
+@end defun
+
+@anchor{2d color rgb}@defun rgb color-code
+Translate an RGB format string COLOR-CODE into a color object.  For
+example: #xffffff will return a color with RGBA values 1, 1, 1, 1.
+
+@end defun
+
+Commonly used colors are predefined for convenience.
+
+@anchor{2d color white}@defvar white
+@end defvar
+
+@anchor{2d color black}@defvar black
+@end defvar
+
+@anchor{2d color red}@defvar red
+@end defvar
+
+@anchor{2d color green}@defvar green
+@end defvar
+
+@anchor{2d color blue}@defvar blue
+@end defvar
+
+@anchor{2d color magenta}@defvar magenta
+@end defvar

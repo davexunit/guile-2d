@@ -1,0 +1,98 @@
+@node Audio
+@chapter Audio
+
+Guile-2D provides a simple wrapper over SDL's mixer API for working
+with music and sound effects.
+
+@menu
+* Music
+* Samples
+@end menu
+
+@node Music
+@section Music
+
+Music objects are used for a game's background music. Only one music
+object is playing at any given time.
+
+@anchor{2d audio make-music}@defspec make-music
+@end defspec
+
+@anchor{2d audio load-music}@defun load-music filename
+Load music from FILENAME.  Return #f on failure.
+
+@end defun
+
+@anchor{2d audio music?}@defspec music?
+@end defspec
+
+@anchor{2d audio music-audio}@defspec music-audio
+@end defspec
+
+@anchor{2d audio music-pause}@defun music-pause
+@end defun
+
+@anchor{2d audio music-paused?}@defun music-paused?
+@end defun
+
+@anchor{2d audio music-play}@defun music-play music
+Play MUSIC.
+
+@end defun
+
+@anchor{2d audio music-playing?}@defun music-playing?
+@end defun
+
+@anchor{2d audio music-resume}@defun music-resume
+@end defun
+
+@anchor{2d audio music-rewind}@defun music-rewind
+@end defun
+
+@anchor{2d audio music-stop}@defun music-stop
+@end defun
+
+@anchor{2d audio music-volume}@defun music-volume
+Return the volume that music is played at.
+
+@end defun
+
+@node Samples
+@section Samples
+
+Samples are short audio clips, typically sound effects. Many samples
+can be played at the same time.
+
+@anchor{2d audio make-sample}@defspec make-sample
+@end defspec
+
+@anchor{2d audio load-sample}@defun load-sample filename
+Load audio sample from FILENAME.  Return #f on failure.
+
+@end defun
+
+@anchor{2d audio sample?}@defspec sample?
+@end defspec
+
+@anchor{2d audio sample-audio}@defspec sample-audio
+@end defspec
+
+@anchor{2d audio sample-play}@defun sample-play sample
+Play audio SAMPLE.
+
+@end defun
+
+@anchor{2d audio sample-volume}@defun sample-volume
+Return volume that samples are played at.
+
+@end defun
+
+@anchor{2d audio set-music-volume}@defun set-music-volume volume
+Set the volume that music is played at.
+
+@end defun
+
+@anchor{2d audio set-sample-volume}@defun set-sample-volume volume
+Set the volume that samples are played at to VOLUME.
+
+@end defun

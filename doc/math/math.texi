@@ -1,0 +1,37 @@
+@node Miscellaneous
+@section Miscellaneous
+
+Miscellaneous math procedures.
+
+@anchor{2d math pi}@defvar pi
+@end defvar
+
+@anchor{2d math degrees->radians}@defun degrees->radians angle
+Convert ANGLE in degrees to radians.
+
+@end defun
+
+@anchor{2d math radians->degrees}@defun radians->degrees angle
+Convert ANGLE in radians to degrees.
+
+@end defun
+
+@anchor{2d math sin-degrees}@defun sin-degrees angle
+Compute the sin of ANGLE expressed in degrees.
+
+@end defun
+
+@anchor{2d math cos-degrees}@defun cos-degrees angle
+Compute the cosine of ANGLE expressed in degrees.
+
+@end defun
+
+@anchor{2d math tan-degrees}@defun tan-degrees angle
+Compute the tangent of ANGLE expressed in degrees.
+
+@end defun
+
+@anchor{2d math atan-degrees}@defun atan-degrees y x
+Compute the arctangent in degrees of the coordinates Y and X.
+
+@end defun

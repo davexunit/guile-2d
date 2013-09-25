@@ -1,0 +1,23 @@
+@node Graphics
+@chapter Graphics
+
+Graphics are a fundamental part of most computer games. Guile-2D makes
+it easy to make sprite-based games by providing all of the necessary
+primitives. Graphics are rendered via OpenGL to take advantage of
+hardware acceleration.
+
+@menu
+* Sprites::
+* Textures::
+* Animations::
+* Colors::
+* Tilesets::
+* Fonts::
+@end menu
+
+@include graphics/sprite.texi
+@include graphics/texture.texi
+@include graphics/animation.texi
+@include graphics/color.texi
+@include graphics/tileset.texi
+@include graphics/font.texi

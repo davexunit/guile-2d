@@ -3,4 +3,47 @@
 
 Guile-2D is a 2D game development framework for GNU Guile. Guile-2D
 aims to be simple for beginners to learn and to provide users with all
-of the necessary tools for making 2D computer games.
+of the necessary tools for making 2D computer games, such as: Sprites,
+tilesets, audio, scripting, and collision detection.
+
+This manual is a work in progress. You will find that it is lacking in
+many areas. If Guile-2D interests you, please consider helping to
+improve the documentation.
+
+@menu
+* Goals
+* The Game Loop
+@end menu
+
+@node Purpose
+@section Purpose
+
+There are many existing game libraries and engines already, so why
+make another one? Well, I, the author, believe that GNU Guile is a
+fantastic Scheme implementation with a great purpose: to bring
+practical user freedom to the GNU system via Emacs-like
+extensibility. There are many libraries available to make games with
+languages such as Python, Java, and Lua, but there isn't much out
+there for Scheme. Guile-2D aims to change that.
+
+I originally set out on the journey to write a game in C with a Scheme
+scripting layer. A year later, I've decided that it would be best to
+create an generic game framework in order to give back to the Guile
+community and help promote Guile to game developers.
+
+Guile-2D draws much inspiration from existing game libraries for
+other, more popular programming languages. Pygame, pyglet, and love2d
+are very beginner friendly, and Guile-2D hopes to translate their good
+ideas into the Scheme world.
+
+@node The Game Loop
+@section The Game Loop
+
+The game loop is so fundamental that it has to be discussed
+immediately, so as to avoid any confusion about how it
+operates. Guile-2D's game loop operates on a fixed-timestep of 1/60th
+of a second. Time is measured in frames rather in seconds to avoid the
+pitfalls of a variable time-based approach. Though the update rate is
+fixed, the frame-rate is not. Guile-2D will render at as high of a
+framerate as it can. Keyboard and mouse input is polled during every
+update and events are emitted to the relevant callbacks.

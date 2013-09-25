@@ -27,9 +27,9 @@ The document was typeset with
 @end copying
 
 @titlepage
-@title Guile-2D
+@title Guile-2D 0.1
 @subtitle Guile-2D is a 2D game development framework for GNU Guile
-@author David Thompson <dave@izanagi>
+@author David Thompson <dthompson@@member.fsf.org>
 @page
 @vskip 0pt plus 1filll
 @insertcopying
@@ -50,11 +50,21 @@ The document was typeset with
 * Copying This Manual::
 * Index::
 * Introduction::
+* Games and Scenes::
+* Graphics::
+* Audio::
+* Scripting::
+* Math::
 @end menu
 
 @c Update all node entries with `C-c C-u C-n'.
 @c Insert new nodes with `C-c C-c n'.
 @include introduction.texi
+@include game.texi
+@include graphics.texi
+@include audio.texi
+@include scripting.texi
+@include math.texi
 
 @node Copying This Manual
 @appendix Copying This Manual

@@ -1,0 +1,17 @@
+@node Math
+@chapter Math
+
+Games typically require a lot of linear algebra and trigonometry in
+order to function. Guile-2D provides modules to perform 2D vector
+math, degree to/from radian conversions, and axis-aligned bounding box
+collision tests.
+
+@menu
+* Vectors
+* Rectangles
+* Miscellaneous
+@end menu
+
+@include math/vector2.texi
+@include math/rect.texi
+@include math/math.texi

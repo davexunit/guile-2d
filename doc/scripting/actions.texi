@@ -1,0 +1,76 @@
+@node Actions
+@section Actions
+
+Actions are composable procedures that perform an operation over a
+period of game time. Action objects have two properties: an arbitrary
+procedure and a duration in game ticks. Action procedures accept one
+argument: a time delta in the range [0, 1]. Use actions in combination
+with coroutines for things that are a function of time, such as moving
+a sprite across the screen.
+
+@anchor{2d actions make-action}@defun make-action proc duration
+Create a new action object that takes DURATION updates to complete.  PROC
+is a procedure that takes a value in the range [0, 1] as its only
+argument.  An error is thrown if DURATION is 0.
+
+@end defun
+
+@anchor{2d actions action?}@defspec action?
+@end defspec
+
+@anchor{2d actions null-action}@defvar null-action
+[unbound!]
+@end defvar
+
+@anchor{2d actions null-action?}@defvar null-action?
+[unbound!]
+@end defvar
+
+@anchor{2d actions action-duration}@defspec action-duration
+@end defspec
+
+@anchor{2d actions action-proc}@defspec action-proc
+@end defspec
+
+@anchor{2d actions perform-action}@defun perform-action action
+Execute ACTION.  `perform-action` must be called from within a
+coroutine, as it yields back to the agenda after each step.
+
+@end defun
+
+@anchor{2d actions schedule-action}@defun schedule-action action
+Schedules a coroutine in the current agenda that will perform ACTION on
+the next update.
+
+@end defun
+
+@anchor{2d actions action-cons}@defun action-cons a1 a2
+Return an action that performs A1 first, followed by A2.
+
+@end defun
+
+@anchor{2d actions action-list}@defun action-list . actions
+Return an action that performs every action in the list ACTIONS.
+
+@end defun
+
+@anchor{2d actions action-parallel}@defun action-parallel . actions
+Perform every action in the list ACTIONS in parallel.
+
+@end defun
+
+@anchor{2d actions action-repeat}@defun action-repeat n action
+Return an action that will perform ACTION N times.
+
+@end defun
+
+@anchor{2d actions idle}@defun idle duration
+Return an action that does nothing.
+
+@end defun
+
+@anchor{2d actions lerp}@defun lerp proc start end duration
+Linearly interpolate a number from START to END that takes DURATION
+updates.  Apply PROC to the linearly interpolated at each step.
+
+@end defun

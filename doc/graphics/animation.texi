@@ -1,0 +1,84 @@
+@node Animations
+@section Animations
+
+Animations are sequences of textures and/or texture regions. Common
+uses for animations are to give the illusion that a character is
+walking across the screen or swinging their sword at a
+monster. Animator objects are used to control the playback of an
+animation.
+
+@anchor{2d animation animation-frame-duration}@defspec animation-frame-duration
+@end defspec
+
+@anchor{2d animation animation-frames}@defspec animation-frames
+@end defspec
+
+@anchor{2d animation animation-loop?}@defspec animation-loop?
+@end defspec
+
+@anchor{2d animation animation?}@defspec animation?
+@end defspec
+
+@anchor{2d animation animator-animation}@defspec animator-animation
+@end defspec
+
+@anchor{2d animation animator-frame}@defspec animator-frame
+@end defspec
+
+@anchor{2d animation animator-playing?}@defspec animator-playing?
+@end defspec
+
+@anchor{2d animation animator-time}@defspec animator-time
+@end defspec
+
+@anchor{2d animation animator?}@defspec animator?
+@end defspec
+
+@anchor{2d animation make-animation}@defspec make-animation
+@end defspec
+
+@anchor{2d animation animation-duration}@defun animation-duration animation
+Return the total duration of ANIMATION in ticks.
+
+@end defun
+
+@anchor{2d animation animation-frame}@defun animation-frame animation index
+Return the texture for the given frame INDEX of ANIMATION.
+
+@end defun
+
+@anchor{2d animation animation-length}@defun animation-length animation
+Return the number of frames in ANIMATION.
+
+@end defun
+
+@anchor{2d animation animator-frame-complete?}@defun animator-frame-complete? animator
+Return #t when ANIMATOR is done displaying the current frame.
+
+@end defun
+
+@anchor{2d animation animator-next!}@defun animator-next! animator
+Advance ANIMATOR to the next frame of its animation.
+
+@end defun
+
+@anchor{2d animation animator-next-frame}@defun animator-next-frame animator
+Return the next frame index for ANIMATOR.
+
+@end defun
+
+@anchor{2d animation animator-texture}@defun animator-texture animator
+Return a texture for the ANIMATOR's current frame.
+
+@end defun
+
+@anchor{2d animation animator-update!}@defun animator-update! animator
+Increment the frame time for the ANIMATOR and advance to the next frame
+when necessary.
+
+@end defun
+
+@anchor{2d animation make-animator}@defun make-animator animation
+Create a new animator for ANIMATION.
+
+@end defun

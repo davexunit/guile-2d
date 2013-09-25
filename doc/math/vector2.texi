@@ -1,0 +1,76 @@
+@node Vectors
+@section Vectors
+
+2D vector math operations. Vector objects are of type vector2 to avoid
+confusion with regular Scheme vectors.
+
+@anchor{2d vector2 vector2}@defspec vector2
+@end defspec
+
+@anchor{2d vector2 vector2?}@defspec vector2?
+@end defspec
+
+@anchor{2d vector2 vx}@defspec vx
+@end defspec
+
+@anchor{2d vector2 vy}@defspec vy
+@end defspec
+
+@anchor{2d vector2 null-vector2}@defvar null-vector2
+@end defvar
+
+@anchor{2d vector2 identity-vector2}@defvar identity-vector2
+@end defvar
+
+@anchor{2d vector2 vector2-polar}@defun vector2-polar r theta
+Convert the polar coordinates (R, THETA) into a cartesian vector.
+
+@end defun
+
+@anchor{2d vector2 v+}@defun v+ . vectors
+Return the sum of all VECTORS.
+
+@end defun
+
+@anchor{2d vector2 v*}@defun v* . vectors
+Return the product of all VECTORS.
+
+@end defun
+
+@anchor{2d vector2 vscale}@defun vscale v scalar
+Multiply the vector V by a scalar value.
+
+@end defun
+
+@anchor{2d vector2 vmag}@defun vmag v
+Return the magnitude of the vector V.
+
+@end defun
+
+@anchor{2d vector2 vnorm}@defun vnorm v
+Normalize the vector V.
+
+@end defun
+
+@anchor{2d vector2 vdot}@defun vdot v1 v2
+Return the dot product of the vectors V1 and V2.
+
+@end defun
+
+@anchor{2d vector2 vcross}@defun vcross v1 v2
+Return the cross product of the vectors V1 and V2.  Technically, the
+cross product of a 2D vector is not defined.  This function instead
+returns the Z coordinate of the cross product as if the vectors were in
+3D space.
+
+@end defun
+
+@anchor{2d vector2 vector2-translate}@defun vector2-translate v
+Perform an OpenGL translate operation with the vector V.
+
+@end defun
+
+@anchor{2d vector2 vector2-scale}@defun vector2-scale v
+Perform an OpenGL scale operation with the vector V.
+
+@end defun

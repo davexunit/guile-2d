@@ -1,0 +1,21 @@
+@node Scripting
+@chapter Scripting
+
+The ability to write scripts is very important for most games. Scripts
+are short programs that modify game state. In an RPG, one might want
+to write a script that causes an NPC to walk up to the player and
+begin a conversation with them. Guile-2D allows for easy, linear
+script writing by using cooperative multitasking, also known as
+coroutines. Agendas are used to schedule scripts to be run at distinct
+points in game time, and actions provide an API to describe
+transformations that happen over a period of game time.
+
+@menu
+* Coroutines
+* Agendas
+* Actions
+@end menu
+
+@include scripting/coroutine.texi
+@include scripting/agenda.texi
+@include scripting/actions.texi

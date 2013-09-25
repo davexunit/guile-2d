@@ -1,0 +1,70 @@
+@node Fonts
+@section Fonts
+
+Guile-2D can render TTF fonts via the FTGL library.
+
+@anchor{2d font font-ftgl-font}@defspec font-ftgl-font
+@end defspec
+
+@anchor{2d font font-size}@defspec font-size
+@end defspec
+
+@anchor{2d font font?}@defspec font?
+@end defspec
+
+@anchor{2d font make-font}@defspec make-font
+@end defspec
+
+@anchor{2d font set-textbox-color!}@defspec set-textbox-color!
+@end defspec
+
+@anchor{2d font set-textbox-position!}@defspec set-textbox-position!
+@end defspec
+
+@anchor{2d font set-textbox-text!}@defspec set-textbox-text!
+@end defspec
+
+@anchor{2d font textbox-alignment}@defspec textbox-alignment
+@end defspec
+
+@anchor{2d font textbox-color}@defspec textbox-color
+@end defspec
+
+@anchor{2d font textbox-font}@defspec textbox-font
+@end defspec
+
+@anchor{2d font textbox-layout}@defspec textbox-layout
+@end defspec
+
+@anchor{2d font textbox-line-length}@defspec textbox-line-length
+@end defspec
+
+@anchor{2d font textbox-position}@defspec textbox-position
+@end defspec
+
+@anchor{2d font textbox-text}@defspec textbox-text
+@end defspec
+
+@anchor{2d font textbox?}@defspec textbox?
+@end defspec
+
+@anchor{2d font draw-font}@defun draw-font font text
+Renders the string text using the given font.
+
+@end defun
+
+@anchor{2d font draw-textbox}@defun draw-textbox textbox
+Draw TEXTBOX.
+
+@end defun
+
+@anchor{2d font load-font}@defun load-font filename size
+Load a font from FILENAME with the given SIZE in points.
+
+@end defun
+
+@anchor{2d font make-textbox}@defun make-textbox font text position color alignment line-length
+Create a textbox that will draw TEXT with the given FONT, at vector
+POSITION, with ALIGNMENT, and a maximum LINE-LENGTH.
+
+@end defun

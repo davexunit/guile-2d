@@ -1,0 +1,37 @@
+@node Agendas
+@section Agendas
+
+Agendas are used to schedule procedures to be called at distinct
+points in game time.
+
+@anchor{2d agenda make-agenda}@defun make-agenda
+Create a new, empty agenda.
+
+@end defun
+
+@anchor{2d agenda with-agenda}@defspec with-agenda agenda body ...
+@end defspec
+
+@anchor{2d agenda agenda-schedule}@defun agenda-schedule thunk [delay]
+Schedule THUNK in the current agenda to run after DELAY updates (1 by
+default).
+
+@end defun
+
+@anchor{2d agenda agenda-schedule-interval}@defun agenda-schedule-interval thunk [interval] [delay]
+Schedule THUNK in the current agenda to run after DELAY updates and run
+every INTERVAL updates thereafter.  Both DELAY and INTERVAL default to
+1.  Simply pass THUNK and nothing else to schedule THUNK to be run upon
+every update.
+
+@end defun
+
+@anchor{2d agenda update-agenda}@defun update-agenda
+Update the current agenda.
+
+@end defun
+
+@anchor{2d agenda clear-agenda}@defun clear-agenda
+Clear the current agenda.
+
+@end defun

@@ -1,0 +1,65 @@
+@node Textures
+@section Textures
+
+Textures are images loaded in graphics memory. Guile-2D supports many
+texture formats via the FreeImage library. A texture object can
+describe a full image or a rectangular section of an image.
+
+@anchor{2d texture make-texture}@defun make-texture id parent width height s1 t1 s2 t2
+Create a new texture object.  ID is the OpenGL texture id.  PARENT is a
+texture object (if this texture only represents a region of another
+texture) or #f.  WIDTH and HEIGHT are the texture dimensions in pixels.
+S1, T1, S2, and T2 are the OpenGL texture coordinates representing the
+area of the texture that will be rendered.
+
+@end defun
+
+@anchor{2d texture make-texture-region}@defun make-texture-region texture x y width height
+Creates new texture region object.  TEXTURE is the region's parent
+texture.  X, Y, WIDTH, and HEIGHT represent the region of the texture
+that will be rendered, in pixels.
+
+@end defun
+
+@anchor{2d texture load-texture}@defun load-texture filename
+Load a texture from an image file at FILENAME.
+
+@end defun
+
+@anchor{2d texture texture?}@defspec texture?
+@end defspec
+
+@anchor{2d texture texture-region?}@defun texture-region? texture
+Return #t if TEXTURE has a parent texture.
+
+@end defun
+
+@anchor{2d texture texture-id}@defspec texture-id
+@end defspec
+
+@anchor{2d texture texture-width}@defspec texture-width
+@end defspec
+
+@anchor{2d texture texture-height}@defspec texture-height
+@end defspec
+
+@anchor{2d texture texture-s1}@defspec texture-s1
+@end defspec
+
+@anchor{2d texture texture-t1}@defspec texture-t1
+@end defspec
+
+@anchor{2d texture texture-s2}@defspec texture-s2
+@end defspec
+
+@anchor{2d texture texture-t2}@defspec texture-t2
+@end defspec
+
+@anchor{2d texture surface->texture}@defvar surface->texture
+[unbound!]
+@end defvar
+
+@anchor{2d texture draw-texture}@defun draw-texture texture x y [color]
+Render a textured quad in GL immediate mode.
+
+@end defun

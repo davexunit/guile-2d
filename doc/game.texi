@@ -1,0 +1,113 @@
+@node Games and Scenes
+@chapter Games and Scenes
+
+In Guile-2D, games are defined declaratively. Game objects define
+things such as the title and screen resolution. Games are composed of
+many scenes, which encapsulate a particular aspect of the
+game. Examples would be a main menu, a world map, or a battle screen.
+
+@node Games
+@section Games
+
+@anchor{2d game make-game}@defun make-game [#:title] [#:resolution] [#:fullscreen] [#:first-scene]
+Return a new game.  All game properties have some reasonable default
+value.
+
+@end defun
+
+@anchor{2d game define-game}@defspec define-game name kwargs ...
+Syntactic sugar over define and make-game.
+
+@end defspec
+
+@anchor{2d game game?}@defspec game?
+@end defspec
+
+@anchor{2d game game-first-scene}@defspec game-first-scene
+@end defspec
+
+@anchor{2d game game-fullscreen?}@defspec game-fullscreen?
+@end defspec
+
+@anchor{2d game game-resolution}@defspec game-resolution
+@end defspec
+
+@anchor{2d game game-title}@defspec game-title
+@end defspec
+
+@anchor{2d game run-game}@defun run-game game
+Open a window and start the game loop for GAME.
+
+@end defun
+
+@node Scenes
+@section Scenes
+
+@anchor{2d game make-scene}@defun make-scene [#:title] [#:events] [#:update] [#:draw] [#:state]
+Return a new scene.  TITLE is a human readable name for the scene.
+EVENTS is an alist of event handlers.  UPDATE is a procedure that
+updates the scene.  DRAW is a procedure that renders the scene.  STATE
+is an object that encapsulates the scene state.
+
+@end defun
+
+@anchor{2d game define-scene}@defspec define-scene name kwargs ...
+Syntactic sugar over define and make-scene.  Return a procedure that
+creates a new scene.
+
+@end defspec
+
+@anchor{2d game scene?}@defspec scene?
+@end defspec
+
+@anchor{2d game scene-draw-proc}@defspec scene-draw-proc
+@end defspec
+
+@anchor{2d game scene-observer}@defspec scene-observer
+@end defspec
+
+@anchor{2d game scene-state}@defspec scene-state
+@end defspec
+
+@anchor{2d game scene-title}@defspec scene-title
+@end defspec
+
+@anchor{2d game scene-update-proc}@defspec scene-update-proc
+@end defspec
+
+@anchor{2d game current-fps}@defun current-fps
+Return the current FPS value.
+
+@end defun
+
+@anchor{2d game default-scene-events}@defun default-scene-events
+@end defun
+
+@anchor{2d game draw-scene}@defun draw-scene scene
+Draw SCENE.
+
+@end defun
+
+@anchor{2d game pop-scene}@defun pop-scene
+Exit the current scene and resume the previous scene.  If there is no
+previous scene, the game loop will terminate.
+
+@end defun
+
+@anchor{2d game push-scene}@defun push-scene scene
+Pause the current scene and start SCENE upon next game tick.
+
+@end defun
+
+@anchor{2d game replace-scene}@defun replace-scene scene
+@end defun
+
+@anchor{2d game scene-trigger}@defun scene-trigger scene event-type . args
+Trigger an event on the scene observer.
+
+@end defun
+
+@anchor{2d game update-scene}@defun update-scene scene
+Update SCENE.
+
+@end defun

@@ -1,0 +1,38 @@
+@node Coroutines
+@section Coroutines
+
+Coroutines are the building block for cooperative multitasking. When
+used with agendas, they are a powerful mechanism for writing game
+scripts.
+
+@anchor{2d coroutine coroutine}@defun coroutine thunk
+Calls a procedure that can yield a continuation.
+
+@end defun
+
+@anchor{2d coroutine colambda}@defspec colambda args body ...
+Syntacic sugar for a lambda that is run as a coroutine.
+
+@end defspec
+
+@anchor{2d coroutine codefine}@defspec codefine (name ...) . body
+Syntactic sugar for defining a procedure that is run as a coroutine.
+
+@end defspec
+
+@anchor{2d coroutine codefine*}@defspec codefine* (name ...) . body
+Syntactic sugar for defining a procedure with optional and keyword
+arguments that is run as a coroutine.
+
+@end defspec
+
+@anchor{2d coroutine wait}@defun wait [delay]
+Yield coroutine and schdule the continuation to be run after DELAY
+ticks.
+
+@end defun
+
+@anchor{2d coroutine yield}@defun yield callback
+Yield continuation to a CALLBACK procedure.
+
+@end defun

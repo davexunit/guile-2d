@@ -1,0 +1,41 @@
+@node Tilesets
+@section Tilesets
+
+In most 2D games, the game world is composed of many small,
+rectangular pieces called tiles. In Guile-2D, tilesets are used to
+encapsulate a group of uniformly sized texture regions that come from
+a single parent texture.
+
+@anchor{2d tileset make-tileset}@defun make-tileset texture width height [#:margin] [#:spacing]
+Return a new tileset that is built by splitting TEXTURE into tiles.
+
+@end defun
+
+@anchor{2d tileset load-tileset}@defun load-tileset filename width height [#:margin] [#:spacing]
+Return a new tileset that is built by loading the texture at FILENAME
+and splitting the texture into tiles.
+
+@end defun
+
+@anchor{2d tileset tileset?}@defspec tileset?
+@end defspec
+
+@anchor{2d tileset tileset-tiles}@defspec tileset-tiles
+@end defspec
+
+@anchor{2d tileset tileset-width}@defspec tileset-width
+@end defspec
+
+@anchor{2d tileset tileset-height}@defspec tileset-height
+@end defspec
+
+@anchor{2d tileset tileset-margin}@defspec tileset-margin
+@end defspec
+
+@anchor{2d tileset tileset-spacing}@defspec tileset-spacing
+@end defspec
+
+@anchor{2d tileset tileset-ref}@defun tileset-ref tileset i
+Return the tile texture of TILESET at index I.
+
+@end defun

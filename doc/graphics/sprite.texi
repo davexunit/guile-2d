@@ -1,0 +1,121 @@
+@node Sprites
+@section Sprites
+
+Sprites are typically the most important part of a 2D game. Sprites
+represent a texture with a specific color, position, rotation and
+scale. Sprites can render texture objects or animations.
+
+@anchor{2d sprite set-sprite-batch-size!}@defspec set-sprite-batch-size!
+@end defspec
+
+@anchor{2d sprite set-sprite-batch-texture!}@defspec set-sprite-batch-texture!
+@end defspec
+
+@anchor{2d sprite set-sprite-drawable!}@defspec set-sprite-drawable!
+@end defspec
+
+@anchor{2d sprite set-sprite-vertices!}@defspec set-sprite-vertices!
+@end defspec
+
+@anchor{2d sprite sprite-anchor}@defspec sprite-anchor
+@end defspec
+
+@anchor{2d sprite sprite-batch-max-size}@defspec sprite-batch-max-size
+@end defspec
+
+@anchor{2d sprite sprite-batch-size}@defspec sprite-batch-size
+@end defspec
+
+@anchor{2d sprite sprite-batch-texture}@defspec sprite-batch-texture
+@end defspec
+
+@anchor{2d sprite sprite-batch-vertices}@defspec sprite-batch-vertices
+@end defspec
+
+@anchor{2d sprite sprite-batch?}@defspec sprite-batch?
+@end defspec
+
+@anchor{2d sprite sprite-color}@defspec sprite-color
+@end defspec
+
+@anchor{2d sprite sprite-drawable}@defspec sprite-drawable
+@end defspec
+
+@anchor{2d sprite sprite-position}@defspec sprite-position
+@end defspec
+
+@anchor{2d sprite sprite-rotation}@defspec sprite-rotation
+@end defspec
+
+@anchor{2d sprite sprite-scale}@defspec sprite-scale
+@end defspec
+
+@anchor{2d sprite sprite-vertices}@defspec sprite-vertices
+@end defspec
+
+@anchor{2d sprite sprite?}@defspec sprite?
+@end defspec
+
+@anchor{2d sprite with-sprite-batch}@defspec with-sprite-batch batch body ...
+@end defspec
+
+@anchor{2d sprite animated-sprite?}@defun animated-sprite? sprite
+Return #t if SPRITE has an animation as its drawable object.
+
+@end defun
+
+@anchor{2d sprite draw-sprite}@defun draw-sprite sprite
+Render SPRITE to the screen.  A sprite batch will be used if one is
+currently bound.
+
+@end defun
+
+@anchor{2d sprite load-sprite}@defun load-sprite filename [#:position] [#:scale] [#:rotation] [#:color] [#:anchor]
+Load a sprite from the file at FILENAME.  See make-sprite for optional
+keyword arguments.
+
+@end defun
+
+@anchor{2d sprite make-sprite}@defun make-sprite drawable [#:position] [#:scale] [#:rotation] [#:color] [#:anchor]
+Create a new sprite object.  DRAWABLE is either a texture or animation
+object.  All keyword arguments are optional.  POSITION is a vector2
+object with a default of (0, 0).  SCALE is a vector2 object that
+describes how much DRAWABLE should be strected on the x and y axes, with
+a default of 1x scale.  ROTATION is an angle in degrees with a default
+of 0.  COLOR is a color object with a default of white.  ANCHOR is
+either a vector2 that represents the center point of the sprite, or
+'center which will place the anchor at the center of DRAWABLE.  Sprites
+are centered by default.
+
+@end defun
+
+@anchor{2d sprite make-sprite-batch}@defun make-sprite-batch [max-size]
+Creates a new sprite batch.  The default max-size is 1000.
+
+@end defun
+
+@anchor{2d sprite set-sprite-anchor!}@defun set-sprite-anchor! sprite value
+@end defun
+
+@anchor{2d sprite set-sprite-color!}@defun set-sprite-color! sprite value
+@end defun
+
+@anchor{2d sprite set-sprite-position!}@defun set-sprite-position! sprite value
+@end defun
+
+@anchor{2d sprite set-sprite-rotation!}@defun set-sprite-rotation! sprite value
+@end defun
+
+@anchor{2d sprite set-sprite-scale!}@defun set-sprite-scale! sprite value
+@end defun
+
+@anchor{2d sprite sprite-batch-draw}@defun sprite-batch-draw . args
+Add a textured quad to the current sprite batch.  X, Y, WIDTH, and
+HEIGHT represent the quad in pixels.  ORIGIN-X and ORIGIN-Y represent
+the center point of the quad which is used for rotation.  SCALE-X and
+SCALE-Y are the scaling factors for the x and y axis, respectively.
+ROTATION is the angle in degrees to rotate the quad.  U, V, U2, and V2
+represent the texture coordinate region to texture the quad with.  COLOR
+is a color object.
+
+@end defun
