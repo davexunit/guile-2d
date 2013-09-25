@@ -169,7 +169,7 @@
 
    - [X] Font rendering with FTGL
    - [X] Resolve issues with FIGL
-   - [ ] Texinfo documentation
+   - [X] Texinfo documentation
    - [X] Clean up docstrings
    - [X] Autotools build files
    - [X] Fix animation bug
