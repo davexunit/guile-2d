@@ -15,7 +15,7 @@ else
    AC_MSG_ERROR([Guile 2.0 required.])
 fi
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile doc/Makefile])
 AC_CONFIG_FILES([env], [chmod +x env])
 
 PKG_CHECK_MODULES([SDL], [sdl <= 1.3 sdl >= 1.2])
