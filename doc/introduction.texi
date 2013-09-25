@@ -42,8 +42,8 @@ ideas into the Scheme world.
 The game loop is so fundamental that it has to be discussed
 immediately, so as to avoid any confusion about how it
 operates. Guile-2D's game loop operates on a fixed-timestep of 1/60th
-of a second. Time is measured in frames rather in seconds to avoid the
-pitfalls of a variable time-based approach. Though the update rate is
-fixed, the frame-rate is not. Guile-2D will render at as high of a
-framerate as it can. Keyboard and mouse input is polled during every
-update and events are emitted to the relevant callbacks.
+of a second. Time is measured in frames rather than in seconds to
+avoid the pitfalls of a variable time-based approach. Though the
+update rate is fixed, the frame-rate is not. Guile-2D will render at
+as high of a framerate as it can. Keyboard and mouse input is polled
+during every update and events are emitted to the relevant callbacks.
