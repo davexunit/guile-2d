@@ -3,7 +3,7 @@
              (2d vector2))
 
 (define (demo-sprite)
-  (load-sprite "images/sprite.png"
+  (load-sprite "images/ghost.png"
                #:position (vector2 320 240)))
 
 (define-scene demo
