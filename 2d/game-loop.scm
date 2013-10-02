@@ -30,8 +30,7 @@
   #:use-module (2d agenda)
   #:use-module (2d coroutine)
   #:use-module (2d private game)
-  #:use-module (2d repl server)
-  #:use-module (2d repl repl)
+  #:use-module (2d repl repl2)
   #:use-module (2d mvars)
   #:use-module (2d window)
   #:export (current-fps
@@ -162,30 +161,6 @@ is the unused accumulator time."
       accumulator))
 
 ;;;
-;;; REPL
-;;;
-
-(define (run-repl-thunk thunk input output error stack)
-  "Run THUNK with the given REPL STACK. I/O is redirected to the given
-INPUT, OUTPUT, and ERROR ports."
-  (put-mvar
-   repl-output-mvar
-   (with-input-from-port input
-     (lambda ()
-       (with-output-to-port output
-         (lambda ()
-           (with-error-to-port error
-             (lambda ()
-               (with-fluids ((*repl-stack* stack))
-                 (thunk))))))))))
-
-(define (run-repl)
-  "Execute a thunk from the REPL is there is one."
-  (unless (mvar-empty? repl-input-mvar)
-    (and-let* ((vals (try-take-mvar repl-input-mvar)))
-              (apply run-repl-thunk vals))))
-
-;;;
 ;;; Scene management
 ;;;
 
@@ -239,7 +214,6 @@ time in milliseconds that has passed since the last game update."
     (let* ((current-time (SDL:get-ticks))
            (dt (- current-time last-time))
            (remainder (update (+ accumulator dt))))
-      (run-repl)
       (render dt)
       (switch-scenes-maybe)
       (game-loop current-time
@@ -252,7 +226,7 @@ time in milliseconds that has passed since the last game update."
                (game-fullscreen? game))
   (set! running #t)
   (set-initial-scene ((game-first-scene game)))
-  (spawn-server)
+  (agenda-schedule (colambda () (start-repl)))
   (game-loop (SDL:get-ticks) 0)
   (close-window))
 
