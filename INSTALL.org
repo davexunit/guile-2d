@@ -34,7 +34,8 @@
 
 *** Freeimage
 
-    Freeimage is to used to load textures.
+    Freeimage is to used to load textures. Make sure that your distro
+    provides at least version 3.14.
 
     *Debian*
 
