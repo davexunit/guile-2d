@@ -9,7 +9,7 @@
 ;;;
 
 (define (make-sprite-1)
-  (load-sprite "images/sprite.png"
+  (load-sprite "images/ghost.png"
                #:position (vector2 320 240)))
 
 (define (scene-1-key-press sprite key mod unicode)
