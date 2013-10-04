@@ -24,7 +24,7 @@
       (run-repl repl))))
 
 (define (repl-read-wrapper reader)
-  (put-mvar repl-read-mvar (list reader (fluid-ref *repl-stack*)))
+  (put-mvar repl-read-mvar reader)
   (yield repl-read-callback))
 
 (define (repl-read-callback resume)
@@ -36,8 +36,5 @@
   (agenda-schedule try-to-resume repl-wait-time))
 
 (define (reader-thread-loop)
-  (match (take-mvar repl-read-mvar)
-    ((reader stack)
-     (with-fluids ((*repl-stack* stack))
-       (put-mvar repl-eval-mvar (reader)))))
+  (put-mvar repl-eval-mvar ((take-mvar repl-read-mvar)))
   (reader-thread-loop))
