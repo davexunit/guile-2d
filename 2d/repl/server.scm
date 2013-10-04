@@ -20,8 +20,10 @@
 ;;; Code:
 
 (define-module (2d repl server)
-  #:use-module (2d repl repl)
   #:use-module (ice-9 threads)
+  #:use-module (2d agenda)
+  #:use-module (2d coroutine)
+  #:use-module (2d repl coop-repl)
   #:export (make-tcp-server-socket
             make-unix-domain-server-socket
             run-server
@@ -119,8 +121,8 @@
   (make-thread run-server server-socket))
 
 (define (serve-client client addr)
-  (with-continuation-barrier
-   (lambda ()
+  (agenda-schedule
+   (colambda ()
      (with-input-from-port client
        (lambda ()
          (with-output-to-port client
@@ -128,5 +130,5 @@
              (with-error-to-port client
                (lambda ()
                  (with-fluids ((*repl-stack* '()))
-                   (start-repl))))))))))
-  (close-socket! client))
+                   (start-repl))))))))
+       (close-socket! client))))

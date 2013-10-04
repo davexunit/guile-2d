@@ -30,7 +30,7 @@
   #:use-module (2d agenda)
   #:use-module (2d coroutine)
   #:use-module (2d private game)
-  #:use-module (2d repl repl2)
+  #:use-module (2d repl server)
   #:use-module (2d mvars)
   #:use-module (2d window)
   #:export (current-fps
@@ -226,7 +226,7 @@ time in milliseconds that has passed since the last game update."
                (game-fullscreen? game))
   (set! running #t)
   (set-initial-scene ((game-first-scene game)))
-  (agenda-schedule (colambda () (start-repl)))
+  (spawn-server)
   (game-loop (SDL:get-ticks) 0)
   (close-window))
 
