@@ -6,9 +6,12 @@
   (load-sprite "images/ghost.png"
                #:position (vector2 320 240)))
 
+(define (draw sprite)
+  (draw-sprite sprite))
+
 (define-scene demo
   #:title  "Demo"
-  #:draw   (lambda (sprite) (draw-sprite sprite))
+  #:draw   (lambda (sprite) (draw sprite))
   #:state  (demo-sprite))
 
 (define-game simple
