@@ -25,12 +25,14 @@
   #:use-module (ice-9 q)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
+  #:use-module (2d coroutine)
   #:export (make-agenda
             with-agenda
             agenda-schedule
             agenda-schedule-interval
             update-agenda
-            clear-agenda))
+            clear-agenda
+            wait))
 
 ;; This code is a modified version of the agenda implementation in
 ;; SICP. Thank you, SICP!
@@ -192,3 +194,8 @@ upon every update."
 (define (clear-agenda)
   "Clear the current agenda."
   (%clear-agenda *current-agenda*))
+
+(define* (wait #:optional (delay 1))
+  "Yield coroutine and schdule the continuation to be run after DELAY
+ticks."
+  (yield (lambda (resume) (agenda-schedule resume delay))))

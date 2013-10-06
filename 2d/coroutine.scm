@@ -25,10 +25,8 @@
   #:export (coroutine
             colambda
             codefine
-            codefine*
-            wait)
-  #:replace (yield)
-  #:use-module (2d agenda))
+            codefine*)
+  #:replace (yield))
 
 (define (coroutine thunk)
   "Calls a procedure that can yield a continuation."
@@ -76,8 +74,3 @@ keyword arguments that is run as a coroutine."
 (define (yield callback)
   "Yield continuation to a CALLBACK procedure."
   (abort-to-prompt 'coroutine-prompt callback))
-
-(define* (wait #:optional (delay 1))
-  "Yield coroutine and schdule the continuation to be run after DELAY
-ticks."
-  (yield (lambda (resume) (agenda-schedule resume delay))))
