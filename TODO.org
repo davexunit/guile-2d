@@ -81,7 +81,7 @@
    - [X] Write wrappers for needed FTGL functions
    - [X] Write font rendering procedures
 
-** TODO Sound
+** DONE Sound
    Provide helpful wrappers around SDL sound procedures?
 
 ** TODO A* pathfinding
@@ -177,3 +177,6 @@
 ** TODO 0.2 Release
    - [ ] New REPL server
    - [ ] Screencast
+   - [ ] Keymaps
+   - [ ] Better scene management
+   - [ ] More documentation
