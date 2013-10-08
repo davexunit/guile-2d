@@ -39,7 +39,11 @@
             replace-scene
             pop-scene
             run-game
-            quit-game-loop!))
+            quit-game
+            pause-game
+            resume-game
+            game-running?
+            game-paused?))
 
 ;;;
 ;;; Constants
@@ -53,7 +57,6 @@
 ;;;
 
 (define game-fps 0)
-(define running #f)
 
 ;;;
 ;;; Event Handling
@@ -206,7 +209,7 @@ INPUT, OUTPUT, and ERROR ports."
   "Exit the current scene and resume the previous scene. If there is
 no previous scene, the game loop will terminate."
   (if (null? scenes)
-      (quit-game-loop!)
+      (quit-game)
       (begin
         (set! next-scene (car scenes))
         (set! scenes (cdr scenes)))))
@@ -231,11 +234,14 @@ the stack."
 ;;; Game Loop
 ;;;
 
+(define running? #f)
+(define paused? #f)
+
 (define (game-loop last-time accumulator)
   "Update game state, and render. LAST-TIME is the time in
 milliseconds of the last iteration of the loop. ACCUMULATOR is the
 time in milliseconds that has passed since the last game update."
-  (when running
+  (when running?
     (let* ((current-time (SDL:get-ticks))
            (dt (- current-time last-time))
            (remainder (update (+ accumulator dt))))
@@ -250,12 +256,27 @@ time in milliseconds that has passed since the last game update."
   (open-window (game-title game)
                (game-resolution game)
                (game-fullscreen? game))
-  (set! running #t)
+  (set! running? #t)
+  (resume-game)
   (set-initial-scene ((game-first-scene game)))
   (spawn-server)
   (game-loop (SDL:get-ticks) 0)
   (close-window))
 
-(define (quit-game-loop!)
+(define (game-running?)
+  (running?))
+
+(define (game-paused?)
+  (paused?))
+
+(define (pause-game)
+  "Pauses the game loop. Useful when developing."
+  (set! paused? #t))
+
+(define (resume-game)
+  "Resumes the game loop."
+  (set! paused? #f))
+
+(define (quit-game)
   "Finish the current frame and terminate the game loop."
-  (set! running #f))
+  (set! running? #f))
