@@ -102,6 +102,11 @@ value."
            game-fullscreen?
            game-first-scene
            run-game
+           quit-game
+           pause-game
+           resume-game
+           game-running?
+           game-paused?
            current-fps)
 
 (export make-game
