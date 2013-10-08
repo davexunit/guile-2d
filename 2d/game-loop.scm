@@ -237,6 +237,19 @@ the stack."
 (define running? #f)
 (define paused? #f)
 
+(define (tick dt accumulator)
+  "Advance the game by one frame."
+  (if paused?
+      (begin
+        (run-repl)
+        (SDL:delay tick-interval)
+        accumulator)
+      (let ((remainder (update accumulator)))
+        (run-repl)
+        (render dt)
+        (switch-scenes-maybe)
+        remainder)))
+
 (define (game-loop last-time accumulator)
   "Update game state, and render. LAST-TIME is the time in
 milliseconds of the last iteration of the loop. ACCUMULATOR is the
@@ -244,12 +257,8 @@ time in milliseconds that has passed since the last game update."
   (when running?
     (let* ((current-time (SDL:get-ticks))
            (dt (- current-time last-time))
-           (remainder (update (+ accumulator dt))))
-      (run-repl)
-      (render dt)
-      (switch-scenes-maybe)
-      (game-loop current-time
-                 remainder))))
+           (accumulator (+ accumulator dt)))
+      (game-loop current-time (tick dt accumulator)))))
 
 (define (run-game game)
   "Open a window and start the game loop for GAME."
