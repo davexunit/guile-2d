@@ -53,12 +53,6 @@
 (define tick-interval (floor (/ 1000 target-fps)))
 
 ;;;
-;;; Mutable state
-;;;
-
-(define game-fps 0)
-
-;;;
 ;;; Event Handling
 ;;;
 
@@ -117,6 +111,8 @@
 ;;;
 ;;; Frames Per Second
 ;;;
+
+(define game-fps 0)
 
 (define accumulate-fps!
   (let* ((elapsed-time 0)
