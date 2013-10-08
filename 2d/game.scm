@@ -35,10 +35,10 @@
 ;; When no event callbacks are specified for a scene, these
 ;; (hopefully) convenient defaults will be used.
 (define %default-scene-events
-  `((quit     . ,(lambda (state) (quit-game-loop!)))
+  `((quit     . ,(lambda (state) (quit-game)))
     (key-down . ,(lambda (state key mode unicode)
                    (when (any-equal? key 'escape 'q)
-                     (quit-game-loop!))))))
+                     (quit-game))))))
 
 (define (default-scene-events)
   (copy-tree %default-scene-events))
