@@ -165,7 +165,7 @@
        ;; Move horizontally across the screen, starting at x=0 and moving to
        ;; x=800, in 60 ticks.
         (lerp (lambda (x)
-                (set-sprite-position! sprite (vector x (/ window-height 2))))
+                (set-sprite-position! sprite (vector2 x (/ window-height 2))))
               0 800 60))
     #+END_SRC
 
@@ -183,7 +183,7 @@
       (schedule-action
        (action-parallel
         (lerp (lambda (x)
-                (set-sprite-position! sprite (vector x (/ window-height 2))))
+                (set-sprite-position! sprite (vector2 x (/ window-height 2))))
               0 800 60)
         ;; Rotate sprite 1080 degrees in 120 ticks.
         (lerp (lambda (angle)
