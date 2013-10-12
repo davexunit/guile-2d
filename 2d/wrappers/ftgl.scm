@@ -80,8 +80,12 @@
   float "ftglGetFontAscender" '(*))
 
 (define (ftgl-create-texture-font filename)
-  (wrap-ftgl-font
-   (%ftgl-create-texture-font (string->pointer filename))))
+  (unless (file-exists? filename)
+    (throw 'font-not-found filename))
+  (let ((font (%ftgl-create-texture-font (string->pointer filename))))
+    (when (null-pointer? font)
+      (throw 'font-load-failure filename))
+    (wrap-ftgl-font font)))
 
 (define (ftgl-set-font-face-size font size res)
   (%ftgl-set-font-face-size (unwrap-ftgl-font font) size res))
