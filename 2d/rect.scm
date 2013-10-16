@@ -156,14 +156,10 @@ not overlap, a rect of size 0 is returned."
 
 (define (rect-intersects? rect1 rect2)
   "Return #t if RECT2 overlaps RECT1."
-  (or (and (>= (rect-x  rect2) (rect-x  rect1))
-           (<= (rect-x  rect2) (rect-x2 rect1)))
-      (and (>= (rect-x2 rect2) (rect-x  rect1))
-           (<= (rect-x2 rect2) (rect-x2 rect1))))
-  (or (and (>= (rect-y  rect2) (rect-y  rect1))
-           (<= (rect-y  rect2) (rect-y2 rect1)))
-      (and (>= (rect-y2 rect2) (rect-y  rect1))
-           (<= (rect-y2 rect2) (rect-y2 rect1)))))
+  (and (<= (rect-x  rect1) (rect-x2 rect2))
+       (>= (rect-x2 rect1) (rect-x  rect2))
+       (<= (rect-y  rect1) (rect-y2 rect2))
+       (>= (rect-y2 rect1) (rect-y  rect2))))
 
 (define (%rect-contains? rect x y)
   (and (>= x (rect-x  rect))
