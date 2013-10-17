@@ -58,37 +58,37 @@
 
 (define handle-events
   (let ((e (SDL:make-event)))
-    (lambda ()
+    (lambda (scene)
       "Handle all events in the SDL event queue."
       (while (SDL:poll-event e)
-        (handle-event e)))))
+        (handle-event scene e)))))
 
-(define (handle-event e)
+(define (handle-event scene e)
   "Call the relevant callbacks for the event, E."
   (case (SDL:event:type e)
     ((active)
-     (scene-trigger current-scene 'active))
+     (scene-trigger scene 'active))
     ((video-resize)
-     (scene-trigger current-scene
+     (scene-trigger scene
                     'resize
                     (SDL:event:resize:w e)
                     (SDL:event:resize:h e)))
     ((quit)
-     (scene-trigger current-scene 'quit))
+     (scene-trigger scene 'quit))
     ((key-down)
-     (scene-trigger current-scene
+     (scene-trigger scene
                     'key-down
                     (SDL:event:key:keysym:sym e)
                     (SDL:event:key:keysym:mod e)
                     (SDL:event:key:keysym:unicode e)))
     ((key-up)
-     (scene-trigger current-scene
+     (scene-trigger scene
                     'key-up
                     (SDL:event:key:keysym:sym e)
                     (SDL:event:key:keysym:mod e)
                     (SDL:event:key:keysym:unicode e)))
     ((mouse-motion)
-     (scene-trigger current-scene
+     (scene-trigger scene
                     'mouse-motion
                     (SDL:event:motion:state e)
                     (SDL:event:motion:x e)
@@ -96,13 +96,13 @@
                     (SDL:event:motion:xrel e)
                     (SDL:event:motion:yrel e)))
     ((mouse-button-down)
-     (scene-trigger current-scene
+     (scene-trigger scene
                     'mouse-press
                     (SDL:event:button:button e)
                     (SDL:event:button:x e)
                     (SDL:event:button:y e)))
     ((mouse-button-up)
-     (scene-trigger current-scene
+     (scene-trigger scene
                     'mouse-click
                     (SDL:event:button:button e)
                     (SDL:event:button:x e)
@@ -139,25 +139,25 @@ second."
 ;;; Update and Render
 ;;;
 
-(define (render dt)
+(define (render scene dt)
   "Render a frame."
   (set-gl-matrix-mode (matrix-mode modelview))
   (gl-load-identity)
   (gl-clear (clear-buffer-mask color-buffer depth-buffer))
-  (draw-scene current-scene)
+  (draw-scene scene)
   (SDL:gl-swap-buffers)
   (accumulate-fps! dt))
 
-(define (update accumulator)
+(define (update scene accumulator)
   "Call the update callback. The update callback will be called as
 many times as `tick-interval` can divide ACCUMULATOR. The return value
 is the unused accumulator time."
   (if (>= accumulator tick-interval)
       (begin
-        (handle-events)
+        (handle-events scene)
         (update-agenda)
-        (update-scene current-scene)
-        (update (- accumulator tick-interval)))
+        (update-scene scene)
+        (update scene (- accumulator tick-interval)))
       accumulator))
 
 ;;;
@@ -189,42 +189,34 @@ INPUT, OUTPUT, and ERROR ports."
 ;;;
 
 (define scenes '())
-(define current-scene #f)
-(define next-scene #f)
+
+(define (current-scene)
+  (car scenes))
 
 (define (push-scene scene)
   "Pause the current scene and start SCENE upon next game tick."
-  (set! scenes (cons scene scenes))
-  (set! next-scene scene))
+  (set! scenes (cons scene scenes)))
 
 (define (replace-scene scene)
-  (set! scenes (cons scene (cdr scenes)))
-  (set! next-scene scene))
+  (set! scenes (cons scene (cdr scenes))))
 
 (define (pop-scene)
   "Exit the current scene and resume the previous scene. If there is
 no previous scene, the game loop will terminate."
   (if (null? scenes)
       (quit-game)
-      (begin
-        (set! next-scene (car scenes))
-        (set! scenes (cdr scenes)))))
+      (set! scenes (cdr scenes))))
 
-(define (switch-scenes-maybe)
+(define (switch-scenes-maybe scene)
   "Switch scenes if the current scene is not the scene at the top of
 the stack."
-  (when next-scene
-    (scene-trigger current-scene 'stop)
-    (set-current-scene next-scene)
-    (set! next-scene #f)))
-
-(define (set-current-scene scene)
-  (scene-trigger scene 'start)
-  (set! current-scene scene))
+  (unless (eq? scene (current-scene))
+    (scene-trigger scene 'stop)
+    (scene-trigger (current-scene) 'start)))
 
 (define (set-initial-scene scene)
   (set! scenes (list scene))
-  (set-current-scene scene))
+  (scene-trigger scene 'start))
 
 ;;;
 ;;; Game Loop
@@ -242,10 +234,11 @@ the stack."
         accumulator)
       (catch #t
         (lambda ()
-          (let ((remainder (update accumulator)))
+          (let* ((scene (current-scene))
+                 (remainder (update scene accumulator)))
             (run-repl)
-            (render dt)
-            (switch-scenes-maybe)
+            (render scene dt)
+            (switch-scenes-maybe scene)
             remainder))
         (lambda (key . args)
           (pause-game)
