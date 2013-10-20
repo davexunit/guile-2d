@@ -30,15 +30,22 @@
             rect?
             rect-x
             rect-y
-            rect-x2
-            rect-y2
+            rect-left
+            rect-right
+            rect-top
+            rect-bottom
+            rect-position
+            rect-top-left
+            rect-top-right
+            rect-bottom-left
+            rect-bottom-right
             rect-center-x
             rect-center-y
+            rect-center
             rect-half-width
             rect-half-height
             rect-width
             rect-height
-            rect-position
             rect-size
             rect-move
             rect-inflate
@@ -63,11 +70,34 @@
   (width rect-width)
   (height rect-height))
 
-(define (rect-x2 rect)
-  (+ (rect-x rect) (rect-width rect) -1))
+(define (rect-right rect)
+  (+ (rect-x rect) (rect-width rect)))
 
-(define (rect-y2 rect)
-  (+ (rect-y rect) (rect-height rect) -1))
+(define rect-left rect-x)
+
+(define rect-top rect-y)
+
+(define (rect-bottom rect)
+  (+ (rect-y rect) (rect-height rect)))
+
+(define (rect-position rect)
+  "Return the top-left corner of RECT as a vector2."
+  (vector2 (rect-x rect)
+           (rect-y rect)))
+
+(define rect-top-left rect-position)
+
+(define (rect-top-right rect)
+  (vector2 (rect-right rect)
+           (rect-top   rect)))
+
+(define (rect-bottom-left rect)
+  (vector2 (rect-left   rect)
+           (rect-bottom rect)))
+
+(define (rect-bottom-right rect)
+  (vector2 (rect-right  rect)
+           (rect-bottom rect)))
 
 (define (rect-center-x rect)
   (+ (rect-x rect) (rect-half-width rect)))
@@ -75,16 +105,15 @@
 (define (rect-center-y rect)
   (+ (rect-y rect) (rect-half-height rect)))
 
+(define (rect-center rect)
+  (vector2 (rect-center-x rect)
+           (rect-center-y rect)))
+
 (define (rect-half-width rect)
   (/ (rect-width rect) 2))
 
 (define (rect-half-height rect)
   (/ (rect-height rect) 2))
-
-(define (rect-position rect)
-  "Return the top-left corner of RECT as a vector2."
-  (vector2 (rect-x rect)
-           (rect-y rect)))
 
 (define (rect-size rect)
   "Return the size of RECT as a vector2."
@@ -128,44 +157,40 @@ and y coordinates as separate arguments."
 
 (define (rect-union rect1 rect2)
   "Return a rect that covers the area of RECT1 and RECT2."
-  (let ((x1 (min (rect-x  rect1) (rect-x  rect2)))
-        (x2 (max (rect-x2 rect1) (rect-x2 rect2)))
-        (y1 (min (rect-y  rect1) (rect-y  rect2)))
-        (y2 (max (rect-y2 rect1) (rect-y2 rect2))))
+  (let ((x1 (min (rect-left   rect1) (rect-left   rect2)))
+        (x2 (max (rect-right  rect1) (rect-right  rect2)))
+        (y1 (min (rect-top    rect1) (rect-top    rect2)))
+        (y2 (max (rect-bottom rect1) (rect-bottom rect2))))
     (make-rect x1 y1 (- x2 x1) (- y2 y1))))
 
 (define (rect-clip rect1 rect2)
   "Return the overlapping region of RECT1 and RECT2. If the rects do
 not overlap, a rect of size 0 is returned."
-  (let ((x1 (max (rect-x  rect1) (rect-x  rect2)))
-        (x2 (min (rect-x2 rect1) (rect-x2 rect2)))
-        (y1 (max (rect-y  rect1) (rect-y  rect2)))
-        (y2 (min (rect-y2 rect1) (rect-y2 rect2))))
+  (let ((x1 (max (rect-left   rect1) (rect-left   rect2)))
+        (x2 (min (rect-right  rect1) (rect-right  rect2)))
+        (y1 (max (rect-top    rect1) (rect-top    rect2)))
+        (y2 (min (rect-bottom rect1) (rect-bottom rect2))))
     (make-rect x1 y1 (max (- x2 x1) 0) (max (- y2 y1) 0))))
 
 (define (rect-within? rect1 rect2)
   "Return #t if RECT2 is completely within RECT1."
-  (and (>= (rect-x  rect2) (rect-x  rect1))
-       (<= (rect-x  rect2) (rect-x2 rect1))
-       (>= (rect-x2 rect2) (rect-x  rect1))
-       (<= (rect-x2 rect2) (rect-x2 rect1))
-       (>= (rect-y  rect2) (rect-y  rect1))
-       (<= (rect-y  rect2) (rect-y2 rect1))
-       (>= (rect-y2 rect2) (rect-y  rect1))
-       (<= (rect-y2 rect2) (rect-y2 rect1))))
+  (and (>= (rect-left   rect2) (rect-left   rect1))
+       (<= (rect-right  rect2) (rect-right  rect1))
+       (>= (rect-top    rect2) (rect-top    rect1))
+       (<= (rect-bottom rect2) (rect-bottom rect1))))
 
 (define (rect-intersects? rect1 rect2)
   "Return #t if RECT2 overlaps RECT1."
-  (and (<= (rect-x  rect1) (rect-x2 rect2))
-       (>= (rect-x2 rect1) (rect-x  rect2))
-       (<= (rect-y  rect1) (rect-y2 rect2))
-       (>= (rect-y2 rect1) (rect-y  rect2))))
+  (and (< (rect-left   rect1) (rect-right  rect2))
+       (> (rect-right  rect1) (rect-left   rect2))
+       (< (rect-top    rect1) (rect-bottom rect2))
+       (> (rect-bottom rect1) (rect-top    rect2))))
 
 (define (%rect-contains? rect x y)
-  (and (>= x (rect-x  rect))
-       (<= x (rect-x2 rect))
-       (>= y (rect-y  rect))
-       (<= y (rect-y2 rect))))
+  (and (>= x (rect-left   rect))
+       (<= x (rect-right  rect))
+       (>= y (rect-top    rect))
+       (<= y (rect-bottom rect))))
 
 (define rect-contains?
   (case-lambda
