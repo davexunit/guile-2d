@@ -223,7 +223,6 @@ time in milliseconds that has passed since the last game update."
 
 (define (run-game game)
   "Open a window and start the game loop for GAME."
-  (pk 'game game)
   (open-window (game-title game)
                (game-resolution game)
                (game-fullscreen? game))
