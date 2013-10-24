@@ -35,6 +35,7 @@
             exit-stage
             draw-stage
             update-stage
+            stage-trigger
             stage-define
             stage-ref
             stage-set!
@@ -77,6 +78,9 @@
 (define (draw-stage stage)
   "Call the scene draw callback for STAGE."
   ((scene-draw (stage-scene stage))))
+
+(define (stage-trigger stage event . args)
+  #f)
 
 ;;;
 ;;; Stage environment
