@@ -2,15 +2,20 @@
              (2d agenda)
              (2d coroutine)
              (2d game)
+             (2d game-loop)
+             (2d scene)
              (2d sprite)
+             (2d stage)
              (2d vector2))
 
 (define (demo-sprite)
   (load-sprite "images/ghost.png"
                #:position (vector2 320 240)))
 
-(define (start sprite)
-  (let ((size (game-resolution actions)))
+(define (init)
+  (let ((size (game-resolution actions-demo))
+        (sprite (demo-sprite)))
+    (stage-define sprite sprite)
     (schedule-action
      (action-parallel
       ;; Move horizontally across the screen in 60 frames.
@@ -24,16 +29,14 @@
               (set-sprite-rotation! sprite angle))
             0 360 120)))))
 
-(define-scene demo
-  #:title  "Demo"
-  #:draw   (lambda (sprite) (draw-sprite sprite))
-  #:events (append
-            (default-scene-events)
-            `((start . ,(lambda (sprite) (start sprite)))))
-  #:state  (demo-sprite))
+(define demo-scene
+  (make-scene
+   #:init init
+   #:draw (lambda () (draw-sprite (stage-ref sprite)))))
 
-(define-game actions
-  #:title       "actions"
-  #:first-scene demo)
+(define actions-demo
+  (make-game
+   #:title       "Actions"
+   #:first-scene demo-scene))
 
-(run-game actions)
+(run-game actions-demo)
