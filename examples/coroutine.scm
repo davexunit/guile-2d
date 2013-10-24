@@ -1,35 +1,37 @@
 (use-modules (2d agenda)
              (2d coroutine)
              (2d game)
+             (2d game-loop)
+             (2d scene)
              (2d sprite)
+             (2d stage)
              (2d vector2))
 
 (define (demo-sprite)
   (load-sprite "images/ghost.png"
                #:position (vector2 320 240)))
 
-(define (start sprite)
+(define (init)
   ;; Simple script that moves the sprite to a random location every
   ;; second.
+  (stage-define sprite (demo-sprite))
   (agenda-schedule
    (colambda ()
      (while #t
        (set-sprite-position!
-        sprite
-        (vector2 (random (vx (game-resolution coroutines)))
-                 (random (vy (game-resolution coroutines)))))
+        (stage-ref sprite)
+        (vector2 (random (vx (game-resolution coroutine-demo)))
+                 (random (vy (game-resolution coroutine-demo)))))
        (wait 60)))))
 
-(define-scene demo
-  #:title  "Demo"
-  #:draw   (lambda (sprite) (draw-sprite sprite))
-  #:events (append
-            (default-scene-events)
-            `((start . ,(lambda (sprite) (start sprite)))))
-  #:state  (demo-sprite))
+(define demo-scene
+  (make-scene
+   #:init init
+   #:draw (lambda () (draw-sprite (stage-ref sprite)))))
 
-(define-game coroutines
-  #:title       "Coroutines"
-  #:first-scene demo)
+(define coroutine-demo
+  (make-game
+   #:title       "Coroutines"
+   #:first-scene demo-scene))
 
-(run-game coroutines)
+(run-game coroutine-demo)
