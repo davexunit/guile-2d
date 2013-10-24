@@ -1,6 +1,9 @@
 (use-modules (2d animation)
              (2d game)
+             (2d game-loop)
+             (2d scene)
              (2d sprite)
+             (2d stage)
              (2d tileset)
              (2d vector2)
              (2d window))
@@ -23,13 +26,16 @@ sprite out of it."
   (make-sprite (demo-animation)
                #:position (vector2 320 240)))
 
-(define-scene demo
-  #:title  "Demo"
-  #:draw   (lambda (sprite) (draw-sprite sprite))
-  #:state  (demo-sprite))
+(define demo-scene
+  (make-scene
+   #:init (lambda ()
+            (stage-define sprite (demo-sprite)))
+   #:draw (lambda ()
+            (draw-sprite (stage-ref sprite)))))
 
-(define-game animation
-  #:title       "Animation"
-  #:first-scene demo)
+(define animation-demo
+  (make-game
+   #:title       "Animation"
+   #:first-scene demo-scene))
 
-(run-game animation)
+(run-game animation-demo)
