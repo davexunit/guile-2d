@@ -61,23 +61,29 @@
 
 (define (init-stage stage)
   "Call the scene init callback for STAGE."
-  ((scene-init (stage-scene stage))))
+  (with-agenda (stage-agenda stage)
+    ((scene-init (stage-scene stage)))))
 
 (define (enter-stage stage)
   "Call the scene enter callback for STAGE."
-  ((scene-enter (stage-scene stage))))
+  (with-agenda (stage-agenda stage)
+    ((scene-enter (stage-scene stage)))))
 
 (define (exit-stage stage)
   "Call the scene exit callback for STAGE."
-  ((scene-exit (stage-scene stage))))
+  (with-agenda (stage-agenda stage)
+    ((scene-exit (stage-scene stage)))))
 
 (define (update-stage stage)
   "Call the scene update callback for STAGE."
-  ((scene-update (stage-scene stage))))
+  (with-agenda (stage-agenda stage)
+    (update-agenda)
+    ((scene-update (stage-scene stage)))))
 
 (define (draw-stage stage)
   "Call the scene draw callback for STAGE."
-  ((scene-draw (stage-scene stage))))
+  (with-agenda (stage-agenda stage)
+    ((scene-draw (stage-scene stage)))))
 
 (define (stage-trigger stage event . args)
   #f)
