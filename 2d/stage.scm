@@ -36,9 +36,8 @@
             draw-stage
             update-stage
             stage-trigger
-            stage-define
-            stage-ref
-            stage-set!
+            make-stage-variable
+            define-stage-variable
             current-stage
             push-stage
             pop-stage
@@ -92,22 +91,32 @@
 ;;; Stage environment
 ;;;
 
-(define (%stage-define stage key value)
-  "Define a new variable on STAGE with the specified symbolic name KEY
-and arbitrary VALUE. An error is thrown when there is already a value
-associated with KEY."
-  (let ((env (stage-env stage)))
-    (if (hash-get-handle env key)
-        (error 'stage-already-defined-variable key)
-        (hash-set! env key value))))
+(define uuid-counter 1)
 
-(define (%stage-ref stage key)
-  "Return the value stored in STAGE associated with KEY. An error is
-thrown if there is no value associated with KEY."
-  (let ((handle (hash-get-handle (stage-env stage) key)))
+(define (next-uuid)
+  "Return the next available uuid and increment the uuid counter."
+  (let ((uuid uuid-counter))
+    (set! uuid-counter (1+ uuid-counter))
+    uuid))
+
+(define (make-stage-variable init-thunk)
+  "Create a new stage variable that is initialized by INIT-THUNK."
+  (let ((uuid (next-uuid)))
+    (case-lambda
+      (()
+       (stage-ref-or-init uuid init-thunk))
+      ((new-value)
+       (stage-set! uuid new-value)))))
+
+(define (%stage-ref-or-init stage key init-thunk)
+  "Return the value stored in STAGE associated with KEY. If there is
+no association for KEY then create it and set the value returned by
+INIT-THUNK."
+  (let* ((env (stage-env stage))
+         (handle (hash-get-handle env key)))
     (if handle
         (cdr handle)
-        (error 'stage-unbound-variable key))))
+        (cdr (hash-create-handle! env key (init-thunk))))))
 
 (define (%stage-set! stage key value)
   "Associate KEY with VALUE in the STAGE environment. An error is
@@ -117,19 +126,16 @@ thrown if there is no value associated with KEY."
         (set-cdr! handle value)
         (error 'stage-unbound-variable key))))
 
-(define-syntax-rule (stage-define key value)
-  "Define the variable KEY with VALUE in the current stage
-environment."
-  (%stage-define (current-stage) 'key value))
+(define (stage-ref-or-init key init)
+  (%stage-ref-or-init (current-stage) key init))
 
-(define-syntax-rule (stage-ref key)
-  "Return the value bound to KEY in the current stage environment."
-  (%stage-ref (current-stage) 'key))
+(define (stage-set! key value)
+  (%stage-set! (current-stage) key value))
 
-(define-syntax-rule (stage-set! key value)
-  "Assign VALUE to the variable bound to KEY in the current stage
-environment."
-  (%stage-set! (current-stage) 'key value))
+(define-syntax-rule (define-stage-variable name value)
+  "Define a stage variable named NAME with value VALUE. VALUE is
+lazily evaluated the first time it is referenced in a stage object."
+  (define name (make-stage-variable (lambda () value))))
 
 ;;;
 ;;; Stage management
