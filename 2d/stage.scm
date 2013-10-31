@@ -24,10 +24,12 @@
 (define-module (2d stage)
   #:use-module (srfi srfi-9)
   #:use-module (2d agenda)
+  #:use-module (2d observer)
   #:use-module (2d scene)
   #:export (make-stage
             stage?
             stage-agenda
+            stage-observer
             stage-env
             stage-scene
             init-stage
@@ -38,21 +40,24 @@
             stage-trigger
             make-stage-variable
             define-stage-variable
+            stage-on
+            stage-off
             current-stage
             push-stage
             pop-stage
             replace-stage))
 
 (define-record-type <stage>
-  (%make-stage agenda env scene)
+  (%make-stage agenda observer env scene)
   stage?
   (agenda stage-agenda)
+  (observer stage-observer)
   (env stage-env)
   (scene stage-scene))
 
 (define (make-stage scene)
   "Create a new stage object for SCENE."
-  (%make-stage (make-agenda) (make-hash-table) scene))
+  (%make-stage (make-agenda) (make-observer) (make-hash-table) scene))
 
 ;;;
 ;;; Scene callbacks
@@ -85,7 +90,7 @@
     ((scene-draw (stage-scene stage)))))
 
 (define (stage-trigger stage event . args)
-  #f)
+  (apply observer-trigger (stage-observer stage) event args))
 
 ;;;
 ;;; Stage environment
@@ -136,6 +141,12 @@ thrown if there is no value associated with KEY."
   "Define a stage variable named NAME with value VALUE. VALUE is
 lazily evaluated the first time it is referenced in a stage object."
   (define name (make-stage-variable (lambda () value))))
+
+(define (stage-on event callback)
+  (observer-on (stage-observer (current-stage)) event callback))
+
+(define (stage-off event callback)
+  (observer-off (stage-observer (current-stage)) event callback))
 
 ;;;
 ;;; Stage management
