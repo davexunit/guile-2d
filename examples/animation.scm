@@ -22,16 +22,14 @@ sprite out of it."
                          (tileset-ref tiles 26))))
     (make-animation frames 6 #t)))
 
-(define (demo-sprite)
+(define-stage-variable sprite
   (make-sprite (demo-animation)
                #:position (vector2 320 240)))
 
 (define demo-scene
   (make-scene
-   #:init (lambda ()
-            (stage-define sprite (demo-sprite)))
    #:draw (lambda ()
-            (draw-sprite (stage-ref sprite)))))
+            (draw-sprite (sprite)))))
 
 (define animation-demo
   (make-game
