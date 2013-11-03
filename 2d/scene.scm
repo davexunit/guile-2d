@@ -23,7 +23,8 @@
 
 (define-module (2d scene)
   #:use-module (srfi srfi-9)
-  #:export (make-scene
+  #:export (<scene>
+            make-scene
             scene?
             scene-name
             scene-init
