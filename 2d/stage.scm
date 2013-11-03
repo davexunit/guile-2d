@@ -87,7 +87,7 @@
 
 (define (stage-trigger stage event . args)
   (with-agenda (stage-agenda stage)
-    #f))
+    (apply scene-trigger (stage-scene stage) event args)))
 
 ;;;
 ;;; Stage management

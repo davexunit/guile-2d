@@ -33,6 +33,7 @@
   #:use-module (2d mvars)
   #:use-module (2d repl server)
   #:use-module (2d repl repl)
+  #:use-module (2d scene)
   #:use-module (2d stage)
   #:use-module (2d window)
   #:export (current-fps
@@ -44,6 +45,74 @@
             game-paused?))
 
 ;;;
+;;; Game Loop
+;;;
+
+(define running? #f)
+(define paused? #f)
+
+(define (tick dt accumulator)
+  "Advance the game by one frame."
+  (if paused?
+      (begin
+        (run-repl)
+        (SDL:delay tick-interval)
+        accumulator)
+      (catch #t
+        (lambda ()
+          (let* ((stage (current-stage))
+                 (remainder (update stage accumulator)))
+            (run-repl)
+            (render stage dt)
+            remainder))
+        (lambda (key . args)
+          (pause-game)
+          accumulator)
+        (lambda (key . args)
+          (display-backtrace (make-stack #t)
+                             (current-output-port))))))
+
+(define (game-loop last-time accumulator)
+  "Update game state, and render. LAST-TIME is the time in
+milliseconds of the last iteration of the loop. ACCUMULATOR is the
+time in milliseconds that has passed since the last game update."
+  (when running?
+    (let* ((current-time (SDL:get-ticks))
+           (dt (- current-time last-time))
+           (accumulator (+ accumulator dt)))
+      (game-loop current-time (tick dt accumulator)))))
+
+(define (run-game game)
+  "Open a window and start the game loop for GAME."
+  (open-window (game-title game)
+               (game-resolution game)
+               (game-fullscreen? game))
+  (set! running? #t)
+  (resume-game)
+  (push-scene (game-first-scene game))
+  (spawn-server)
+  (game-loop (SDL:get-ticks) 0)
+  (close-window))
+
+(define (game-running?)
+  (running?))
+
+(define (game-paused?)
+  (paused?))
+
+(define (pause-game)
+  "Pauses the game loop. Useful when developing."
+  (set! paused? #t))
+
+(define (resume-game)
+  "Resumes the game loop."
+  (set! paused? #f))
+
+(define (quit-game)
+  "Finish the current frame and terminate the game loop."
+  (set! running? #f))
+
+;;;
 ;;; Constants
 ;;;
 
@@ -53,6 +122,12 @@
 ;;;
 ;;; Event Handling
 ;;;
+
+;; By default, pressing the escape key will pop the current scene, and
+;; closing the window will quit the game.
+(default-events `((key-down . ,(lambda (key mod unicode)
+                                 (pop-scene)))
+                  (quit . ,quit-game)))
 
 (define handle-events
   (let ((e (SDL:make-event)))
@@ -72,7 +147,6 @@
                     (SDL:event:resize:w e)
                     (SDL:event:resize:h e)))
     ((quit)
-     (quit-game)
      (stage-trigger stage 'quit))
     ((key-down)
      (stage-trigger stage
@@ -182,71 +256,3 @@ INPUT, OUTPUT, and ERROR ports."
   (unless (mvar-empty? repl-input-mvar)
     (and-let* ((vals (try-take-mvar repl-input-mvar)))
               (apply run-repl-thunk vals))))
-
-;;;
-;;; Game Loop
-;;;
-
-(define running? #f)
-(define paused? #f)
-
-(define (tick dt accumulator)
-  "Advance the game by one frame."
-  (if paused?
-      (begin
-        (run-repl)
-        (SDL:delay tick-interval)
-        accumulator)
-      (catch #t
-        (lambda ()
-          (let* ((stage (current-stage))
-                 (remainder (update stage accumulator)))
-            (run-repl)
-            (render stage dt)
-            remainder))
-        (lambda (key . args)
-          (pause-game)
-          accumulator)
-        (lambda (key . args)
-          (display-backtrace (make-stack #t)
-                             (current-output-port))))))
-
-(define (game-loop last-time accumulator)
-  "Update game state, and render. LAST-TIME is the time in
-milliseconds of the last iteration of the loop. ACCUMULATOR is the
-time in milliseconds that has passed since the last game update."
-  (when running?
-    (let* ((current-time (SDL:get-ticks))
-           (dt (- current-time last-time))
-           (accumulator (+ accumulator dt)))
-      (game-loop current-time (tick dt accumulator)))))
-
-(define (run-game game)
-  "Open a window and start the game loop for GAME."
-  (open-window (game-title game)
-               (game-resolution game)
-               (game-fullscreen? game))
-  (set! running? #t)
-  (resume-game)
-  (push-scene (game-first-scene game))
-  (spawn-server)
-  (game-loop (SDL:get-ticks) 0)
-  (close-window))
-
-(define (game-running?)
-  (running?))
-
-(define (game-paused?)
-  (paused?))
-
-(define (pause-game)
-  "Pauses the game loop. Useful when developing."
-  (set! paused? #t))
-
-(define (resume-game)
-  "Resumes the game loop."
-  (set! paused? #f))
-
-(define (quit-game)
-  "Finish the current frame and terminate the game loop."
-  (set! running? #f))

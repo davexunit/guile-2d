@@ -23,6 +23,7 @@
 
 (define-module (2d scene)
   #:use-module (srfi srfi-9)
+  #:use-module (2d observer)
   #:export (<scene>
             make-scene
             scene?
@@ -32,23 +33,28 @@
             scene-exit
             scene-draw
             scene-update
+            scene-observer
             init-scene
             enter-scene
             exit-scene
             draw-scene
-            update-scene))
+            update-scene
+            scene-trigger
+            default-events))
 
 (define-record-type <scene>
-  (%make-scene name init enter exit draw update)
+  (%make-scene name init enter exit draw update observer)
   scene?
   (name scene-name)
   (init scene-init)
   (enter scene-enter)
   (exit scene-exit)
   (draw scene-draw)
-  (update scene-update))
+  (update scene-update)
+  (observer scene-observer))
 
 (define no-op (lambda args #f))
+(define default-events (make-parameter '()))
 
 (define* (make-scene name
                      #:optional #:key
@@ -56,9 +62,11 @@
                      (enter no-op)
                      (exit no-op)
                      (draw no-op)
-                     (update no-op))
+                     (update no-op)
+                     (events (default-events)))
   "Create a new scene object. All callbacks default to a no-op."
-  (%make-scene name init enter exit draw update))
+  (%make-scene name init enter exit draw update
+               (alist->observer events)))
 
 (define (init-scene scene)
   "Return the value returned by the state constructor thunk for
@@ -80,3 +88,6 @@ SCENE."
 (define (update-scene scene state)
   "Call the update callback for SCENE with STATE."
   ((scene-update scene) state))
+
+(define (scene-trigger scene event . args)
+  (apply observer-trigger (scene-observer scene) event args))
