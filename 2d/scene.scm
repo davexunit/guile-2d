@@ -25,6 +25,7 @@
   #:use-module (srfi srfi-9)
   #:export (make-scene
             scene?
+            scene-name
             scene-init
             scene-enter
             scene-exit
@@ -37,8 +38,9 @@
             update-scene))
 
 (define-record-type <scene>
-  (%make-scene init enter exit draw update)
+  (%make-scene name init enter exit draw update)
   scene?
+  (name scene-name)
   (init scene-init)
   (enter scene-enter)
   (exit scene-exit)
@@ -47,14 +49,15 @@
 
 (define no-op (lambda args #f))
 
-(define* (make-scene #:optional #:key
+(define* (make-scene name
+                     #:optional #:key
                      (init no-op)
                      (enter no-op)
                      (exit no-op)
                      (draw no-op)
                      (update no-op))
   "Create a new scene object. All callbacks default to a no-op."
-  (%make-scene init enter exit draw update))
+  (%make-scene name init enter exit draw update))
 
 (define (init-scene scene)
   "Return the value returned by the state constructor thunk for
