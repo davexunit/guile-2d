@@ -29,7 +29,12 @@
             scene-enter
             scene-exit
             scene-draw
-            scene-update))
+            scene-update
+            init-scene
+            enter-scene
+            exit-scene
+            draw-scene
+            update-scene))
 
 (define-record-type <scene>
   (%make-scene init enter exit draw update)
@@ -50,3 +55,24 @@
                      (update no-op))
   "Create a new scene object. All callbacks default to a no-op."
   (%make-scene init enter exit draw update))
+
+(define (init-scene scene)
+  "Return the value returned by the state constructor thunk for
+SCENE."
+  ((scene-init scene)))
+
+(define (enter-scene scene state)
+  "Call enter callback for SCENE with STATE."
+  ((scene-enter scene) state))
+
+(define (exit-scene scene state)
+  "Call the exit callback for SCENE with STATE."
+  ((scene-exit scene) state))
+
+(define (draw-scene scene state)
+  "Call the draw callback for SCENE with STATE."
+  ((scene-draw scene) state))
+
+(define (update-scene scene state)
+  "Call the update callback for SCENE with STATE."
+  ((scene-update scene) state))

@@ -228,7 +228,7 @@ time in milliseconds that has passed since the last game update."
                (game-fullscreen? game))
   (set! running? #t)
   (resume-game)
-  (push-stage (make-stage (game-first-scene game)))
+  (push-scene (game-first-scene game))
   (spawn-server)
   (game-loop (SDL:get-ticks) 0)
   (close-window))
