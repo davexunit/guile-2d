@@ -126,7 +126,8 @@ time in milliseconds that has passed since the last game update."
 ;; By default, pressing the escape key will pop the current scene, and
 ;; closing the window will quit the game.
 (default-events `((key-down . ,(lambda (key mod unicode)
-                                 (pop-scene)))
+                                 (when (eq? key 'escape)
+                                   (pop-scene))))
                   (quit . ,quit-game)))
 
 (define handle-events
