@@ -51,6 +51,12 @@
 (define running? #f)
 (define paused? #f)
 
+(define (update-and-render stage dt accumulator)
+  (let ((remainder (update stage accumulator)))
+    (run-repl)
+    (render stage dt)
+    remainder))
+
 (define (tick dt accumulator)
   "Advance the game by one frame."
   (if paused?
@@ -60,11 +66,10 @@
         accumulator)
       (catch #t
         (lambda ()
-          (let* ((stage (current-stage))
-                 (remainder (update stage accumulator)))
-            (run-repl)
-            (render stage dt)
-            remainder))
+          (let ((stage (current-stage)))
+            (if stage
+                (update-and-render stage dt accumulator)
+                (quit-game))))
         (lambda (key . args)
           (pause-game)
           accumulator)
