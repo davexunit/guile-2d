@@ -87,7 +87,11 @@
 
 (define (stage-trigger stage event . args)
   (with-agenda (stage-agenda stage)
-    (apply scene-trigger (stage-scene stage) event args)))
+    (apply scene-trigger
+           (stage-scene stage)
+           (stage-state stage)
+           event
+           args)))
 
 ;;;
 ;;; Stage management
@@ -116,7 +120,7 @@ present."
       (exit-stage prev-stage))
     (set! stack (cdr stack))
     (when (current-stage)
-      (enter-stage (car stack)))))
+      (enter-stage (current-stage)))))
 
 (define (replace-scene scene)
   "Replace the current stage with STAGE."

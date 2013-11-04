@@ -89,5 +89,5 @@ SCENE."
   "Call the update callback for SCENE with STATE."
   ((scene-update scene) state))
 
-(define (scene-trigger scene event . args)
-  (apply observer-trigger (scene-observer scene) event args))
+(define (scene-trigger scene state event . args)
+  (apply observer-trigger (scene-observer scene) event state args))
