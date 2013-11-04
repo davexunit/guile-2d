@@ -8,7 +8,7 @@
              (2d stage)
              (2d vector2))
 
-(define (demo-textbox)
+(define (make-demo-textbox)
   (make-textbox (load-font "fonts/Boxy-Bold.ttf" 48)
                 "The quick brown fox jumped over the lazy dog."
                 (vector2 240 160)
@@ -16,14 +16,15 @@
                 'left
                 200))
 
-(define demo-scene
+(define fonts-scene
   (make-scene
-   #:init (lambda () (stage-define textbox (demo-textbox)))
-   #:draw (lambda () (draw-textbox (stage-ref textbox)))))
+   "Fonts"
+   #:init make-demo-textbox
+   #:draw draw-textbox))
 
 (define fonts-demo
   (make-game
-   #:title       "Fonts"
-   #:first-scene demo-scene))
+   #:title "Fonts"
+   #:first-scene fonts-scene))
 
 (run-game fonts-demo)

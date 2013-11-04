@@ -2,9 +2,11 @@
              (srfi srfi-9)
              (srfi srfi-42)
              (2d game)
+             (2d game-loop)
+             (2d scene)
+             (2d sprite)
              (2d texture)
              (2d tileset)
-             (2d sprite)
              (2d vector2))
 
 ;;;
@@ -81,13 +83,15 @@
                                     tileset
                                     map-tiles))))
 
-(define-scene demo
-  #:title  "Demo"
-  #:draw   (lambda (map) (draw-map-layer map))
-  #:state  (build-map))
+(define tilemap-scene
+  (make-scene
+   "Tilemap"
+   #:init build-map
+   #:draw draw-map-layer))
 
-(define-game tilemap
-  #:title       "Tilemap"
-  #:first-scene demo)
+(define tilemap
+  (make-game
+   #:title "Tilemap"
+   #:first-scene tilemap-scene))
 
 (run-game tilemap)

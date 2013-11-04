@@ -8,33 +8,33 @@
              (2d stage)
              (2d vector2))
 
-(define-stage-variable sprite
-  (load-sprite "images/ghost.png"
-               #:position (vector2 320 240)))
-
-(define (init)
+(define (enter sprite)
   (let ((size (game-resolution actions-demo)))
     (schedule-action
      (action-parallel
       ;; Move horizontally across the screen in 60 frames.
       (lerp (lambda (x)
               (set-sprite-position!
-               (sprite)
+               sprite
                (vector2 x (/ (vy size) 2))))
-            0 (vx size) 120)
+            0 (vx size) 60)
       ;; Rotate 1080 degrees in 120 frames.
       (lerp (lambda (angle)
-              (set-sprite-rotation! (sprite) angle))
+              (set-sprite-rotation! sprite angle))
             0 360 120)))))
 
-(define demo-scene
+(define actions-scene
   (make-scene
-   #:init init
-   #:draw (lambda () (draw-sprite (sprite)))))
+   "Actions"
+   #:init (lambda ()
+            (load-sprite "images/ghost.png"
+                         #:position (vector2 320 240)))
+   #:enter enter
+   #:draw draw-sprite))
 
 (define actions-demo
   (make-game
-   #:title       "Actions"
-   #:first-scene demo-scene))
+   #:title "Actions"
+   #:first-scene actions-scene))
 
 (run-game actions-demo)

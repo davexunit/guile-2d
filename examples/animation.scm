@@ -8,7 +8,7 @@
              (2d vector2)
              (2d window))
 
-(define (demo-animation)
+(define (make-demo-animation)
   "Load a texture, split it into 64x64 tiles, and build an animated
 sprite out of it."
   (let* ((tiles (load-tileset "images/princess.png" 64 64))
@@ -22,18 +22,17 @@ sprite out of it."
                          (tileset-ref tiles 26))))
     (make-animation frames 6 #t)))
 
-(define-stage-variable sprite
-  (make-sprite (demo-animation)
-               #:position (vector2 320 240)))
-
-(define demo-scene
+(define animation-scene
   (make-scene
-   #:draw (lambda ()
-            (draw-sprite (sprite)))))
+   "Animation"
+   #:init (lambda ()
+            (make-sprite (make-demo-animation)
+                         #:position (vector2 320 240)))
+   #:draw draw-sprite))
 
 (define animation-demo
   (make-game
-   #:title       "Animation"
-   #:first-scene demo-scene))
+   #:title "Animation"
+   #:first-scene animation-scene))
 
 (run-game animation-demo)

@@ -2,6 +2,8 @@
 (use-modules (srfi srfi-1)
              (srfi srfi-9)
              (2d game)
+             (2d game-loop)
+             (2d scene)
              (2d sprite)
              (2d texture)
              (2d vector2))
@@ -63,16 +65,21 @@
 (define (update state)
   (for-each update-particle! (demo-particles state)))
 
-(define-scene demo
-  #:title  "Demo"
-  #:draw   (lambda (state) (draw state))
-  #:update (lambda (state) (update state))
-  #:state  (make-demo-state (load-sprite "images/stars.png"
-                                         #:anchor null-vector2)
-                            (generate-particles particle-count)))
+(define (init)
+  (make-demo-state (load-sprite "images/stars.png"
+                                #:anchor null-vector2)
+                   (generate-particles particle-count)))
 
-(define-game particles
-  #:title       "Particles"
-  #:first-scene demo)
+(define particles-scene
+  (make-scene
+   "Particles"
+   #:draw draw
+   #:update update
+   #:init init))
+
+(define particles
+  (make-game
+   #:title "Particles"
+   #:first-scene particles-scene))
 
 (run-game particles)
