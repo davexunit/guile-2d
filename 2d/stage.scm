@@ -31,6 +31,7 @@
             stage-observer
             stage-env
             stage-scene
+            set-stage-scene!
             enter-stage
             exit-stage
             draw-stage
@@ -49,7 +50,7 @@
   (%make-stage agenda scene state)
   stage?
   (agenda stage-agenda)
-  (scene stage-scene)
+  (scene stage-scene set-stage-scene!)
   (state stage-state))
 
 (define (make-stage scene)
