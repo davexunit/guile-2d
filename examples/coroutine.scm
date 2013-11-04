@@ -1,7 +1,6 @@
 (use-modules (2d agenda)
              (2d coroutine)
              (2d game)
-             (2d game-loop)
              (2d scene)
              (2d sprite)
              (2d stage)

@@ -3,7 +3,6 @@
              (2d color)
              (2d font)
              (2d game)
-             (2d game-loop)
              (2d scene)
              (2d stage)
              (2d vector2))

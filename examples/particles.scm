@@ -2,7 +2,6 @@
 (use-modules (srfi srfi-1)
              (srfi srfi-9)
              (2d game)
-             (2d game-loop)
              (2d scene)
              (2d sprite)
              (2d texture)
