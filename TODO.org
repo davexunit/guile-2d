@@ -99,11 +99,17 @@
 ** TODO Particle systems
    Provide a highly configurible particle simulation system.
 
+   - [ ] Investigate ways to make it fast. Might have to resort to a C
+     shared library to avoid GC overhead.
+
 ** TODO Asset Management
    Provide a generic system for loading assets (images, sounds, fonts,
    etc.) and storing them in a cache. Explore using weak keys so that
    assets are removed from the cache when they are no longer
    referenced.
+
+   - [ ] Create asset cache
+   - [ ] Investigate automatic asset reloading.
 
 ** TODO Actions
    Provide a library of coroutines that perform commonly used
@@ -122,30 +128,18 @@
    describing a system that uses functional reactive programming.
 
    - [ ] Abstract away input methods
-
      Controls can be bound to keys, mouse, whatever
-
    - [ ] Basic sequences
-
      Press A then B
-
    - [ ] Simultaneous key presses
-
      Press A and B at the same time
-
    - [ ] Composing sequences
-
      Press A then B + C
-
    - [ ] Timeouts
-
      Press A then B then C within 15 frames time
-
    - [ ] Sequences with actions along the way
-
      Press A to kick, then forward + B to uppercut, within 30 frames
      time.
-
 
 ** TODO GUI widgets
    Provide a set of common graphical widgets such as buttons, scroll
@@ -178,5 +172,5 @@
    - [ ] New REPL server
    - [ ] Screencast
    - [ ] Keymaps
-   - [ ] Better scene management
+   - [X] Better scene management
    - [ ] More documentation
