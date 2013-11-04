@@ -30,7 +30,7 @@
   #:use-module (system repl command)
   #:use-module (ice-9 control)
   #:use-module (2d mvars)
-  #:use-module (2d game-loop)
+  #:use-module (2d game)
   #:export (repl-input-mvar repl-output-mvar start-repl run-repl))
 
 
