@@ -21,27 +21,79 @@
    Here is the simplest Guile-2d application (so far).
 
    #+BEGIN_SRC scheme
-     (use-modules (2d sprite)
-                  (2d game)
+     (use-modules (2d game)
+                  (2d scene)
+                  (2d sprite)
                   (2d vector2))
 
-     (define (demo-sprite)
-       (load-sprite "images/sprite.png"
+     (define (make-demo-sprite)
+       (load-sprite "images/ghost.png"
                     #:position (vector2 320 240)))
 
-     (define-scene demo
-       #:title  "Demo"
-       #:draw   (lambda (sprite) (draw-sprite sprite))
-       #:state  (demo-sprite))
+     (define simple-scene
+       (make-scene
+        "Simple"
+        #:init make-demo-sprite
+        #:draw draw-sprite))
 
-     (define-game simple
-       #:title       "Simple Demo"
-       #:first-scene demo)
+     (define simple-demo
+       (make-game
+        #:title "Simple Demo"
+        #:first-scene simple-scene))
 
-     (run-game simple)
+     (run-game simple-demo)
    #+END_SRC
 
 ** Features
+
+*** Scenes
+    Game objects are used to define the basic aspects of a Guile-2D
+    game such as the window title, resolution, whether or not it
+    is fullscreen, and what the first scene is.
+
+    #+BEGIN_SRC scheme
+      (define my-game
+        (make-game
+         #:title "Simple Demo"
+         #:resolution (vector2 640 480)
+         #:fullscreen? #f
+         #:first-scene main-menu))
+    #+END_SRC
+
+    Games can be divided into several smaller pieces, called scenes. A
+    scene describes how a particular part of a game is initialized,
+    drawn, updated, etc.
+
+    #+BEGIN_SRC scheme
+      (define main-menu
+        (make-scene
+         "Main Menu"
+         #:init create-menu
+         #:enter menu-enter
+         #:exit menu-exit
+         #:draw draw-menu
+         #:update update-menu
+         #:events `((key-down . ,menu-key-down))))
+    #+END_SRC
+
+    In addition to the essential callbacks (draw, update, enter,
+    exit), scenes can specify an alist of additional arbitrary event
+    handlers. Some events such as =key-down= are emitted by the game
+    loop when input events are received.
+
+    Scenes live in a place called the stage. There can be many stages,
+    but only one is active at any given time. When a stage enters
+    focus, the scene's enter procedure is applied. When a stage loses
+    focus, the exit procedure is applied. Stages are stored in a
+    stack, and they can pushed and popped as needed. To change the
+    current scene, and thus the current stage, use =push-scene=,
+    =pop-scene=, or =replace-scene=.
+
+    #+BEGIN_SRC scheme
+      (push-scene tetris-clone)
+      (pop-scene)
+      (replace-scene high-scores)
+    #+END_SRC
 
 *** Sprites
     Sprites encapsulate the presentation of an image or a region of an
