@@ -28,8 +28,7 @@
   #:export (make-stage
             stage?
             stage-agenda
-            stage-observer
-            stage-env
+            stage-state
             stage-scene
             set-stage-scene!
             enter-stage
