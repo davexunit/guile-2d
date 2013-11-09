@@ -61,15 +61,15 @@ coroutine."
       (lambda () (name ...)))))
 
 ;; emacs: (put 'codefine* 'scheme-indent-function 1)
-(define-syntax-rule (codefine* (name ...) . body)
-    "Syntactic sugar for defining a procedure with optional and
-keyword arguments that is run as a coroutine."
-  (define* (name ...)
+(define-syntax-rule (codefine* (name . formals) . body)
+  "Syntactic sugar for defining a procedure that is run as a
+coroutine."
+  (define (name . args)
     ;; Create an inner procedure with the same signature so that a
     ;; recursive procedure call does not create a new prompt.
-    (define* (name ...) . body)
+    (define* (name . formals) . body)
     (coroutine
-      (lambda () (name ...)))))
+     (lambda () (apply name args)))))
 
 (define (yield callback)
   "Yield continuation to a CALLBACK procedure."
