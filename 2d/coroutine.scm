@@ -42,7 +42,7 @@
   ;; Call procedure.
   (call-with-prompt 'coroutine-prompt thunk handler))
 
-;; emacs: (put 'colambda 'scheme-indent-function 0)
+;; emacs: (put 'colambda 'scheme-indent-function 1)
 (define-syntax-rule (colambda args body ...)
   "Syntacic sugar for a lambda that is run as a coroutine."
   (lambda args
