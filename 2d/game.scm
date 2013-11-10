@@ -56,21 +56,33 @@
 ;;;
 
 (define-record-type <game>
-  (%make-game title resolution fullscreen? first-scene)
+  (%make-game title resolution fullscreen? first-scene tick-rate)
   game?
   (title game-title)
   (resolution game-resolution)
   (fullscreen? game-fullscreen?)
-  (first-scene game-first-scene))
+  (first-scene game-first-scene)
+  (tick-rate game-tick-rate))
 
 (define* (make-game #:optional #:key
                     (title "A Guile-2D Game")
                     (resolution (vector2 640 480))
                     (fullscreen? #f)
-                    (first-scene #f))
+                    (first-scene #f)
+                    (tick-rate 60))
   "Return a new game. All game properties have some reasonable default
 value."
-  (%make-game title resolution fullscreen? first-scene))
+  (%make-game title resolution fullscreen? first-scene tick-rate))
+
+(define tick-interval 0)
+(define running? #f)
+(define paused? #f)
+
+(define (game-running?)
+  running?)
+
+(define (game-paused?)
+  paused?)
 
 (define (run-game game)
   "Open a window and start the game loop for GAME."
@@ -78,6 +90,7 @@ value."
                (game-resolution game)
                (game-fullscreen? game))
   (set! running? #t)
+  (set! tick-interval (floor (/ 1000 (game-tick-rate game))))
   (resume-game)
   (push-scene (game-first-scene game))
   (spawn-server)
@@ -87,9 +100,6 @@ value."
 ;;;
 ;;; Game Loop
 ;;;
-
-(define running? #f)
-(define paused? #f)
 
 (define (update-and-render stage dt accumulator)
   (let ((remainder (update stage accumulator)))
@@ -127,12 +137,6 @@ time in milliseconds that has passed since the last game update."
            (accumulator (+ accumulator dt)))
       (game-loop current-time (tick dt accumulator)))))
 
-(define (game-running?)
-  (running?))
-
-(define (game-paused?)
-  (paused?))
-
 (define (pause-game)
   "Pauses the game loop. Useful when developing."
   (set! paused? #t))
@@ -144,13 +148,6 @@ time in milliseconds that has passed since the last game update."
 (define (quit-game)
   "Finish the current frame and terminate the game loop."
   (set! running? #f))
-
-;;;
-;;; Constants
-;;;
-
-(define target-fps 60)
-(define tick-interval (floor (/ 1000 target-fps)))
 
 ;;;
 ;;; Event Handling
