@@ -101,10 +101,31 @@ value."
 ;;; Game Loop
 ;;;
 
-(define (update-and-render stage dt accumulator)
+(define (draw stage dt alpha)
+  "Render a frame."
+  (set-gl-matrix-mode (matrix-mode modelview))
+  (gl-load-identity)
+  (gl-clear (clear-buffer-mask color-buffer depth-buffer))
+  (draw-stage stage)
+  (SDL:gl-swap-buffers)
+  (accumulate-fps! dt))
+
+(define (update stage accumulator)
+  "Call the update callback. The update callback will be called as
+many times as `tick-interval` can divide ACCUMULATOR. The return value
+is the unused accumulator time."
+  (if (>= accumulator tick-interval)
+      (begin
+        (handle-events stage)
+        (update-agenda)
+        (update-stage stage)
+        (update stage (- accumulator tick-interval)))
+      accumulator))
+
+(define (update-and-draw stage dt accumulator)
   (let ((remainder (update stage accumulator)))
     (run-repl)
-    (render stage dt)
+    (draw stage dt (/ remainder tick-interval))
     remainder))
 
 (define (tick dt accumulator)
@@ -112,13 +133,12 @@ value."
   (if paused?
       (begin
         (run-repl)
-        (SDL:delay tick-interval)
         accumulator)
       (catch #t
         (lambda ()
           (let ((stage (current-stage)))
             (if stage
-                (update-and-render stage dt accumulator)
+                (update-and-draw stage dt accumulator)
                 (quit-game))))
         (lambda (key . args)
           (pause-game)
@@ -239,31 +259,6 @@ second."
 (define (current-fps)
   "Return the current FPS value."
   game-fps)
-
-;;;
-;;; Update and Render
-;;;
-
-(define (render stage dt)
-  "Render a frame."
-  (set-gl-matrix-mode (matrix-mode modelview))
-  (gl-load-identity)
-  (gl-clear (clear-buffer-mask color-buffer depth-buffer))
-  (draw-stage stage)
-  (SDL:gl-swap-buffers)
-  (accumulate-fps! dt))
-
-(define (update stage accumulator)
-  "Call the update callback. The update callback will be called as
-many times as `tick-interval` can divide ACCUMULATOR. The return value
-is the unused accumulator time."
-  (if (>= accumulator tick-interval)
-      (begin
-        (handle-events stage)
-        (update-agenda)
-        (update-stage stage)
-        (update stage (- accumulator tick-interval)))
-      accumulator))
 
 ;;;
 ;;; REPL
