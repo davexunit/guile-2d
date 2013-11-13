@@ -106,7 +106,7 @@ value."
   (set-gl-matrix-mode (matrix-mode modelview))
   (gl-load-identity)
   (gl-clear (clear-buffer-mask color-buffer depth-buffer))
-  (draw-stage stage)
+  (draw-stage stage alpha)
   (SDL:gl-swap-buffers)
   (accumulate-fps! dt))
 

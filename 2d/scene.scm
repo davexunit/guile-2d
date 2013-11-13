@@ -81,9 +81,10 @@ SCENE."
   "Call the exit callback for SCENE with STATE."
   ((scene-exit scene) state))
 
-(define (draw-scene scene state)
-  "Call the draw callback for SCENE with STATE."
-  ((scene-draw scene) state))
+(define (draw-scene scene state alpha)
+  "Call the draw callback for SCENE with STATE and interpolation
+scalar ALPHA."
+  ((scene-draw scene) state alpha))
 
 (define (update-scene scene state)
   "Call the update callback for SCENE with STATE."

@@ -79,11 +79,15 @@
     (update-scene (stage-scene stage)
                   (stage-state stage))))
 
-(define (draw-stage stage)
-  "Call the scene draw callback for STAGE."
+(define (draw-stage stage alpha)
+  "Call the scene draw callback for STAGE using the ALPHA value for
+interpolation. ALPHA is a number in the range [0, 1] that represents
+the distance in between the last rendered frame and the next rendered
+frame."
   (with-agenda (stage-agenda stage)
     (draw-scene (stage-scene stage)
-                (stage-state stage))))
+                (stage-state stage)
+                alpha)))
 
 (define (stage-trigger stage event . args)
   (with-agenda (stage-agenda stage)
