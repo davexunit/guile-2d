@@ -2,7 +2,6 @@
 .#*
 *.go
 autom4te.cache/
-build-aux/
 Makefile
 Makefile.in
 /configure
