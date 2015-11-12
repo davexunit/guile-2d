@@ -1,7 +1,7 @@
 * guile-2d
 
-  *ATTENTION: Guile-2d has a new home at [[https://gitorious.org/sly/sly][Gitorious]] under a new name:
-  Sly*
+  *ATTENTION: Guile-2d has a new home at [[http://dthompson.us/pages/software/sly.html][my own web server]] under a new
+  name: Sly*
 
   Guile-2d is a 2D game programming library for GNU Guile. It is a
   layer above SDL and OpenGL that provides abstractions for common 2D
